@@ -13,6 +13,7 @@
 </div></header>
 <div class="container mx-auto max-w-7xl px-4 pt-4"><div class="flex border-b border-slate-200">
 <button onclick="switchTab('dash')" id="t1" class="tb tab-a flex items-center gap-2"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>대시보드</button>
+<button onclick="switchTab('gap')" id="t5" class="tb tab-i flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4"></i>전세/갭 분석</button>
 <button onclick="switchTab('peak')" id="t4" class="tb tab-i flex items-center gap-2"><i data-lucide="arrow-up-circle" class="w-4 h-4"></i>전고점 비교</button>
 <button onclick="switchTab('vol')" id="t3" class="tb tab-i flex items-center gap-2"><i data-lucide="bar-chart-big" class="w-4 h-4"></i>거래량 분석</button>
 <button onclick="switchTab('raw')" id="t2" class="tb tab-i flex items-center gap-2"><i data-lucide="table" class="w-4 h-4"></i>실거래 원본 데이터</button>
@@ -40,9 +41,16 @@
 </div>
 <div id="p4" class="container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
 <div class="glass rounded-2xl p-6">
-<h2 class="text-lg font-bold flex items-center gap-2 mb-5 pb-4 border-b border-slate-100"><i data-lucide="arrow-up-circle" class="w-5 h-5 text-indigo-500"></i>전고점 대비 회복률 분석</h2>
-<div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-slate-600 text-xs"><tr><th class="px-3 py-3 text-left">동</th><th class="px-3 py-3 text-left">아파트명</th><th class="px-3 py-3 text-right">최근 거래가</th><th class="px-3 py-3 text-right text-indigo-600">전고점</th><th class="px-3 py-3 text-right">하락액</th><th class="px-3 py-3 text-right">회복률</th></tr></thead>
+<h2 class="text-lg font-bold flex items-center gap-2 mb-5 pb-4 border-b border-slate-100"><i data-lucide="arrow-up-circle" class="w-5 h-5 text-indigo-500"></i>전고점 대비 회복률 분석 (10년 기준)</h2>
+<div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-slate-600 text-xs"><tr><th class="px-3 py-3 text-left">동</th><th class="px-3 py-3 text-left">아파트명</th><th class="px-3 py-3 text-right">최근 거래가</th><th class="px-3 py-3 text-right text-indigo-600">전고점</th><th class="px-3 py-3 text-right text-red-500">최대 하락률</th><th class="px-3 py-3 text-right">현재 하락액</th><th class="px-3 py-3 text-right">회복률</th></tr></thead>
 <tbody id="peakB" class="divide-y divide-slate-100"></tbody></table></div>
+</div>
+</div>
+<div id="p5" class="container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
+<div class="glass rounded-2xl p-6">
+<h2 class="text-lg font-bold flex items-center gap-2 mb-5 pb-4 border-b border-slate-100"><i data-lucide="pie-chart" class="w-5 h-5 text-indigo-500"></i>전세가율 및 갭투자금 분석</h2>
+<div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-slate-600 text-xs"><tr><th class="px-3 py-3 text-left">동</th><th class="px-3 py-3 text-left">아파트명</th><th class="px-3 py-3 text-right">최근 매매가</th><th class="px-3 py-3 text-right">최근 전세가</th><th class="px-3 py-3 text-right text-indigo-600">투자금 (갭)</th><th class="px-3 py-3 text-right">전세가율</th></tr></thead>
+<tbody id="gapB" class="divide-y divide-slate-100"></tbody></table></div>
 </div>
 </div>
 <div id="p2" class="container mx-auto px-4 py-6 max-w-7xl hidden">
@@ -67,12 +75,24 @@
 <div class="p-5 border-b flex justify-between items-center bg-slate-50"><h3 id="mT" class="text-lg font-bold"></h3><button onclick="cM()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button></div>
 <div class="p-5 overflow-y-auto space-y-4">
 <div id="mSummary" class="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg"></div>
+<div class="bg-indigo-50 p-4 rounded-xl text-sm">
+    <h4 class="font-bold mb-2 flex items-center gap-1"><i data-lucide="calculator" class="w-4 h-4 text-indigo-500"></i>매수 자금 시뮬레이션</h4>
+    <div class="flex items-center gap-2 mb-2">
+        <label class="text-xs text-slate-600 w-16">보유 현금:</label>
+        <input type="number" id="calcCash" value="30000" class="border rounded px-2 py-1 w-24 text-right bg-white focus:outline-indigo-300" oninput="calcLoan()" /> <span class="text-xs">만원</span>
+    </div>
+    <div id="calcResult" class="text-xs text-slate-700 space-y-1"></div>
+</div>
 <table class="w-full text-sm"><thead class="bg-slate-50 text-slate-500"><tr><th class="px-2 py-2 text-left">거래일</th><th class="px-2 py-2 text-right">금액</th><th class="px-2 py-2 text-right">면적</th><th class="px-2 py-2 text-right">층</th></tr></thead><tbody id="mB" class="divide-y"></tbody></table>
 <div id="mI" class="bg-indigo-50 p-4 rounded-xl text-sm"></div>
 </div></div></div>
 <script>
 if(typeof lucide!=='undefined')lucide.createIcons();
-var D=[{n:'망포동',i:'🟠',a:[{id:'mangpo_hillstate',nm:'힐스테이트영통',c:'#dc2626',d:[]},{id:'mangpo_ipark',nm:'아이파크캐슬1단지',c:'#ea580c',d:[6,3]},{id:'mangpo_skview',nm:'영통SK뷰',c:'#f59e0b',d:[2,3]},{id:'mangpo_sujain',nm:'한양수자인',c:'#f97316',d:[8,4,2,4]}]},{n:'영통동',i:'🔵',a:[{id:'yeongtong_edupark',nm:'영통에듀파크',c:'#2563eb',d:[]},{id:'yeongtong_dongbo',nm:'신나무실동보',c:'#7c3aed',d:[6,3]},{id:'yeongtong_shinmyung',nm:'신나무실신명',c:'#6366f1',d:[2,3]}]},{n:'매교동',i:'🟢',a:[{id:'maegyo_skview',nm:'매교역푸르지오SK뷰',c:'#059669',d:[]},{id:'maegyo_hillstate',nm:'힐스테이트푸르지오',c:'#0d9488',d:[6,3]}]}];
+var D=[
+{n:'망포동',i:'🟠',a:[{id:'mangpo_hillstate',nm:'힐스테이트영통',c:'#dc2626',d:[], p:'1.25대', y:'2017년', f:'224%', t:['망포역 도보권','망포초']},{id:'mangpo_ipark',nm:'아이파크캐슬1단지',c:'#ea580c',d:[6,3], p:'1.21대', y:'2019년', f:'199%', t:['글빛초','대단지']},{id:'mangpo_skview',nm:'영통SK뷰',c:'#f59e0b',d:[2,3], p:'1.21대', y:'2016년', f:'199%', t:['망포초','조용한단지']},{id:'mangpo_sujain',nm:'한양수자인',c:'#f97316',d:[8,4,2,4], p:'1.14대', y:'2013년', f:'198%', t:['망포초','방죽공원']}]},
+{n:'영통동',i:'🔵',a:[{id:'yeongtong_edupark',nm:'영통에듀파크',c:'#2563eb',d:[], p:'1.02대', y:'1998년', f:'219%', t:['영통역 역세권','영동초','영통학원가']},{id:'yeongtong_dongbo',nm:'신나무실동보',c:'#7c3aed',d:[6,3], p:'1.04대', y:'1998년', f:'218%', t:['영통학원가','영동초']},{id:'yeongtong_shinmyung',nm:'신나무실신명',c:'#6366f1',d:[2,3], p:'1.02대', y:'1997년', f:'219%', t:['영통학원가','영동초']}]},
+{n:'매교동',i:'🟢',a:[{id:'maegyo_skview',nm:'매교역푸르지오SK뷰',c:'#059669',d:[], p:'1.25대', y:'2022년', f:'259%', t:['매교역 초역세권','매교초 초품아']},{id:'maegyo_hillstate',nm:'힐스테이트푸르지오',c:'#0d9488',d:[6,3], p:'1.25대', y:'2022년', f:'223%', t:['매교역 역세권','대단지']}]}
+];
 var A=[];D.forEach(function(x){x.a.forEach(function(y){y.dn=x.n;A.push(y)})});
 var ch=null,vh=null,gD=null,gM=null,rF=[],rK='d',rA=false,rPg=0,PS=50,cPd=12,PK={};
 // ======== AUTO_UPDATE_ZONE_START ========
@@ -84,10 +104,10 @@ const INJECTED_RAW = [{"d": "2026.05.27", "type": "매매", "dong": "망포동",
 const INJECTED_NEWS = [{"tag": "금리", "title": "한국은행 기준금리 동결 (3.50%)", "desc": "금통위 만장일치 동결. 하반기 인하 기대감 지속.", "date": "2026.05", "tc": "bg-amber-100 text-amber-700"}, {"tag": "정책", "title": "수원시, 노후계획도시 정비 기본계획 수립", "desc": "영통지구 등 노후 단지 재건축 활성화 기대.", "date": "2026.05", "tc": "bg-indigo-100 text-indigo-700"}, {"tag": "교통", "title": "인동선/월판선 공사 순항 중", "desc": "망포역, 영통역 주변 교통 접근성 대폭 개선 전망.", "date": "2026.05", "tc": "bg-emerald-100 text-emerald-700"}];
 // ======== AUTO_UPDATE_ZONE_END ========
 function switchTab(t){
-    const tabs=['dash','raw','vol','peak'];
+    const tabs=['dash','raw','vol','peak','gap'];
     tabs.forEach(x=>{
         const isTarget = x===t;
-        const idSuffix = (x==='dash'?1:x==='raw'?2:x==='vol'?3:4);
+        const idSuffix = (x==='dash'?1:x==='raw'?2:x==='vol'?3:x==='peak'?4:5);
         const panel = document.getElementById('p'+idSuffix);
         const btn = document.getElementById('t'+idSuffix);
         if(panel) panel.classList.toggle('hidden', !isTarget);
@@ -98,6 +118,7 @@ function switchTab(t){
     }
     if(t==='vol') drawVolChart();
     if(t==='peak') renderPeakAnalysis();
+    if(t==='gap') renderGapAnalysis();
 }
 function bAF(){var s=new Set();(INJECTED_RAW||[]).forEach(function(r){s.add(r.apt)});var el=document.getElementById('aF');var v=el.value;el.innerHTML='<option value="">전체 아파트</option>';Array.from(s).sort().forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;el.appendChild(o)});el.value=v}
 function fR(){
@@ -173,12 +194,6 @@ function renderAll(data,months){
     gD=data;gM=months;
     if(INJECTED_TIMESTAMP)document.getElementById('updateTime').innerText='업데이트: '+INJECTED_TIMESTAMP;
     
-    // Initialize Peek Prices
-    (INJECTED_RAW||[]).filter(r=>r.type==='매매').forEach(r=>{
-        var key = r.apt;
-        if(!PK[key]||r.price>PK[key])PK[key]=r.price;
-    });
-
     var pb='';
     [{l:'12개월',v:12},{l:'6개월',v:6},{l:'3개월',v:3},{l:'1개월',v:1}].forEach(function(p){
         pb+='<button class="pb'+(p.v===12?' active':'')+'" data-m="'+p.v+'" onclick="setPd('+p.v+')">'+p.l+'</button>';
@@ -195,13 +210,19 @@ function renderAll(data,months){
             var tc=diff>0?'text-red-500':diff<0?'text-blue-500':'text-slate-400';
             var ar=diff>0?'↑':diff<0?'↓':'→';
             
-            // Peak/Gap Logic
-            var peak = PK[a.nm] || cur;
-            var drop = peak > cur ? Math.round((cur - peak) / peak * 100) : 0;
+            // Peak/Gap Logic from 10y data
+            var aData = typeof INJECTED_ANALYSIS_DATA !== 'undefined' ? INJECTED_ANALYSIS_DATA[a.id] : null;
+            var peak = aData ? aData.peak : cur;
+            var drop = aData && peak > cur ? Math.round((cur - peak) / peak * 100) : 0;
             
             h+='<div onclick="oM(\''+a.id+'\')" class="cursor-pointer glass rounded-xl p-3 border-l-4 hover:-translate-y-1 transition-all hover:shadow-md relative overflow-hidden" style="border-left-color:'+a.c+'">';
             if(drop <= -5) h+='<span class="absolute top-0 right-0 bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded-bl-lg font-bold">고점대비 '+drop+'%</span>';
-            h+='<h4 class="text-xs font-bold text-slate-500 truncate">'+a.nm+'</h4><div class="text-xl font-extrabold mt-1">'+(cur/10000).toFixed(1)+'<span class="text-sm text-slate-400 ml-1">억</span></div><div class="text-xs font-bold '+tc+' mt-1">'+ar+' '+(Math.abs(diff/10000)).toFixed(1)+'억 ('+pct+'%)</div></div>';
+            h+='<h4 class="text-xs font-bold text-slate-500 truncate">'+a.nm+'</h4>';
+            h+='<div class="flex flex-wrap gap-1 mt-1">';
+            if(a.t) a.t.forEach(function(tag){ h+='<span class="text-[9px] bg-slate-100 text-slate-500 px-1 py-0.5 rounded">'+tag+'</span>'; });
+            h+='</div>';
+            h+='<div class="text-[10px] text-slate-400 mt-1 flex gap-1"><span>연식 '+a.y+'</span><span>| 주차 '+a.p+'</span></div>';
+            h+='<div class="text-xl font-extrabold mt-1">'+(cur/10000).toFixed(1)+'<span class="text-sm text-slate-400 ml-1">억</span></div><div class="text-xs font-bold '+tc+' mt-1">'+ar+' '+(Math.abs(diff/10000)).toFixed(1)+'억 ('+pct+'%)</div></div>';
         });
         h+='</div></div>';
     });
@@ -283,26 +304,60 @@ function oM(id){
     }
     document.getElementById('mB').innerHTML=tb;
     
-    var prices=gD[id]; var cur=prices[prices.length-1]; var peak=PK[apt.nm]||cur; var drop=peak>cur?Math.round((cur-peak)/peak*100):0;
-    document.getElementById('mSummary').innerHTML='최근 거래 <b>'+raw.length+'건</b> | 중위가 <b>'+(cur/10000).toFixed(1)+'억</b> | 전고점 <b>'+(peak/10000).toFixed(1)+'억</b>';
+    var prices=gD[id]; var cur=prices[prices.length-1]; 
+    var aData = typeof INJECTED_ANALYSIS_DATA !== 'undefined' ? INJECTED_ANALYSIS_DATA[id] : null;
+    var peak = aData ? aData.peak : cur;
+    var drop = aData && peak > cur ? Math.round((cur - peak) / peak * 100) : 0;
+    var tagsHtml = apt.t ? apt.t.map(t=>'<span class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[10px] font-bold">'+t+'</span>').join('') : '';
+    document.getElementById('mSummary').innerHTML='<div class="mb-2 pb-2 border-b border-slate-200">연식: <b>'+apt.y+'</b> | 세대당 주차: <b>'+apt.p+'</b> | 용적률: <b>'+apt.f+'</b></div><div class="flex flex-wrap gap-1 mb-2">'+tagsHtml+'</div>최근 거래 <b>'+raw.length+'건</b> | 중위가 <b>'+(cur/10000).toFixed(1)+'억</b> | 10년 전고점 <b>'+(peak/10000).toFixed(1)+'억</b>';
     var mom=cur-prices[Math.max(0,prices.length-4)];
     var h_mom=mom>0?'<p><strong class="text-indigo-900">🔥 3개월 상승</strong><br>+'+(mom/10000).toFixed(1)+'억 상승</p>':mom<0?'<p><strong class="text-indigo-900">📉 3개월 조정</strong><br>'+(mom/10000).toFixed(1)+'억 하락</p>':'<p><strong class="text-indigo-900">⚖️ 보합</strong><br>박스권 흐름</p>';
     if(drop<=-5) h_mom+='<div class="mt-3 pt-3 border-t border-indigo-100 text-xs text-indigo-700">⚠️ 전고점 대비 <b>'+drop+'% 하락</b> 중입니다.</div>';
     document.getElementById('mI').innerHTML=h_mom;
     
+    // Calculator init
+    window.currentAptPrice = cur;
+    calcLoan();
+
     document.getElementById('modal').classList.remove('hidden');
     if(typeof lucide!=='undefined')lucide.createIcons();
 }
 
+function calcLoan() {
+    if (!window.currentAptPrice) return;
+    var cash = parseInt(document.getElementById('calcCash').value) || 0;
+    var price = window.currentAptPrice; // in 10,000 KRW
+    var loanNeeded = price - cash;
+    if (loanNeeded < 0) loanNeeded = 0;
+    
+    // Simplified acquisition tax (1.1% ~ 3.3%)
+    var taxRate = 0.011;
+    if (price > 60000 && price <= 90000) taxRate = 0.022;
+    else if (price > 90000) taxRate = 0.033;
+    var tax = price * taxRate;
+    
+    // Monthly interest (Assume 4.0% annual)
+    var monthlyInterest = (loanNeeded * 10000 * 0.04) / 12; // in KRW
+    
+    var h = '<div class="mt-3 pt-3 border-t border-indigo-100 flex justify-between"><span>필요 대출금:</span> <b class="'+(loanNeeded>0?'text-red-600':'text-indigo-600')+'">'+(loanNeeded/10000).toFixed(1)+'억</b></div>';
+    h += '<div class="flex justify-between mt-1"><span>예상 취득세:</span> <b>대략 '+Math.round(tax).toLocaleString()+'만원</b></div>';
+    if(loanNeeded > 0) {
+        h += '<div class="flex justify-between mt-1"><span>예상 월 이자 (4% 가정):</span> <b class="text-indigo-600">'+Math.round(monthlyInterest/10000).toLocaleString()+'만원</b></div>';
+    }
+    document.getElementById('calcResult').innerHTML = h;
+}
+
 function renderPeakAnalysis(){
     var h='';
+    if(typeof INJECTED_ANALYSIS_DATA === 'undefined') return;
     A.forEach(a=>{
-        var prices = gD[a.id] || [];
-        if(prices.length===0) return;
-        var cur = prices[prices.length-1];
-        var peak = PK[a.nm] || cur;
+        var data = INJECTED_ANALYSIS_DATA[a.id];
+        if(!data) return;
+        var cur = data.curr;
+        var peak = data.peak;
         var diff = cur - peak;
-        var ratio = peak>0 ? Math.round((cur/peak)*100) : 100;
+        var max_drop_pct = data.drop;
+        var ratio = data.ratio;
         var dc = a.dn==='망포동'?'text-orange-600':a.dn==='영통동'?'text-blue-600':'text-emerald-600';
         var rc = ratio>=95?'text-red-600':ratio>=85?'text-amber-600':'text-slate-500';
         
@@ -311,11 +366,48 @@ function renderPeakAnalysis(){
         h+='<td class="px-3 py-4 font-bold">'+a.nm+'</td>';
         h+='<td class="px-3 py-4 text-right font-bold">'+(cur/10000).toFixed(1)+'억</td>';
         h+='<td class="px-3 py-4 text-right text-indigo-600 font-bold">'+(peak/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-right text-red-500 font-bold">-'+max_drop_pct+'%</td>';
         h+='<td class="px-3 py-4 text-right '+(diff<0?'text-blue-500':'text-slate-400')+'">'+(diff/10000).toFixed(1)+'억</td>';
         h+='<td class="px-3 py-4 text-right font-extrabold '+rc+'">'+ratio+'%</td>';
         h+='</tr>';
     });
     document.getElementById('peakB').innerHTML=h;
+}
+
+function renderGapAnalysis(){
+    var h='';
+    if(typeof INJECTED_ANALYSIS_DATA === 'undefined') return;
+    
+    // 전세가율 내림차순 정렬
+    var sortedA = [...A].sort((a,b) => {
+        var aData = INJECTED_ANALYSIS_DATA[a.id];
+        var bData = INJECTED_ANALYSIS_DATA[b.id];
+        return (bData ? bData.jeonse_ratio : 0) - (aData ? aData.jeonse_ratio : 0);
+    });
+
+    sortedA.forEach(a=>{
+        var data = INJECTED_ANALYSIS_DATA[a.id];
+        if(!data) return;
+        var cur = data.curr;
+        var jeonse = data.jeonse;
+        var gap = data.gap;
+        var ratio = data.jeonse_ratio;
+        var dc = a.dn==='망포동'?'text-orange-600':a.dn==='영통동'?'text-blue-600':'text-emerald-600';
+        
+        // Highlight logic (갭 2.5억 이하이거나 전세가율 65% 이상 하이라이트)
+        var gapClass = gap <= 25000 ? 'text-red-600 font-extrabold bg-red-50' : 'text-indigo-600 font-bold';
+        var ratioClass = ratio >= 65 ? 'text-red-600 font-extrabold' : 'font-bold';
+        
+        h+='<tr class="hover:bg-slate-50 border-b border-slate-50">';
+        h+='<td class="px-3 py-4 font-medium '+dc+'">'+a.dn+'</td>';
+        h+='<td class="px-3 py-4 font-bold">'+a.nm+'</td>';
+        h+='<td class="px-3 py-4 text-right">'+(cur/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-right">'+(jeonse/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-right '+gapClass+'">'+(gap/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-right '+ratioClass+'">'+ratio+'%</td>';
+        h+='</tr>';
+    });
+    document.getElementById('gapB').innerHTML=h;
 }
 
 function cM(){document.getElementById('modal').classList.add('hidden')}

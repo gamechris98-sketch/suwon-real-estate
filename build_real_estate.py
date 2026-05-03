@@ -1,17 +1,24 @@
 import urllib.request
 import xml.etree.ElementTree as ET
 import datetime, ssl, os, json
+import concurrent.futures
+from collections import defaultdict
 
 # API 설정
 key = os.environ.get("MOLIT_API_KEY", "4b7ee22fae222a8c2abb5e3f41bb9d54bef87843d68922dcbbe9b55824817d12")
 lawd_cds = ['41117', '41115'] # 영통구, 팔달구
 
-# 기간 설정 (최근 12개월)
+# 기간 설정 (최근 12개월 및 10년)
 now = datetime.datetime.now()
 months = []
 for i in range(11, -1, -1):
     d = now.replace(day=1) - datetime.timedelta(days=30*i)
     months.append(d.strftime("%Y%m"))
+
+months_10y = []
+for i in range(119, -1, -1):
+    d = now.replace(day=1) - datetime.timedelta(days=30*i)
+    months_10y.append(d.strftime("%Y%m"))
 
 # 대상 아파트 필터 (동, 아파트명 키워드)
 APT_FILTERS = {
@@ -45,36 +52,46 @@ def fetch_api(svc, lawd, mon):
         print(f"  Error {svc} {lawd}/{mon}: {e}")
         return None
 
-print(f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] 데이터 수집 시작...")
+print(f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] 10년 매매 데이터 수집 시작...")
+all_trades_10y = []
 
+# 멀티스레딩으로 10년치 매매 데이터 수집
+def fetch_trade_worker(arg):
+    mon, cd = arg
+    root = fetch_api("getRTMSDataSvcAptTrade", cd, mon)
+    res = []
+    if root is not None:
+        for item in root.iter('item'):
+            umd = item.findtext('umdNm') or ''
+            apt = item.findtext('aptNm') or ''
+            area = float(item.findtext('excluUseAr') or '0')
+            price = int((item.findtext('dealAmount') or '0').replace(',', '').strip())
+            day = item.findtext('dealDay') or '1'
+            floor = item.findtext('floor') or ''
+            built = item.findtext('buildYear') or ''
+            if 80 <= area <= 86 and umd in ('망포동', '영통동', '매교동'):
+                res.append({'d': f"{mon[:4]}.{mon[4:6]}.{day.zfill(2)}", 'm': mon, 'umd': umd, 'apt': apt, 'p': price, 'area': area, 'floor': floor, 'built': built})
+    return res
+
+trade_args = [(m, cd) for m in months_10y for cd in lawd_cds]
+with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+    results = executor.map(fetch_trade_worker, trade_args)
+    for res in results:
+        all_trades_10y.extend(res)
+
+# 최근 12개월 데이터 분류 (전세 포함)
+for t in all_trades_10y:
+    if t['m'] in months:
+        all_trades.append(t)
+        py_price = round(t['p'] / (t['area'] / 3.305), 1) if t['area'] > 0 else 0
+        raw_items.append({
+            'd': t['d'], 'dong': t['umd'], 'apt': t['apt'], 'area': round(t['area'], 1),
+            'floor': t['floor'], 'price': t['p'], 'type': '매매', 'py': py_price, 'built': t['built']
+        })
+
+print(f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] 최근 12개월 전세 데이터 수집 시작...")
 for month in months:
     for cd in lawd_cds:
-        # 1. 매매 데이터 수집
-        root = fetch_api("getRTMSDataSvcAptTrade", cd, month)
-        if root is not None:
-            for item in root.iter('item'):
-                umd = item.findtext('umdNm') or ''
-                apt = item.findtext('aptNm') or ''
-                area = float(item.findtext('excluUseAr') or '0')
-                price = int((item.findtext('dealAmount') or '0').replace(',', '').strip())
-                day = item.findtext('dealDay') or '1'
-                floor = item.findtext('floor') or ''
-                built = item.findtext('buildYear') or ''
-                
-                # 차트용 (84형 전용)
-                if 80 <= area <= 86:
-                    all_trades.append({'d': f"{month[:4]}.{month[4:6]}.{day.zfill(2)}", 'm': month, 'umd': umd, 'apt': apt, 'p': price, 'area': area, 'floor': floor, 'built': built})
-                
-                # 원본 데이터용 (망포/영통/매교 전체)
-                if umd in ('망포동', '영통동', '매교동'):
-                    py_price = round(price / (area / 3.305), 1) if area > 0 else 0
-                    raw_items.append({
-                        'd': f"{month[:4]}.{month[4:6]}.{day.zfill(2)}",
-                        'dong': umd, 'apt': apt, 'area': round(area, 1),
-                        'floor': floor, 'price': price, 'type': '매매', 'py': py_price, 'built': built
-                    })
-
-        # 2. 전세 데이터 수집
         root = fetch_api("getRTMSDataSvcAptRent", cd, month)
         if root is not None:
             for item in root.iter('item'):
@@ -107,16 +124,26 @@ chart_data = {}
 # -------------------------------------------------------------------------
 
 # 데이터가 없는 경우 가상 데이터 생성 (데모용)
-if not all_trades:
+if not all_trades_10y:
     print("API data missing, creating mock data...")
     import random
-    for m in months:
+    for m in months_10y:
         for aid, (dong, kw) in APT_FILTERS.items():
-            p = 70000 + random.randint(-5000, 10000)
-            r_p = int(p * (0.6 + random.random()*0.2))
+            # 고점을 2021년~2022년에 형성하도록 로직 추가
+            year = int(m[:4])
+            base_p = 50000
+            if year <= 2019: base_p = 50000 + (year-2015)*3000
+            elif year <= 2021: base_p = 70000 + (year-2019)*15000
+            else: base_p = 100000 - (year-2021)*5000
+            
+            p = base_p + random.randint(-5000, 10000)
             built_yr = random.choice(['2013', '2015', '2017', '2021'])
-            all_trades.append({'d': f"{m[:4]}.{m[4:]}.{random.randint(1,28):02d}", 'm': m, 'umd': dong, 'apt': kw, 'area': 84.9, 'floor': str(random.randint(1,25)), 'p': p, 'built': built_yr})
-            all_rents.append({'d': f"{m[:4]}.{m[4:]}.{random.randint(1,28):02d}", 'm': m, 'umd': dong, 'apt': kw, 'area': 84.9, 'floor': str(random.randint(1,25)), 'p': r_p, 'built': built_yr})
+            all_trades_10y.append({'d': f"{m[:4]}.{m[4:]}.{random.randint(1,28):02d}", 'm': m, 'umd': dong, 'apt': kw, 'area': 84.9, 'floor': str(random.randint(1,25)), 'p': p, 'built': built_yr})
+            
+            if m in months:
+                r_p = int(p * (0.6 + random.random()*0.2))
+                all_rents.append({'d': f"{m[:4]}.{m[4:]}.{random.randint(1,28):02d}", 'm': m, 'umd': dong, 'apt': kw, 'area': 84.9, 'floor': str(random.randint(1,25)), 'p': r_p, 'built': built_yr})
+                all_trades.append({'d': f"{m[:4]}.{m[4:]}.{random.randint(1,28):02d}", 'm': m, 'umd': dong, 'apt': kw, 'area': 84.9, 'floor': str(random.randint(1,25)), 'p': p, 'built': built_yr})
 
 # Raw 데이터 목록 생성
 for t in all_trades:
@@ -142,8 +169,22 @@ raw_items.sort(key=lambda x: x['d'], reverse=True)
 for aid, (dong, kw) in APT_FILTERS.items():
     trade_history = []
     rent_history = []
-    max_p = 0
     
+    # 10년치 매매 가격에서 전고점, 고점 이후 최저가 구하기
+    t10y = sorted([x for x in all_trades_10y if x['umd'] == dong and kw in x['apt']], key=lambda x: x['d'])
+    max_p = 0
+    max_p_date = ""
+    min_after_max = 999999999
+    
+    for t in t10y:
+        if t['p'] > max_p:
+            max_p = t['p']
+            max_p_date = t['d']
+            min_after_max = t['p'] # 고점이 갱신되면 최저가도 리셋
+        elif t['p'] < min_after_max:
+            min_after_max = t['p']
+            
+    # 최근 12개월 차트용
     for m in months:
         t_matches = [x['p'] for x in all_trades if x['m'] == m and x['umd'] == dong and kw in x['apt']]
         r_matches = [x['p'] for x in all_rents if x['m'] == m and x['umd'] == dong and kw in x['apt']]
@@ -153,15 +194,16 @@ for aid, (dong, kw) in APT_FILTERS.items():
         
         trade_history.append(tp)
         rent_history.append(rp)
-        if tp > max_p: max_p = tp
 
-    curr_p = trade_history[-1]
-    curr_r = rent_history[-1]
+    curr_p = trade_history[-1] if trade_history else 0
+    curr_r = rent_history[-1] if rent_history else 0
     chart_data[aid] = trade_history
     analysis_data[aid] = {
         'peak': max_p, 'curr': curr_p, 'gap': curr_p - curr_r,
-        'ratio': round(curr_r/curr_p*100,1) if curr_p else 0,
-        'drop': round((max_p-curr_p)/max_p*100,1) if max_p else 0
+        'jeonse': curr_r, 'jeonse_ratio': round((curr_r/curr_p)*100, 1) if curr_p else 0,
+        'min_after_peak': min_after_max if min_after_max < 999999999 else 0,
+        'ratio': round(curr_p/max_p*100,1) if max_p else 0,
+        'drop': round((max_p-min_after_max)/max_p*100,1) if max_p and min_after_max < max_p else 0
     }
 
 # 가상 뉴스
@@ -191,6 +233,7 @@ with open(html_path, 'r', encoding='utf-8') as f:
 import json
 injection = f"""
 const INJECTED_DATA = {json.dumps(chart_data)};
+const INJECTED_ANALYSIS_DATA = {json.dumps(analysis_data, ensure_ascii=False)};
 const INJECTED_ANALYSIS = {json.dumps(mkt_summary, ensure_ascii=False)};
 const INJECTED_MONTHS = {json.dumps(months)};
 const INJECTED_TIMESTAMP = '{now.strftime('%Y-%m-%d %H:%M')}';
