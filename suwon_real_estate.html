@@ -98,11 +98,16 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
             <div class="relative h-[300px]"><canvas id="recoveryChart"></canvas></div>
         </div>
         <div class="glass rounded-2xl p-6">
-            <h3 class="text-sm font-black mb-4 flex items-center gap-2 text-slate-700">
-                <div class="p-1.5 bg-rose-50 rounded-lg text-rose-600"><i data-lucide="trending-up" class="w-4 h-4"></i></div>
-                시장 전체 회복 추이 (%)
-            </h3>
-            <div class="relative h-[300px]"><canvas id="recoveryTrendChart"></canvas></div>
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-black flex items-center gap-2 text-slate-700">
+                    <div class="p-1.5 bg-rose-50 rounded-lg text-rose-600"><i data-lucide="trending-up" class="w-4 h-4"></i></div>
+                    시장 전체 회복 추이 (%)
+                </h3>
+                <span class="text-[10px] text-slate-400 font-bold bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
+                    100% = 아파트별 10년 역대 최고가 기준
+                </span>
+            </div>
+            <div class="relative h-[450px]"><canvas id="recoveryTrendChart"></canvas></div>
         </div>
     </div>
 
@@ -897,8 +902,7 @@ function renderPeakAnalysis(){
                 },
                 scales: {
                     y: { 
-                        min: 50,
-                        max: 120,
+                        beginAtZero: false,
                         grid: { color: '#f1f5f9' }, 
                         ticks: { font: { size: 10 }, callback: function(v){ return v + '%' } } 
                     },
