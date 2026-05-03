@@ -34,34 +34,56 @@ APT_FILTERS = {
 }
 
 all_trades = [] # 매매 데이터
-all_rents = []  # 전세 데이터
 raw_items = []  # 원본 데이터 탭용
 
 ctx = ssl.create_default_context()
 ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
 
-def fetch_api(svc, lawd, mon):
-    url = (f"https://apis.data.go.kr/1613000/{svc}/{svc}?"
-           f"serviceKey={key}&pageNo=1&numOfRows=1000&LAWD_CD={lawd}&DEAL_YMD={mon}")
-    try:
-        req = urllib.request.Request(url)
-        with urllib.request.urlopen(req, context=ctx) as resp:
-            return ET.fromstring(resp.read())
-    except Exception as e:
-        print(f"  Error {svc} {lawd}/{mon}: {e}")
-        return None
+import time
 
-print(f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] 10년 매매 데이터 수집 시작...")
+import urllib.parse
+
+def fetch_api(svc, lawd, mon):
+    # 가이드북 지침에 따라 서비스키를 URL 인코딩하여 전송 (403 에러 방지)
+    encoded_key = urllib.parse.quote(urllib.parse.unquote(key)) 
+    service_name = svc.replace("get", "")
+    url = (f"https://apis.data.go.kr/1613000/{service_name}/{svc}?"
+           f"serviceKey={encoded_key}&LAWD_CD={lawd}&DEAL_YMD={mon}&pageNo=1&numOfRows=1000")
+    
+    for attempt in range(2): # 재시도 횟수 축소 (속도 향상)
+        try:
+            time.sleep(0.1) # 지연 시간 최적화
+            req = urllib.request.Request(url)
+            # 타임아웃 10초 추가
+            with urllib.request.urlopen(req, context=ctx, timeout=10) as resp:
+                data = resp.read()
+                root = ET.fromstring(data)
+                res_code = root.findtext('.//resultCode')
+                if res_code not in ['00', '000']:
+                    return None
+                return root
+        except Exception:
+            if attempt < 1:
+                time.sleep(1)
+                continue
+            return None
+    return None
+
+print(f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] 10년 매매 데이터 수집 시작 (약 2~3분 소요)...")
 all_trades_10y = []
 
 # 멀티스레딩으로 10년치 매매 데이터 수집
 def fetch_trade_worker(arg):
     mon, cd = arg
+    # 진행 상황 출력
+    print(f"  > [{mon}] 데이터 요청 중...", end='\r')
     root = fetch_api("getRTMSDataSvcAptTrade", cd, mon)
     res = []
     if root is not None:
-        for item in root.iter('item'):
+        items = list(root.iter('item'))
+        for item in items:
+
             umd = item.findtext('umdNm') or ''
             apt = item.findtext('aptNm') or ''
             area = float(item.findtext('excluUseAr') or '0')
@@ -74,46 +96,26 @@ def fetch_trade_worker(arg):
     return res
 
 trade_args = [(m, cd) for m in months_10y for cd in lawd_cds]
-with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor: # 동시 접속자 수 축소
     results = executor.map(fetch_trade_worker, trade_args)
     for res in results:
         all_trades_10y.extend(res)
 
-# 최근 12개월 데이터 분류 (전세 포함)
+print(f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] 총 {len(all_trades_10y)}건의 매매 데이터 수집 완료.")
+
+# 10년 전체 데이터 원본 목록 생성
+raw_items = []
+for t in all_trades_10y:
+    py_price = round(t['p'] / (t['area'] / 3.305), 1) if t['area'] > 0 else 0
+    raw_items.append({
+        'd': t['d'], 'dong': t['umd'], 'apt': t['apt'], 'area': round(t['area'], 1),
+        'floor': t['floor'], 'price': t['p'], 'type': '매매', 'py': py_price, 'built': t['built']
+    })
+
+# 최근 12개월 데이터 분류 (차트용)
 for t in all_trades_10y:
     if t['m'] in months:
         all_trades.append(t)
-        py_price = round(t['p'] / (t['area'] / 3.305), 1) if t['area'] > 0 else 0
-        raw_items.append({
-            'd': t['d'], 'dong': t['umd'], 'apt': t['apt'], 'area': round(t['area'], 1),
-            'floor': t['floor'], 'price': t['p'], 'type': '매매', 'py': py_price, 'built': t['built']
-        })
-
-print(f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] 최근 12개월 전세 데이터 수집 시작...")
-for month in months:
-    for cd in lawd_cds:
-        root = fetch_api("getRTMSDataSvcAptRent", cd, month)
-        if root is not None:
-            for item in root.iter('item'):
-                umd = item.findtext('umdNm') or ''
-                apt = item.findtext('aptNm') or ''
-                area = float(item.findtext('excluUseAr') or '0')
-                deposit = int((item.findtext('deposit') or '0').replace(',', '').strip())
-                monthly = int(item.findtext('monthlyRent') or '0')
-                day = item.findtext('dealDay') or '1'
-                floor = item.findtext('floor') or ''
-                built = item.findtext('buildYear') or ''
-
-                if monthly == 0: # 순수 전세만
-                    if 80 <= area <= 86:
-                        all_rents.append({'d': f"{month[:4]}.{month[4:6]}.{day.zfill(2)}", 'm': month, 'umd': umd, 'apt': apt, 'p': deposit, 'area': area, 'floor': floor, 'built': built})
-                    if umd in ('망포동', '영통동', '매교동'):
-                        py_price = round(deposit / (area / 3.305), 1) if area > 0 else 0
-                        raw_items.append({
-                            'd': f"{month[:4]}.{month[4:6]}.{day.zfill(2)}",
-                            'dong': umd, 'apt': apt, 'area': round(area, 1),
-                            'floor': floor, 'price': deposit, 'type': '전세', 'py': py_price, 'built': built
-                        })
 
 # 데이터 가공 및 지표 계산
 analysis_data = {}
@@ -125,23 +127,8 @@ chart_data = {}
 
 # 데모 데이터 생성 로직 제거됨
 
-# Raw 데이터 목록 생성
-for t in all_trades:
-    py_price = int(t['p']/(t.get('area', 84.9)/3.305))
-    raw_items.append({
-        'd': t.get('d', f"{t['m'][:4]}.{t['m'][4:]}.01"), 
-        'type': '매매', 'dong': t['umd'], 'apt': t['apt'], 
-        'area': t.get('area', 84.9), 'floor': t.get('floor', '-'), 
-        'price': t['p'], 'py': py_price, 'built': t.get('built', '-')
-    })
-for r in all_rents:
-    py_price = int(r['p']/(r.get('area', 84.9)/3.305))
-    raw_items.append({
-        'd': r.get('d', f"{r['m'][:4]}.{r['m'][4:]}.01"), 
-        'type': '전세', 'dong': r['umd'], 'apt': r['apt'], 
-        'area': r.get('area', 84.9), 'floor': r.get('floor', '-'), 
-        'price': r['p'], 'py': py_price, 'built': r.get('built', '-')
-    })
+# Raw 데이터 정렬 (최신순)
+raw_items.sort(key=lambda x: x['d'], reverse=True)
 
 raw_items.sort(key=lambda x: x['d'], reverse=True)
 
@@ -167,20 +154,13 @@ for aid, (dong, kw) in APT_FILTERS.items():
     # 최근 12개월 차트용
     for m in months:
         t_matches = [x['p'] for x in all_trades if x['m'] == m and x['umd'] == dong and kw in x['apt']]
-        r_matches = [x['p'] for x in all_rents if x['m'] == m and x['umd'] == dong and kw in x['apt']]
-        
         tp = sorted(t_matches)[len(t_matches)//2] if t_matches else (trade_history[-1] if trade_history else 0)
-        rp = sorted(r_matches)[len(r_matches)//2] if r_matches else (rent_history[-1] if rent_history else 0)
-        
         trade_history.append(tp)
-        rent_history.append(rp)
 
     curr_p = trade_history[-1] if trade_history else 0
-    curr_r = rent_history[-1] if rent_history else 0
     chart_data[aid] = trade_history
     analysis_data[aid] = {
-        'peak': max_p, 'curr': curr_p, 'gap': curr_p - curr_r,
-        'jeonse': curr_r, 'jeonse_ratio': round((curr_r/curr_p)*100, 1) if curr_p else 0,
+        'peak': max_p, 'peak_date': max_p_date, 'curr': curr_p,
         'min_after_peak': min_after_max if min_after_max < 999999999 else 0,
         'ratio': round(curr_p/max_p*100,1) if max_p else 0,
         'drop': round((max_p-min_after_max)/max_p*100,1) if max_p and min_after_max < max_p else 0
@@ -205,8 +185,11 @@ mkt_summary = {
     ]
 }
 
-# HTML 주입
-html_path = r"C:\Users\재영\.gemini\antigravity\scratch\suwon_real_estate.html"
+# HTML 주입 (상대 경로로 수정하여 깃허브 호환성 확보)
+html_path = "suwon_real_estate.html"
+if not os.path.exists(html_path):
+    # 로컬 실행 시 경로 대응
+    html_path = os.path.join(os.path.dirname(__file__), "suwon_real_estate.html")
 with open(html_path, 'r', encoding='utf-8') as f:
     html = f.read()
 
@@ -217,7 +200,7 @@ const INJECTED_ANALYSIS_DATA = {json.dumps(analysis_data, ensure_ascii=False)};
 const INJECTED_ANALYSIS = {json.dumps(mkt_summary, ensure_ascii=False)};
 const INJECTED_MONTHS = {json.dumps(months)};
 const INJECTED_TIMESTAMP = '{now.strftime('%Y-%m-%d %H:%M')}';
-const INJECTED_RAW = {json.dumps(raw_items[:500], ensure_ascii=False)};
+const INJECTED_RAW = {json.dumps(raw_items, ensure_ascii=False)};
 const INJECTED_NEWS = {json.dumps(news_list, ensure_ascii=False)};
 """
 
@@ -229,5 +212,5 @@ html = re.sub(r"// ======== AUTO_UPDATE_ZONE_START ========.*?// ======== AUTO_U
 with open(html_path, 'w', encoding='utf-8') as f:
     f.write(html)
 
-print(f"Update Complete: trade {len(all_trades)}, rent {len(all_rents)}. HTML updated!")
+print(f"Update Complete: trade {len(all_trades)}. HTML updated!")
 
