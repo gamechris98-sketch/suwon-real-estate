@@ -23,17 +23,17 @@ for i in range(119, -1, -1):
     month = (now.month - 1 - i) % 12 + 1
     months_10y.append(f"{year}{month:02d}")
 
-# 대상 아파트 필터 (동, 아파트명 키워드, 세대수, 지하주차장 연결)
+# 대상 아파트 필터 (동, 아파트명 키워드, 세대수, 주차대수, 지하주차장 연결)
 APT_FILTERS = {
-    'mangpo_hillstate':    ('망포동', '힐스테이트영통', 2140, '연결 O'),
-    'mangpo_ipark':        ('망포동', '아이파크캐슬1단지', 1783, '연결 O'),
-    'mangpo_skview':       ('망포동', '영통SKVIEW', 710, '연결 O'),
-    'mangpo_sujain':       ('망포동', '한양수자인', 530, '연결 O'),
-    'yeongtong_edupark':   ('영통동', '에듀파크', 1279, '연결 X'),
-    'yeongtong_dongbo':    ('영통동', '신나무실동보', 836, '연결 X'),
-    'yeongtong_shinmyung': ('영통동', '신나무실신명', 384, '연결 X'),
-    'maegyo_skview':       ('매교동', '푸르지오SKVIEW', 3603, '연결 O'),
-    'maegyo_hillstate':    ('매교동', '힐스테이트푸르지오', 2586, '연결 O'),
+    'mangpo_hillstate':    ('망포동', '힐스테이트영통', 2140, '1.28대', '연결 O'),
+    'mangpo_ipark':        ('망포동', '아이파크캐슬1단지', 1783, '1.21대', '연결 O'),
+    'mangpo_skview':       ('망포동', '영통SKVIEW', 710, '1.21대', '연결 O'),
+    'mangpo_sujain':       ('망포동', '한양수자인', 530, '1.14대', '연결 O'),
+    'yeongtong_edupark':   ('영통동', '에듀파크', 1279, '1.02대', '연결 X'),
+    'yeongtong_dongbo':    ('영통동', '신나무실동보', 836, '1.04대', '연결 X'),
+    'yeongtong_shinmyung': ('영통동', '신나무실신명', 384, '1.02대', '연결 X'),
+    'maegyo_skview':       ('매교동', '푸르지오SKVIEW', 3603, '1.25대', '연결 O'),
+    'maegyo_hillstate':    ('매교동', '힐스테이트푸르지오', 2586, '1.25대', '연결 O'),
 }
 
 all_trades = [] # 매매 데이터
@@ -201,20 +201,21 @@ for aid, meta in APT_FILTERS.items():
     analysis_data[aid] = {
         'hist_peak': hist_peak_p, 'hist_peak_date': hist_peak_d,
         'hist_min': hist_min_p,
+        'drop_amt': hist_peak_p - hist_min_p,
         'recent_peak': recent_peak_p, 'recent_peak_date': recent_peak_d,
         'curr': curr_p, 'curr_date': curr_peak_d,
         'drop': round((hist_min_p - hist_peak_p) / hist_peak_p * 100, 1) if hist_peak_p > 0 else 0,
         'ratio': round(curr_p / hist_peak_p * 100, 1) if hist_peak_p else 0,
-        'households': households, 'parking': f"{parking_ratio} | {parking_conn}"
+        'households': households, 'parking': f"주차 {parking_ratio} | {parking_conn}"
     }
 
 # 가상 전문가 의견 (다른 성향의 5인)
 experts = [
-    {"nm": "나불패", "role": "공격적 투자자", "c": "text-red-600", "m": "지금 안 사면 후회합니다. 전세가 상승이 매수세를 밀어올리고 있어요. 공급 부족이 가시화되는 2-3년 뒤를 생각하면 지금이 무릎입니다."},
-    {"nm": "도현금", "role": "자산관리 전문가", "c": "text-blue-600", "m": "고금리가 생각보다 오래갈 수 있습니다. 무리한 대출보다는 가용 현금 범위 내에서 하반기 시장 변동성을 관망하며 급급매를 노리세요."},
-    {"nm": "박임장", "role": "현장 중심 중개사", "c": "text-amber-600", "m": "유튜브 뉴스보다 현장 분위기가 더 뜨겁습니다. 망포/영통 대장주 로열동은 매물 나오면 바로 나갑니다. 실거주라면 지금이 적기예요."},
-    {"nm": "최수치", "role": "빅데이터 분석가", "c": "text-emerald-600", "m": "거래량이 평균치를 회복 중이나 폭발적이지는 않습니다. 전고점 대비 회복률 90% 돌파 여부가 향후 추세 상승의 관건이 될 것입니다."},
-    {"nm": "이선점", "role": "가치투자 전문가", "c": "text-violet-600", "m": "입지는 변하지 않습니다. 신축급인 매교역세권과 학군지인 영통 핵심 입지는 하락장에서도 견고합니다. 저평가된 단지를 선점할 기회입니다."}
+    {"nm": "나불패", "role": "공격적 투자자", "c": "text-red-600", "s": "적극 매수", "sc": "bg-red-500", "m": "지금 안 사면 후회합니다. 전세가 상승이 매수세를 밀어올리고 있어요. 공급 부족이 가시화되는 2-3년 뒤를 생각하면 지금이 무릎입니다."},
+    {"nm": "도현금", "role": "자산관리 전문가", "c": "text-blue-600", "s": "관망/대기", "sc": "bg-slate-500", "m": "고금리가 생각보다 오래갈 수 있습니다. 무리한 대출보다는 가용 현금 범위 내에서 하반기 시장 변동성을 관망하며 급급매를 노리세요."},
+    {"nm": "박임장", "role": "현장 중심 중개사", "c": "text-amber-600", "s": "매수 고려", "sc": "bg-amber-500", "m": "유튜브 뉴스보다 현장 분위기가 더 뜨겁습니다. 망포/영통 대장주 로열동은 매물 나오면 바로 나갑니다. 실거주라면 지금이 적기예요."},
+    {"nm": "최수치", "role": "빅데이터 분석가", "c": "text-emerald-600", "s": "중립", "sc": "bg-emerald-500", "m": "거래량이 평균치를 회복 중이나 폭발적이지는 않습니다. 전고점 대비 회복률 90% 돌파 여부가 향후 추세 상승의 관건이 될 것입니다."},
+    {"nm": "이선점", "role": "가치투자 전문가", "c": "text-violet-600", "s": "분할 매수", "sc": "bg-violet-500", "m": "입지는 변하지 않습니다. 신축급인 매교역세권과 학군지인 영통 핵심 입지는 하락장에서도 견고합니다. 저평가된 단지를 선점할 기회입니다."}
 ]
 
 # 시장 분석 요약
@@ -229,6 +230,12 @@ mkt_summary = {
     ],
     'experts': experts
 }
+
+news_list = [
+    {"tag": "금리", "title": "한국은행 기준금리 동결 (3.50%)", "desc": "금통위 만장일치 동결. 하반기 인하 기대감 지속.", "date": "2026.05", "tc": "bg-amber-100 text-amber-700"},
+    {"tag": "정책", "title": "수원시, 노후계획도시 정비 기본계획 수립", "desc": "영통지구 등 노후 단지 재건축 활성화 기대.", "date": "2026.05", "tc": "bg-indigo-100 text-indigo-700"},
+    {"tag": "교통", "title": "인동선/월판선 공사 순항 중", "desc": "망포역, 영통역 주변 교통 접근성 대폭 개선 전망.", "date": "2026.05", "tc": "bg-emerald-100 text-emerald-700"}
+]
 
 # HTML 주입 (상대 경로로 수정하여 깃허브 호환성 확보)
 html_path = "suwon_real_estate.html"
