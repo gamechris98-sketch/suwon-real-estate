@@ -344,7 +344,8 @@ function drawVolChart(){
     if(!vh) vh = document.getElementById('volChart').getContext('2d');
     if(!window.volChartObj) {
         var vD=[], pD=[];
-        INJECTED_MONTHS.forEach(function(m){
+        var displayMonths = INJECTED_MONTHS.slice(-6);
+        displayMonths.forEach(function(m){
             var matches = (INJECTED_RAW||[]).filter(function(r){return r.d.indexOf(m.substring(0,4)+'.'+m.substring(4,6)) === 0});
             vD.push(matches.length);
             var avg = matches.length ? matches.reduce(function(sum, item) { return sum + item.price }, 0) / matches.length : 0;
@@ -353,10 +354,10 @@ function drawVolChart(){
         window.volChartObj = new Chart(vh, {
             type: 'bar',
             data: {
-                labels: INJECTED_MONTHS.map(function(m){return m.substring(2,4)+'년'+parseInt(m.substring(4,6))+'월'}),
+                labels: displayMonths.map(function(m){return m.substring(2,4)+'년'+parseInt(m.substring(4,6))+'월'}),
                 datasets: [
-                    { label:'거래량', data:vD, backgroundColor:'#6366f1', order:2, yAxisID:'y' },
-                    { label:'평균가(억)', data:pD.map(function(p){return (p/10000).toFixed(2)}), type:'line', borderColor:'#f43f5e', backgroundColor:'#f43f5e', fill:false, order:1, yAxisID:'y1', tension: 0.3 }
+                    { label:'거래량', data:vD, backgroundColor:'#6366f1', order:2, yAxisID:'y', borderRadius: 4 },
+                    { label:'평균가(억)', data:pD.map(function(p){return (p/10000).toFixed(2)}), type:'line', borderColor:'#f43f5e', backgroundColor:'#f43f5e', fill:false, order:1, yAxisID:'y1', tension: 0.3, pointRadius: 4 }
                 ]
             },
             options: {
@@ -365,7 +366,7 @@ function drawVolChart(){
                     y: { type:'linear', position:'left', title:{display:true,text:'거래건수'}, grid: { color: '#f1f5f9' } },
                     y1: { type:'linear', position:'right', grid:{drawOnChartArea:false}, title:{display:true,text:'평균가(억)'} }
                 },
-                plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } } }
+                plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } } } }
             }
         });
     }
@@ -721,7 +722,33 @@ var sch=null;
 function renderSupplyAnalysis() {
     if(typeof INJECTED_SUPPLY === 'undefined') return;
     var data = INJECTED_SUPPLY;
-    document.getElementById('supplySummary').innerHTML = '<h4 class="font-black text-lg mb-3">시장 분석 리포트</h4><p class="text-sm leading-relaxed">' + data.summary + '</p><div class="mt-4 pt-4 border-t border-indigo-200"><div class="flex justify-between items-center"><span class="text-xs">수원시 적정 수요</span><span class="font-bold text-sm">연간 약 ' + data.demand.toLocaleString() + '세대</span></div></div>';
+    
+    var demandHtml = '<div class="bg-gradient-to-br from-indigo-600 to-violet-700 text-white p-6 rounded-2xl shadow-lg shadow-indigo-100 relative overflow-hidden">';
+    demandHtml += '<div class="z-10 relative"><h4 class="text-xs font-black uppercase tracking-widest opacity-80 mb-2">Market Supply Report</h4>';
+    demandHtml += '<p class="text-sm font-bold leading-relaxed mb-4">' + data.summary + '</p>';
+    demandHtml += '<div class="flex items-center justify-between border-t border-white/20 pt-4 mt-4">';
+    demandHtml += '  <div><span class="text-[10px] opacity-70 block font-bold">ANNUAL DEMAND</span><span class="text-xl font-black">약 ' + data.demand.toLocaleString() + ' 세대</span></div>';
+    demandHtml += '  <div class="bg-white/20 p-2 rounded-lg backdrop-blur-sm"><i data-lucide="home" class="w-5 h-5 text-white"></i></div>';
+    demandHtml += '</div></div>';
+    demandHtml += '<div class="absolute -right-8 -bottom-8 w-24 h-24 bg-white/10 rounded-full"></div></div>';
+    
+    // Add additional insights cards
+    demandHtml += '<div class="grid grid-cols-2 gap-3 mt-4">';
+    var lastSupply = data.supply[data.supply.length-1];
+    var supplyStatus = lastSupply > data.demand ? '과잉' : '부족';
+    var statusColor = lastSupply > data.demand ? 'text-slate-500' : 'text-indigo-600';
+    var statusBg = lastSupply > data.demand ? 'bg-slate-100' : 'bg-indigo-50';
+    
+    demandHtml += '<div class="'+statusBg+' p-4 rounded-xl border border-indigo-100/50 flex flex-col">';
+    demandHtml += '  <span class="text-[9px] font-black text-slate-400 uppercase tracking-tight mb-1">Current Status</span>';
+    demandHtml += '  <span class="text-sm font-black '+statusColor+'">' + supplyStatus + ' 상태</span></div>';
+    
+    demandHtml += '<div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100/50 flex flex-col">';
+    demandHtml += '  <span class="text-[9px] font-black text-slate-400 uppercase tracking-tight mb-1">Target Year</span>';
+    demandHtml += '  <span class="text-sm font-black text-indigo-700">' + data.years[data.years.length-1] + '년</span></div>';
+    demandHtml += '</div>';
+
+    document.getElementById('supplySummary').innerHTML = demandHtml;
     
     if(sch) sch.destroy();
     sch = new Chart(document.getElementById('supplyChart').getContext('2d'), {
@@ -732,12 +759,14 @@ function renderSupplyAnalysis() {
                 label: '공급 물량 (세대)',
                 data: data.supply,
                 backgroundColor: data.supply.map(function(v) { return v > data.demand ? '#cbd5e1' : '#6366f1' }),
-                borderRadius: 8
+                borderRadius: 8,
+                barThickness: 24
             }, {
                 label: '적정 수요량',
                 data: Array(data.years.length).fill(data.demand),
                 type: 'line',
                 borderColor: '#f43f5e',
+                borderWidth: 3,
                 borderDash: [5, 5],
                 fill: false,
                 pointRadius: 0
@@ -747,10 +776,12 @@ function renderSupplyAnalysis() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'bottom' }
+                legend: { position: 'bottom', labels: { font: { size: 10, weight: 'bold' }, usePointStyle: true } },
+                tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 12, titleFont: { size: 14, weight: 'bold' } }
             },
             scales: {
-                y: { beginAtZero: true, grid: { color: '#f1f5f9' } }
+                y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
+                x: { grid: { display: false }, ticks: { font: { size: 10 } } }
             }
         }
     });
@@ -783,11 +814,12 @@ function renderRankAnalysis() {
         var badge = idx === 0 ? '🏆 최우수 투자지' : idx === 1 ? '🥈 핵심 우량지' : idx === 2 ? '🥉 주요 관심지' : '';
         
         h += '<div class="glass p-7 rounded-3xl flex flex-col gap-5 relative overflow-hidden group hover:border-indigo-400 transition-all border-2 bg-gradient-to-br '+bgClass+' shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300">';
-        if(badge) h += '<div class="absolute top-4 right-4 text-[9px] font-black px-2.5 py-1.5 rounded-full bg-white/90 shadow-sm border border-slate-100 z-20 flex items-center gap-1.5 backdrop-blur-sm">' + badge + '</div>';
-        h += '<div class="flex justify-between items-start z-10">';
+        h += '<div class="flex justify-between items-start z-10 relative">';
         h += '  <div class="flex items-center gap-4">';
         h += '    <div class="text-6xl font-black ' + rankColor + ' italic opacity-25 group-hover:opacity-40 transition-opacity select-none tracking-tighter">' + (idx+1) + '</div>';
-        h += '    <div><span class="text-[9px] font-black text-indigo-500/70 uppercase tracking-[0.2em] mb-1 block">' + it.dn + '</span><h4 class="text-xl font-black text-slate-800 leading-tight">' + it.nm + '</h4></div>';
+        h += '    <div><span class="text-[9px] font-black text-indigo-500/70 uppercase tracking-[0.2em] mb-1 block">' + it.dn + '</span><h4 class="text-xl font-black text-slate-800 leading-tight">' + it.nm + '</h4>';
+        if(badge) h += '<div class="mt-2 text-[9px] font-black px-2 py-1 rounded-full bg-white/90 shadow-sm border border-slate-100 flex items-center gap-1.5 w-fit">' + badge + '</div>';
+        h += '    </div>';
         h += '  </div>';
         h += '  <div class="text-right"><div class="text-4xl font-black text-indigo-600 tracking-tighter">' + it.score.toFixed(1) + '<span class="text-[10px] ml-1 font-black text-indigo-400 uppercase">pts</span></div><div class="text-[9px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Investment Score</div></div>';
         h += '</div>';
