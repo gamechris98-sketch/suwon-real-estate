@@ -739,10 +739,10 @@ function renderPeakAnalysis(){
             aptTrendData[aptInfo.id][month].push(ratio);
         });
         
-        // Use the last 18 months for better density
+        // Filter months from 2021 onwards
         var allMonths = {};
         for(var id in aptTrendData) { for(var m in aptTrendData[id]) allMonths[m] = true; }
-        var sortedMonths = Object.keys(allMonths).sort().slice(-18);
+        var sortedMonths = Object.keys(allMonths).sort().filter(function(m) { return m >= "2021.01" });
         var trendLabels = sortedMonths.map(function(m) { return m.substring(2) });
         
         var datasets = [];
