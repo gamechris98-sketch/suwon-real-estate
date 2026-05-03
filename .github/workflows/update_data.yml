@@ -2,20 +2,26 @@ name: Daily Real Estate Update
 
 on:
   schedule:
+    # 매일 한국 시간 오전 9시 (UTC 00:00) 실행
     - cron: '0 0 * * *'
-  workflow_dispatch:
+  workflow_dispatch: # 수동으로도 실행 가능하게 설정
+
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.10'
 
       - name: Run data collection script
         env:
@@ -28,5 +34,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add suwon_real_estate.html
-          git commit -m "Auto update: Real estate data [$(date +'%Y-%m-%d %H:%M')]" || echo "No changes to commit"
+          git commit -m "Auto update: Real estate data [$(date +'%Y-%m-%d %H:%M')]" || exit 0
           git push
