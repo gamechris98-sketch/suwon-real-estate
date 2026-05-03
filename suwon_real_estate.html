@@ -714,7 +714,7 @@ function renderPeakAnalysis(){
                     tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 10 }
                 },
                 scales: { 
-                    x: { min: 60, max: 100, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10, weight: 'bold' } } }, 
+                    x: { min: 50, max: 120, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10, weight: 'bold' } } }, 
                     y: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } } 
                 }
             }
@@ -826,9 +826,8 @@ function renderPeakAnalysis(){
                 },
                 scales: {
                     y: { 
-                        beginAtZero: false,
-                        suggestedMin: 70,
-                        suggestedMax: 100,
+                        min: 50,
+                        max: 120,
                         grid: { color: '#f1f5f9' }, 
                         ticks: { font: { size: 10 }, callback: function(v){ return v + '%' } } 
                     },
