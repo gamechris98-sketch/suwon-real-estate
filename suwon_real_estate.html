@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>수원 부동산 모니터링 시스템 (영통/망포/매교)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; background-color: #f1f5f9; }
+        .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 1); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
+        .trend-up { color: #ef4444; } .trend-down { color: #3b82f6; } .trend-flat { color: #64748b; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 max-w-7xl flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <i data-lucide="building-2" class="w-8 h-8 text-indigo-200"></i>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-tight">수원 부동산 모니터링 시스템</h1>
+                    <p class="text-xs text-indigo-200 mt-0.5">Automated Daily Report (GitHub Actions)</p>
+                </div>
+            </div>
+            <div class="text-sm font-medium bg-indigo-700/50 px-3 py-1.5 rounded-md flex items-center gap-2">
+                <i data-lucide="clock" class="w-4 h-4"></i>
+                <span id="updateTime">최근 업데이트: 오늘</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-7xl space-y-6">
+        <div id="statusAlert" class="hidden rounded-lg p-4 mb-4 text-sm font-medium"></div>
+        
+        <!-- KPI Cards -->
+        <h2 class="text-sm font-bold text-slate-500 ml-1 mb-2">아파트 단지를 클릭하면 상세 실거래가 표를 확인할 수 있습니다.</h2>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="kpiCards"></div>
+
+        <div class="grid lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 glass-panel rounded-2xl p-6">
+                <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                    <h2 class="text-xl font-bold flex items-center gap-2 text-slate-800">
+                        <i data-lucide="trending-up" class="w-6 h-6 text-indigo-500"></i> 최근 1년 실거래가 추이 (84㎡ 기준)
+                    </h2>
+                </div>
+                <div class="relative h-[400px] w-full">
+                    <canvas id="priceChart"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 flex flex-col">
+                <h2 class="text-xl font-bold flex items-center gap-2 text-slate-800 mb-6 border-b border-slate-100 pb-4">
+                    <i data-lucide="bar-chart-3" class="w-6 h-6 text-emerald-500"></i> 시장 전망 및 분석
+                </h2>
+                <div class="space-y-5 flex-grow overflow-y-auto pr-2" id="marketAnalysis">
+                    <!-- Auto-filled by JS -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Apartment Detail Modal -->
+    <div id="detailModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden z-[60] flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2" id="modalTitle">
+                    <i data-lucide="building" class="w-6 h-6 text-indigo-500"></i> 아파트명
+                </h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto">
+                <div class="mb-6">
+                    <h4 class="text-sm font-bold text-slate-500 mb-2">최근 12개월 실거래가 추이 (단위: 만원)</h4>
+                    <div class="border border-slate-200 rounded-lg overflow-hidden">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
+                                <tr>
+                                    <th class="px-4 py-2">거래월</th>
+                                    <th class="px-4 py-2 text-right">실거래가</th>
+                                    <th class="px-4 py-2 text-right">전월대비</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalTableBody" class="divide-y divide-slate-100">
+                                <!-- Table rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="modalAnalysis" class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                    <!-- Specific Analysis -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if(typeof lucide !== 'undefined') lucide.createIcons();
+
+        const APARTMENTS = [
+            { id: 'edu', name: '영통 에듀파크', color: '#8b5cf6' },
+            { id: 'sujain', name: '망포 한양수자인', color: '#ec4899' },
+            { id: 'hillstate', name: '망포 힐스테이트', color: '#10b981' },
+            { id: 'ipark', name: '아이파크캐슬 1단지', color: '#f59e0b' },
+            { id: 'skview', name: '매교 SK뷰', color: '#3b82f6' }
+        ];
+
+        let priceChart = null;
+        let globalData = null;
+        let globalMonths = null;
+
+        // ==========================================
+        // [AUTO_UPDATE_ZONE_START]
+        // ==========================================
+        const INJECTED_DATA = {'edu': [77000, 76000, 76000, 51000, 79500, 84700, 77500, 79000, 82000, 85000, 88000, 88000], 'sujain': [85000, 106000, 85500, 87500, 88000, 80000, 83000, 90000, 93500, 93000, 94500, 94500], 'hillstate': [163000, 60000, 163500, 165000, 57000, 114000, 179000, 173000, 63000, 164000, 63500, 63500], 'ipark': [121000, 96500, 81750, 93500, 68000, 47250, 134000, 135000, 46000, 140000, 97000, 97000], 'skview': [82700, 82700, 89000, 91000, 84200, 92000, 92500, 96500, 91500, 96800, 96800, 96800]};
+        const INJECTED_MONTHS = ['202506', '202507', '202508', '202509', '202510', '202511', '202512', '202601', '202602', '202603', '202604', '202605'];
+        const INJECTED_TIMESTAMP = '2026-05-03 19:40';
+        // ==========================================
+        // [AUTO_UPDATE_ZONE_END]
+        // ==========================================
+
+        function showStatus(msg, type = 'info') {
+            const alert = document.getElementById('statusAlert');
+            if(!alert) return;
+            alert.className = `rounded-lg p-4 mb-4 text-sm font-medium flex items-center gap-2 ${
+                type === 'error' ? 'bg-red-50 text-red-800 border border-red-200' :
+                type === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' :
+                'bg-blue-50 text-blue-800 border border-blue-200'
+            }`;
+            alert.innerHTML = `<i data-lucide="${type === 'error' ? 'alert-circle' : type === 'success' ? 'check-circle' : 'info'}" class="w-5 h-5"></i> ${msg}`;
+            alert.classList.remove('hidden');
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+            
+            if(type !== 'error') {
+                setTimeout(() => alert.classList.add('hidden'), 5000);
+            }
+        }
+
+        function renderDashboard(dataObj, monthsArr) {
+            globalData = dataObj;
+            globalMonths = monthsArr;
+            
+            if(INJECTED_TIMESTAMP) {
+                document.getElementById('updateTime').innerText = `최근 업데이트: ${INJECTED_TIMESTAMP}`;
+            }
+
+            renderKpiCards(dataObj);
+            
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            let labels = monthsArr.map(m => m.substring(2,4) + '년 ' + parseInt(m.substring(4,6)) + '월');
+
+            const datasets = APARTMENTS.map(apt => ({
+                label: apt.name,
+                data: dataObj[apt.id],
+                borderColor: apt.color,
+                backgroundColor: apt.color + '20',
+                borderWidth: 2,
+                tension: 0.3,
+                pointRadius: 3,
+                pointHoverRadius: 6
+            }));
+
+            if(priceChart) priceChart.destroy();
+            priceChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) label += (context.parsed.y / 10000).toFixed(2) + '억';
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: { position: 'bottom' }
+                    },
+                    scales: {
+                        y: { ticks: { callback: v => v/10000 + '억' }, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+            
+            renderAnalysis(dataObj);
+        }
+
+        function renderKpiCards(dataObj) {
+            const container = document.getElementById('kpiCards');
+            container.innerHTML = '';
+            
+            APARTMENTS.forEach(apt => {
+                const prices = dataObj[apt.id];
+                if(!prices || prices.length < 2) return;
+                
+                const currentPrice = prices[prices.length - 1];
+                const prevPrice = prices[prices.length - 2];
+                const diff = currentPrice - prevPrice;
+                const diffPercent = ((diff / prevPrice) * 100).toFixed(1);
+                
+                let trendIcon = diff > 0 ? 'arrow-up-right' : diff < 0 ? 'arrow-down-right' : 'minus';
+                let trendClass = diff > 0 ? 'trend-up bg-red-50' : diff < 0 ? 'trend-down bg-blue-50' : 'trend-flat bg-slate-50';
+                let trendText = diff > 0 ? `+${diff}천 (+${diffPercent}%)` : diff < 0 ? `${diff}천 (${diffPercent}%)` : '보합';
+
+                const cardHtml = `
+                    <div onclick="openModal('${apt.id}')" class="cursor-pointer glass-panel rounded-xl p-4 border-t-4 hover:-translate-y-1 transition-all hover:shadow-lg hover:border-b-4 hover:border-b-slate-100" style="border-top-color: ${apt.color}">
+                        <h3 class="text-xs font-bold text-slate-500 mb-1 truncate" title="${apt.name}">${apt.name}</h3>
+                        <div class="flex items-end justify-between">
+                            <span class="text-xl font-extrabold text-slate-800">${(currentPrice/10000).toFixed(1)}<span class="text-sm font-medium text-slate-500 ml-1">억</span></span>
+                        </div>
+                        <div class="mt-2 text-xs font-bold flex items-center gap-1 ${trendClass} p-1.5 rounded-md inline-flex w-full justify-between">
+                            <span>전월대비</span>
+                            <span class="flex items-center"><i data-lucide="${trendIcon}" class="w-3 h-3 mr-0.5"></i> ${trendText}</span>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function openModal(aptId) {
+            if(!globalData || !globalMonths) return;
+            const apt = APARTMENTS.find(a => a.id === aptId);
+            const prices = globalData[aptId];
+            
+            document.getElementById('modalTitle').innerHTML = `<i data-lucide="building" class="w-6 h-6" style="color:${apt.color}"></i> ${apt.name}`;
+            
+            let tableHtml = '';
+            for(let i=prices.length-1; i>=0; i--) {
+                const price = prices[i];
+                const prevPrice = i > 0 ? prices[i-1] : price;
+                const diff = price - prevPrice;
+                
+                let diffHtml = '<span class="text-slate-400">-</span>';
+                if(diff > 0) diffHtml = `<span class="text-red-500 flex items-center justify-end"><i data-lucide="arrow-up-right" class="w-3 h-3 mr-1"></i>+${diff}</span>`;
+                else if(diff < 0) diffHtml = `<span class="text-blue-500 flex items-center justify-end"><i data-lucide="arrow-down-right" class="w-3 h-3 mr-1"></i>${diff}</span>`;
+
+                const monthLabel = globalMonths[i].substring(2,4) + "년 " + parseInt(globalMonths[i].substring(4,6)) + "월";
+                
+                tableHtml += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-4 py-2 font-medium text-slate-700">${monthLabel}</td>
+                        <td class="px-4 py-2 text-right font-bold">${price.toLocaleString()}</td>
+                        <td class="px-4 py-2 text-right text-xs">${diffHtml}</td>
+                    </tr>
+                `;
+            }
+            document.getElementById('modalTableBody').innerHTML = tableHtml;
+            
+            const momentum = prices[prices.length-1] - prices[prices.length-4];
+            let insight = '';
+            if(momentum > 0) insight = `<p class="text-sm text-indigo-700 leading-relaxed"><strong class="text-indigo-900 font-bold block mb-1">🔥 최근 3개월 단기 상승 흐름</strong> 실거래가가 최근 3개월간 <b>+${momentum.toLocaleString()}만원</b> 상승하며 뚜렷한 매수세가 관찰됩니다. 단기적인 상승 모멘텀이 이어지고 있습니다.</p>`;
+            else if(momentum < 0) insight = `<p class="text-sm text-indigo-700 leading-relaxed"><strong class="text-indigo-900 font-bold block mb-1">📉 단기 조정 국면</strong> 최근 3개월간 <b>${momentum.toLocaleString()}만원</b> 하락하며 조정세를 보이고 있습니다. 급매물 위주로 소화가 이뤄지고 있는지 주시해야 합니다.</p>`;
+            else insight = `<p class="text-sm text-indigo-700 leading-relaxed"><strong class="text-indigo-900 font-bold block mb-1">⚖️ 박스권 보합세</strong> 최근 3개월간 유의미한 가격 변동 없이 보합세를 유지 중입니다. 뚜렷한 방향성이 나타날 때까지 관망세가 지속될 것으로 보입니다.</p>`;
+            
+            document.getElementById('modalAnalysis').innerHTML = insight;
+
+            const modal = document.getElementById('detailModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.firstElementChild.classList.remove('scale-95');
+            }, 10);
+            
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detailModal');
+            modal.classList.add('opacity-0');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function renderAnalysis(dataObj) {
+            const analysisArea = document.getElementById('marketAnalysis');
+            let totalMomentum = 0;
+            APARTMENTS.forEach(apt => {
+                const prices = dataObj[apt.id];
+                if(prices && prices.length >= 4) {
+                    totalMomentum += (prices[prices.length-1] - prices[prices.length-4]);
+                }
+            });
+            
+            const isBullMarket = totalMomentum > 0;
+            let html = `
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                        ${isBullMarket ? '<i data-lucide="trending-up" class="w-5 h-5 text-red-500"></i> 단기 상승 (모멘텀 양수)' : '<i data-lucide="trending-down" class="w-5 h-5 text-blue-500"></i> 단기 조정 (모멘텀 음수)'}
+                    </h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        최근 3개월간 대상 단지들의 흐름을 종합 분석한 결과, 전반적으로 ${isBullMarket ? '상승세' : '조정/보합세'}를 보이고 있습니다. 좌측 상단의 KPI 카드를 클릭하여 각 단지별 세부 모멘텀 분석을 확인해 보세요.
+                    </p>
+                </div>
+            `;
+            analysisArea.innerHTML = html;
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        window.onload = () => {
+            if(INJECTED_DATA && INJECTED_MONTHS) {
+                renderDashboard(INJECTED_DATA, INJECTED_MONTHS);
+            } else {
+                // Generate demo data if python script hasn't run yet
+                const d = new Date();
+                const m = [];
+                for(let i=11; i>=0; i--) {
+                    const temp = new Date(d.getFullYear(), d.getMonth() - i, 1);
+                    m.push(temp.getFullYear().toString() + (temp.getMonth()+1).toString().padStart(2, '0'));
+                }
+                const mockData = {
+                    'edu': [59000, 58500, 59500, 60000, 61000, 61500, 60500, 62000, 63000, 63500, 64000, 64500],
+                    'sujain': [72000, 71500, 72500, 73000, 74000, 75000, 74500, 76000, 77000, 76500, 77500, 78000],
+                    'hillstate': [88000, 89000, 90000, 89500, 91000, 92500, 93000, 94000, 95500, 96000, 97000, 98500],
+                    'ipark': [92000, 91500, 93000, 94000, 95000, 96500, 97000, 98500, 99000, 100000, 101500, 102000],
+                    'skview': [85000, 84000, 85500, 86000, 87500, 88000, 89500, 90000, 91500, 92000, 93500, 94000]
+                };
+                showStatus('Python 자동 업데이트 전송 전이므로 데모 데이터를 렌더링합니다.', 'info');
+                renderDashboard(mockData, m);
+            }
+        };
+    </script>
+</body>
+</html>
