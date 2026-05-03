@@ -12,25 +12,28 @@ lawd_cds = ['41117', '41115'] # 영통구, 팔달구
 now = datetime.datetime.now()
 months = []
 for i in range(11, -1, -1):
-    d = now.replace(day=1) - datetime.timedelta(days=30*i)
-    months.append(d.strftime("%Y%m"))
+    # 정확한 월 계산을 위해 연/월 수식 사용
+    year = now.year + (now.month - 1 - i) // 12
+    month = (now.month - 1 - i) % 12 + 1
+    months.append(f"{year}{month:02d}")
 
 months_10y = []
 for i in range(119, -1, -1):
-    d = now.replace(day=1) - datetime.timedelta(days=30*i)
-    months_10y.append(d.strftime("%Y%m"))
+    year = now.year + (now.month - 1 - i) // 12
+    month = (now.month - 1 - i) % 12 + 1
+    months_10y.append(f"{year}{month:02d}")
 
-# 대상 아파트 필터 (동, 아파트명 키워드)
+# 대상 아파트 필터 (동, 아파트명 키워드, 세대수, 지하주차장 연결)
 APT_FILTERS = {
-    'mangpo_hillstate':    ('망포동', '힐스테이트영통'),
-    'mangpo_ipark':        ('망포동', '아이파크캐슬1단지'),
-    'mangpo_skview':       ('망포동', '영통SKVIEW'),
-    'mangpo_sujain':       ('망포동', '한양수자인'),
-    'yeongtong_edupark':   ('영통동', '에듀파크'),
-    'yeongtong_dongbo':    ('영통동', '신나무실동보'),
-    'yeongtong_shinmyung': ('영통동', '신나무실신명'),
-    'maegyo_skview':       ('매교동', '푸르지오SKVIEW'),
-    'maegyo_hillstate':    ('매교동', '힐스테이트푸르지오'),
+    'mangpo_hillstate':    ('망포동', '힐스테이트영통', 2140, '연결 O'),
+    'mangpo_ipark':        ('망포동', '아이파크캐슬1단지', 1783, '연결 O'),
+    'mangpo_skview':       ('망포동', '영통SKVIEW', 710, '연결 O'),
+    'mangpo_sujain':       ('망포동', '한양수자인', 530, '연결 O'),
+    'yeongtong_edupark':   ('영통동', '에듀파크', 1279, '연결 X'),
+    'yeongtong_dongbo':    ('영통동', '신나무실동보', 836, '연결 X'),
+    'yeongtong_shinmyung': ('영통동', '신나무실신명', 384, '연결 X'),
+    'maegyo_skview':       ('매교동', '푸르지오SKVIEW', 3603, '연결 O'),
+    'maegyo_hillstate':    ('매교동', '힐스테이트푸르지오', 2586, '연결 O'),
 }
 
 all_trades = [] # 매매 데이터
@@ -91,7 +94,8 @@ def fetch_trade_worker(arg):
             day = item.findtext('dealDay') or '1'
             floor = item.findtext('floor') or ''
             built = item.findtext('buildYear') or ''
-            if 80 <= area <= 86 and umd in ('망포동', '영통동', '매교동'):
+            # 면적 범위를 조금 더 넓게 잡아 데이터 누락 방지 (50~120㎡)
+            if 50 <= area <= 125 and umd in ('망포동', '영통동', '매교동'):
                 res.append({'d': f"{mon[:4]}.{mon[4:6]}.{day.zfill(2)}", 'm': mon, 'umd': umd, 'apt': apt, 'p': price, 'area': area, 'floor': floor, 'built': built})
     return res
 
@@ -112,10 +116,12 @@ for t in all_trades_10y:
         'floor': t['floor'], 'price': t['p'], 'type': '매매', 'py': py_price, 'built': t['built']
     })
 
-# 최근 12개월 데이터 분류 (차트용)
+# 최근 12개월 데이터 분류 (차트용, 저층 제외)
 for t in all_trades_10y:
     if t['m'] in months:
-        all_trades.append(t)
+        # 저층(1~5층) 제외 필터 적용
+        if t['floor'] and str(t['floor']).isdigit() and int(t['floor']) > 5:
+            all_trades.append(t)
 
 # 데이터 가공 및 지표 계산
 analysis_data = {}
@@ -133,23 +139,39 @@ raw_items.sort(key=lambda x: x['d'], reverse=True)
 raw_items.sort(key=lambda x: x['d'], reverse=True)
 
 # 차트 및 대시보드용 요약
-for aid, (dong, kw) in APT_FILTERS.items():
+for aid, meta in APT_FILTERS.items():
+    dong, kw, households, parking = meta
     trade_history = []
-    rent_history = []
     
-    # 10년치 매매 가격에서 전고점, 고점 이후 최저가 구하기
-    t10y = sorted([x for x in all_trades_10y if x['umd'] == dong and kw in x['apt']], key=lambda x: x['d'])
+    # 10년치 매매 데이터 필터링 (저층 제외: 5층 초과만, 면적 80~86 기준 우선)
+    t10y_raw = [x for x in all_trades_10y if x['umd'] == dong and kw in x['apt']]
+    # 분석용 데이터: 층수가 파악되고 5층 초과인 것 + 전용면적 80~86(국평) 기준
+    t10y = sorted([x for x in t10y_raw if x['floor'] and str(x['floor']).isdigit() and int(x['floor']) > 5 and 80 <= x['area'] <= 86], key=lambda x: x['d'])
+    
+    # 만약 국평 데이터가 너무 적으면 면적 제한을 조금 완화하여 분석
+    if len(t10y) < 10:
+        t10y = sorted([x for x in t10y_raw if x['floor'] and str(x['floor']).isdigit() and int(x['floor']) > 5], key=lambda x: x['d'])
+    
     max_p = 0
     max_p_date = ""
     min_after_max = 999999999
+
+    # 전고점 탐색 기간 설정 (역사적 고점인 2~3년 전인 2020년~2022년 사이의 최고점 기준)
+    peak_period_start = "2020.01.01"
+    peak_period_end = "2022.12.31"
     
     for t in t10y:
-        if t['p'] > max_p:
-            max_p = t['p']
-            max_p_date = t['d']
-            min_after_max = t['p'] # 고점이 갱신되면 최저가도 리셋
-        elif t['p'] < min_after_max:
-            min_after_max = t['p']
+        # 지정된 기간 내의 최고가를 전고점으로 설정
+        if peak_period_start <= t['d'] <= peak_period_end:
+            if t['p'] > max_p:
+                max_p = t['p']
+                max_p_date = t['d']
+                min_after_max = t['p']
+        
+        # 전고점 이후의 최저점 찾기 (전고점이 이미 정해진 상태에서만 작동)
+        if max_p > 0 and t['d'] > max_p_date:
+            if t['p'] < min_after_max:
+                min_after_max = t['p']
             
     # 최근 12개월 차트용
     for m in months:
@@ -163,7 +185,8 @@ for aid, (dong, kw) in APT_FILTERS.items():
         'peak': max_p, 'peak_date': max_p_date, 'curr': curr_p,
         'min_after_peak': min_after_max if min_after_max < 999999999 else 0,
         'ratio': round(curr_p/max_p*100,1) if max_p else 0,
-        'drop': round((max_p-min_after_max)/max_p*100,1) if max_p and min_after_max < max_p else 0
+        'drop': round((max_p-min_after_max)/max_p*100,1) if max_p and min_after_max < max_p else 0,
+        'households': households, 'parking': parking
     }
 
 # 가상 뉴스
