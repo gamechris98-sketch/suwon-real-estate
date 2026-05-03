@@ -6,23 +6,25 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;background:#f1f5f9}.glass{background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border:1px solid #fff;box-shadow:0 4px 6px -1px rgba(0,0,0,.05)}.tab-a{color:#4f46e5;border-bottom:2px solid #4f46e5;font-weight:700}.tab-i{color:#94a3b8;border-bottom:2px solid transparent}.tb{padding:10px 20px;cursor:pointer;font-size:14px}.tb:hover{color:#6366f1}.pb{padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer;transition:all .2s}.pb.active{background:#4f46e5;color:#fff}.pb:not(.active){background:#e2e8f0;color:#64748b}</style>
 </head><body class="text-slate-800 antialiased min-h-screen flex flex-col">
-<header class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg sticky top-0 z-50">
-<div class="container mx-auto px-4 py-4 max-w-7xl flex justify-between items-center">
-<div class="flex items-center gap-3"><i data-lucide="building-2" class="w-7 h-7 text-indigo-200"></i><div><h1 class="text-xl font-bold">수원 부동산 모니터링 시스템</h1><p class="text-xs text-indigo-200">망포동·영통동·매교동 | 84㎡ 기준</p></div></div>
-<div class="text-xs bg-white/10 px-3 py-1.5 rounded-md flex items-center gap-2"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span id="updateTime">대기중</span></div>
-</div></header>
-<div class="container mx-auto max-w-7xl px-4 pt-4">
-<div class="flex border-b border-slate-200 overflow-x-auto whitespace-nowrap no-scrollbar">
-<button onclick="switchTab('dash')" id="t1" class="tb tab-a flex items-center gap-2"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>대시보드</button>
-<button onclick="switchTab('peak')" id="t4" class="tb tab-i flex items-center gap-2"><i data-lucide="arrow-up-circle" class="w-4 h-4"></i>전고점 비교</button>
-<button onclick="switchTab('vol')" id="t3" class="tb tab-i flex items-center gap-2"><i data-lucide="bar-chart-big" class="w-4 h-4"></i>거래량 분석</button>
-<button onclick="switchTab('calc')" id="t6" class="tb tab-i flex items-center gap-2"><i data-lucide="calculator" class="w-4 h-4"></i>매수 시뮬레이션</button>
-<button onclick="switchTab('rank')" id="t8" class="tb tab-i flex items-center gap-2"><i data-lucide="award" class="w-4 h-4"></i>종합 점수</button>
-<button onclick="switchTab('timing')" id="t7" class="tb tab-i flex items-center gap-2"><i data-lucide="timer" class="w-4 h-4"></i>매수 타이밍</button>
-<button onclick="switchTab('supply')" id="t9" class="tb tab-i flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4"></i>공급 분석</button>
-<button onclick="switchTab('raw')" id="t2" class="tb tab-i flex items-center gap-2"><i data-lucide="table" class="w-4 h-4"></i>실거래 원본 데이터</button>
-</div></div>
-<main id="p1" class="flex-grow container mx-auto px-4 py-6 max-w-7xl space-y-6">
+<div class="sticky top-0 z-50 shadow-lg bg-white/80 backdrop-blur-md">
+<header class="bg-gradient-to-r from-indigo-700 via-indigo-600 to-violet-700 text-white border-b border-white/10">
+<div class="container mx-auto px-4 py-3.5 max-w-7xl flex justify-between items-center">
+<div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('dash')"><div class="p-2 bg-white/10 rounded-lg backdrop-blur-sm"><i data-lucide="building-2" class="w-6 h-6 text-white"></i></div><div><h1 class="text-lg font-black tracking-tight">수원 부동산 모니터링</h1><p class="text-[10px] font-medium text-indigo-100/80">망포·영통·매교 | 84㎡ 국민평수 기준</p></div></div>
+<div class="flex items-center gap-3">
+<div class="hidden sm:flex text-[10px] bg-indigo-500/20 px-3 py-1.5 rounded-full border border-white/10 items-center gap-2 backdrop-blur-sm"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span><span id="updateTime">데이터 연결 중...</span></div>
+</div></div></header>
+<div class="container mx-auto max-w-7xl px-4">
+<div class="flex items-center border-b border-slate-100 overflow-x-auto whitespace-nowrap no-scrollbar scroll-smooth">
+<button onclick="switchTab('dash')" id="t1" class="tb tab-a flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>대시보드</button>
+<button onclick="switchTab('peak')" id="t4" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="trending-up" class="w-4 h-4"></i>전고점 비교</button>
+<button onclick="switchTab('vol')" id="t3" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="bar-chart-big" class="w-4 h-4"></i>거래량 분석</button>
+<button onclick="switchTab('calc')" id="t6" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="calculator" class="w-4 h-4"></i>매수 계산기</button>
+<button onclick="switchTab('rank')" id="t8" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="award" class="w-4 h-4"></i>종합 점수</button>
+<button onclick="switchTab('timing')" id="t7" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="timer" class="w-4 h-4"></i>매수 타이밍</button>
+<button onclick="switchTab('supply')" id="t9" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="bar-chart-3" class="w-4 h-4"></i>공급 분석</button>
+<button onclick="switchTab('raw')" id="t2" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="table" class="w-4 h-4"></i>실거래 데이터</button>
+</div></div></div>
+<main id="p1" class="tab-page flex-grow container mx-auto px-4 py-6 max-w-7xl space-y-6">
 <div class="flex flex-col gap-2">
     <p class="text-xs text-slate-400 ml-1">카드 클릭 → 상세 거래 내역(층수 포함) 확인</p>
     <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 text-[11px] text-indigo-700 flex gap-3 items-start shadow-sm">
@@ -49,7 +51,7 @@
 <div class="glass rounded-2xl p-5"><h2 class="text-lg font-bold flex items-center gap-2 mb-3 pb-3 border-b border-slate-100"><i data-lucide="bar-chart-3" class="w-5 h-5 text-emerald-500"></i>시장 전망</h2><div id="mktA"></div></div>
 <div class="glass rounded-2xl p-5"><h2 class="text-lg font-bold flex items-center gap-2 mb-3 pb-3 border-b border-slate-100"><i data-lucide="newspaper" class="w-5 h-5 text-amber-500"></i>정책·뉴스</h2><div id="newsS" class="space-y-3 text-sm"></div></div>
 </div></div></main>
-<div id="p3" class="container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
+<div id="p3" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
 <div class="grid lg:grid-cols-2 gap-6">
     <div class="glass rounded-2xl p-6">
         <h2 class="text-lg font-bold flex items-center gap-2 mb-5 pb-4 border-b border-slate-100"><i data-lucide="trending-up" class="w-5 h-5 text-indigo-500"></i>거래량 vs 평균가 추이 (전체)</h2>
@@ -74,7 +76,7 @@
 </div>
 
 </div>
-<div id="p4" class="container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
+<div id="p4" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
 <div class="glass rounded-2xl p-6">
 <h2 class="text-lg font-bold flex items-center justify-between mb-5 pb-4 border-b border-slate-100">
     <div class="flex items-center gap-2"><i data-lucide="arrow-up-circle" class="w-5 h-5 text-indigo-500"></i>단지별 전고점 대비 회복률 비교</div>
@@ -86,7 +88,7 @@
 <tbody id="peakB" class="divide-y divide-slate-100"></tbody></table></div>
 </div>
 </div>
-<div id="p6" class="container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
+<div id="p6" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
 <div class="grid lg:grid-cols-2 gap-6">
     <div class="glass rounded-2xl p-6">
         <h2 class="text-lg font-bold flex items-center gap-2 mb-5 pb-4 border-b border-slate-100"><i data-lucide="calculator" class="w-5 h-5 text-indigo-500"></i>전문 매수 시뮬레이터 (LTV/DSR 반영)</h2>
@@ -141,12 +143,12 @@
     </div>
 </div>
 </div>
-<div id="p7" class="container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
+<div id="p7" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
     <div class="glass rounded-2xl p-8" id="timingContent">
         <!-- JS will render content here -->
     </div>
 </div>
-<div id="p8" class="container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
+<div id="p8" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold flex items-center gap-2"><i data-lucide="award" class="text-indigo-600"></i> 투자 가성비 순위 (종합 점수)</h2>
     </div>
@@ -154,7 +156,7 @@
         <!-- JS will render rank cards here -->
     </div>
 </div>
-<div id="p9" class="container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
+<div id="p9" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
     <div class="glass rounded-2xl p-8">
         <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i data-lucide="bar-chart-3" class="text-indigo-600"></i> 수원시 향후 공급 물량 분석</h2>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -173,7 +175,7 @@
         </div>
     </div>
 </div>
-<div id="p2" class="container mx-auto px-4 py-6 max-w-7xl hidden">
+<div id="p2" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden">
 <div class="glass rounded-2xl p-6">
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-5 pb-4 border-b border-slate-100">
 <h2 class="text-lg font-bold flex items-center gap-2"><i data-lucide="database" class="w-5 h-5 text-indigo-500"></i>실거래 원본 데이터 <span id="rCnt" class="text-sm font-normal text-slate-400"></span></h2>
@@ -219,24 +221,7 @@ const INJECTED_RAW = [{"d": "2026.05.02", "dong": "영통동", "apt": "신나무
 const INJECTED_NEWS = [{"tag": "금리", "title": "한국은행 기준금리 동결 (3.50%)", "desc": "금통위 만장일치 동결. 하반기 인하 기대감 지속.", "date": "2026.05", "tc": "bg-amber-100 text-amber-700"}, {"tag": "정책", "title": "수원시, 노후계획도시 정비 기본계획 수립", "desc": "영통지구 등 노후 단지 재건축 활성화 기대.", "date": "2026.05", "tc": "bg-indigo-100 text-indigo-700"}, {"tag": "교통", "title": "인동선/월판선 공사 순항 중", "desc": "망포역, 영통역 주변 교통 접근성 대폭 개선 전망.", "date": "2026.05", "tc": "bg-emerald-100 text-emerald-700"}];
 const INJECTED_SUPPLY = {"years": ["2022", "2023", "2024", "2025", "2026", "2027"], "supply": [11500, 10800, 9200, 6500, 3200, 1800], "demand": 6000, "summary": "2025년 이후 수원시 입주 물량이 급감하며 공급 부족 단계에 진입할 것으로 예상됩니다."};
 // ======== AUTO_UPDATE_ZONE_END ========
-function switchTab(t){
-    const tabs=['dash','raw','vol','peak','calc','timing'];
-    tabs.forEach(x=>{
-        const isTarget = x===t;
-        const idSuffix = (x==='dash'?1:x==='raw'?2:x==='vol'?3:x==='peak'?4:x==='calc'?6:7);
-        const panel = document.getElementById('p'+idSuffix);
-        const btn = document.getElementById('t'+idSuffix);
-        if(panel) panel.classList.toggle('hidden', !isTarget);
-        if(btn) btn.className = 'tb ' + (isTarget?'tab-a':'tab-i');
-    });
-    if(t==='raw' && rF.length===0){
-        bAF(); rF=(INJECTED_RAW||[]).slice(); fR();
-    }
-    if(t==='vol') drawVolChart();
-    if(t==='peak') renderPeakAnalysis();
-    if(t==='calc') initCalcTab();
-    if(t==='timing') renderTimingAnalysis();
-}
+
 function bAF(){var s=new Set();(INJECTED_RAW||[]).forEach(function(r){s.add(r.apt)});var el=document.getElementById('aF');var v=el.value;el.innerHTML='<option value="">전체 아파트</option>';Array.from(s).sort().forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;el.appendChild(o)});el.value=v}
 function fR(){
     var q=(document.getElementById('sI').value||'').toLowerCase();
@@ -588,74 +573,7 @@ function calcLoan() {
     document.getElementById('calcResult').innerHTML = h;
 }
 
-function renderPeakAnalysis(){
-    var h='', labels=[], ratios=[], colors=[];
-    if(typeof INJECTED_ANALYSIS_DATA === 'undefined') return;
-    
-    // 회복률 높은 순 정렬
-    var sorted = A.slice().map(function(a){return {a:a, d:INJECTED_ANALYSIS_DATA[a.id]}}).filter(function(x){return x.d});
-    sorted.sort(function(a,b){return b.d.ratio - a.d.ratio});
 
-    sorted.forEach(function(x){
-        var a = x.a;
-        var data = x.d;
-        var cur = data.curr;
-        var peak = data.hist_peak;
-        var diff = cur - peak;
-        var max_drop_pct = data.drop;
-        var ratio = data.ratio;
-        var dc = a.dn==='망포동'?'text-orange-600':a.dn==='영통동'?'text-blue-600':'text-emerald-600';
-        var rc = ratio>=95?'text-red-600':ratio>=85?'text-amber-600':'text-slate-500';
-        
-        labels.push(a.nm);
-        ratios.push(ratio);
-        colors.push(a.c);
-
-        var h_peak = (data.hist_peak || data.peak || 0);
-        var h_min = (data.hist_min || data.min_after_peak || 0);
-        var h_drop_amt = (data.drop_amt || (h_peak - h_min) || 0);
-        var diff = cur - h_peak;
-        
-        h+='<tr class="hover:bg-slate-50 border-b border-slate-50">';
-        h+='<td class="px-3 py-4 font-medium '+dc+'">'+a.dn+'</td>';
-        h+='<td class="px-3 py-4 font-bold">'+a.nm+'</td>';
-        h+='<td class="px-3 py-4 text-right font-bold">'+((cur||0)/10000).toFixed(1)+'억</td>';
-        h+='<td class="px-3 py-4 text-right text-indigo-600 font-bold">'+((h_peak||0)/10000).toFixed(1)+'억</td>';
-        h+='<td class="px-3 py-4 text-left text-slate-400 text-xs">'+(data.hist_peak_date || data.peak_date || '-')+'</td>';
-        h+='<td class="px-3 py-4 text-right text-blue-600 font-bold">'+((h_min||0)/10000).toFixed(1)+'억</td>';
-        h+='<td class="px-3 py-4 text-right text-red-500 font-bold">'+((h_drop_amt||0)/10000).toFixed(1)+'억</td>';
-        h+='<td class="px-3 py-4 text-right text-red-500 font-bold">'+(max_drop_pct||0)+'%</td>';
-        h+='<td class="px-3 py-4 text-right font-extrabold '+rc+'">'+(ratio||0)+'%</td>';
-        h+='</tr>';
-    });
-    document.getElementById('peakB').innerHTML=h;
-
-    // 회복률 차트
-    if(rh) rh.destroy();
-    rh = new Chart(document.getElementById('recoveryChart').getContext('2d'), {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: '전고점 대비 회복률(%)',
-                data: ratios,
-                backgroundColor: colors.map(c=>c+'80'),
-                borderColor: colors,
-                borderWidth: 1,
-                borderRadius: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { min: 50, max: 100, ticks: { callback: v=>v+'%' }, grid: { color: '#f1f5f9' } },
-                x: { grid: { display: false }, ticks: { font: { size: 10 } } }
-            }
-        }
-    });
-}
 
 function renderTimingAnalysis() {
     var container = document.getElementById('timingContent');
@@ -707,30 +625,97 @@ function renderTimingAnalysis() {
 }
 
 
+function renderPeakAnalysis(){
+    var b=document.getElementById('peakB');if(!b)return;
+    var data=typeof INJECTED_ANALYSIS_DATA!=='undefined'?INJECTED_ANALYSIS_DATA:{};
+    var h='';
+    var labels=[], ratios=[], colors=[];
+    if(!Object.keys(data).length) {
+        b.innerHTML = '<tr><td colspan="9" class="px-3 py-20 text-center text-slate-400 italic">최신 분석 데이터를 불러오는 중입니다...</td></tr>';
+        return;
+    }
+    A.forEach(function(a){
+        var d=data[a.id];if(!d)return;
+        var r=d.ratio||0;
+        var pDate=d.hist_peak_date||'-';
+        h+='<tr class="hover:bg-indigo-50/30 transition-colors border-b border-slate-100 group">';
+        h+='<td class="px-3 py-4 text-xs font-medium text-slate-500">'+a.dn+'</td>';
+        h+='<td class="px-3 py-4 font-black text-xs text-slate-800 group-hover:text-indigo-600 transition-colors">'+a.nm+'</td>';
+        h+='<td class="px-3 py-4 text-right text-xs font-bold">'+((d.curr||0)/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-right text-xs font-black text-indigo-600 bg-indigo-50/50">'+((d.hist_peak||0)/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-[10px] text-slate-400 text-center">'+pDate+'</td>';
+        h+='<td class="px-3 py-4 text-right text-xs text-blue-600 font-medium">'+((d.hist_min||0)/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-right text-xs text-red-500 font-medium">'+((d.drop_amt||0)/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-right text-xs text-red-500 font-black">'+(d.drop||0)+'%</td>';
+        h+='<td class="px-3 py-4 text-right"><span class="px-2.5 py-1 rounded-full text-[10px] font-black border '+ (r>=90?'bg-red-50 text-red-600 border-red-100':r>=80?'bg-amber-50 text-amber-600 border-amber-100':'bg-slate-50 text-slate-500 border-slate-200')+'">'+r+'%</span></td>';
+        h+='</tr>';
+        labels.push(a.nm);
+        ratios.push(r);
+        colors.push(a.c);
+    });
+    b.innerHTML=h;
+    
+    if(window.recChartObj) window.recChartObj.destroy();
+    var ctx = document.getElementById('recoveryChart');
+    if(ctx) {
+        window.recChartObj = new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '전고점 대비 회복률 (%)',
+                    data: ratios,
+                    backgroundColor: colors,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { min: 50, max: 100, grid: { color: '#f1f5f9' } }, y: { grid: { display: false } } }
+            }
+        });
+    }
+}
+
 function switchTab(t){
     const tabs = {
-        'dash': {btn: 't1', page: 'p1'},
-        'raw':  {btn: 't2', page: 'p2'},
-        'vol':  {btn: 't3', page: 'p3'},
-        'peak': {btn: 't4', page: 'p4'},
-        'calc': {btn: 't6', page: 'p6', func: initCalcTab},
-        'timing': {btn: 't7', page: 'p7', func: renderTimingAnalysis},
-        'rank': {btn: 't8', page: 'p8', func: renderRankAnalysis},
-        'supply': {btn: 't9', page: 'p9', func: renderSupplyAnalysis}
+        'dash': {btn: 't1', page: 'p1', title: '대시보드'},
+        'raw':  {btn: 't2', page: 'p2', title: '실거래 데이터'},
+        'vol':  {btn: 't3', page: 'p3', title: '거래량 분석'},
+        'peak': {btn: 't4', page: 'p4', func: renderPeakAnalysis, title: '전고점 비교'},
+        'calc': {btn: 't6', page: 'p6', func: initCalcTab, title: '매수 계산기'},
+        'timing': {btn: 't7', page: 'p7', func: renderTimingAnalysis, title: '매수 타이밍'},
+        'rank': {btn: 't8', page: 'p8', func: renderRankAnalysis, title: '종합 점수'},
+        'supply': {btn: 't9', page: 'p9', func: renderSupplyAnalysis, title: '공급 분석'}
     };
     
     // Hide all pages and deactivate all buttons
-    document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
-    document.querySelectorAll('.tb').forEach(b => b.classList.remove('tab-a'));
+    document.querySelectorAll('.tab-page').forEach(function(c) { c.classList.add('hidden'); });
+    document.querySelectorAll('.tb').forEach(function(b) { b.classList.remove('tab-a'); b.classList.add('tab-i'); });
     
     const target = tabs[t];
     if(target) {
         document.getElementById(target.page).classList.remove('hidden');
         document.getElementById(target.btn).classList.add('tab-a');
+        document.getElementById(target.btn).classList.remove('tab-i');
         if(target.func) target.func();
         window.scrollTo({top:0, behavior:'smooth'});
+        
+        // Update hash without jumping
+        if(history.pushState) history.pushState(null, null, '#'+t);
+        else location.hash = t;
     }
+    if(typeof lucide !== 'undefined') lucide.createIcons();
 }
+
+// Handle browser back/forward
+window.onpopstate = function() {
+    var h = location.hash.replace('#','') || 'dash';
+    switchTab(h);
+};
 
 var sch=null;
 function renderSupplyAnalysis() {
@@ -784,38 +769,51 @@ function renderRankAnalysis() {
     sorted.sort(function(a,b){return b.score - a.score});
     
     var h = '';
+    if(!sorted.length) {
+        h = '<div class="col-span-full py-20 text-center text-slate-400">종합 분석 데이터를 준비 중입니다...</div>';
+    }
     sorted.forEach(function(it, idx){
         var rankColor = idx < 3 ? (idx===0?'text-yellow-500':idx===1?'text-slate-400':'text-orange-400') : 'text-slate-300';
-        h += '<div class="glass p-5 rounded-2xl flex items-center gap-4 relative overflow-hidden group hover:border-indigo-300 transition-all cursor-default">';
-        h += '<div class="text-4xl font-black ' + rankColor + ' w-12 italic">' + (idx+1) + '</div>';
-        h += '<div class="flex-grow">';
-        h += '<div class="flex justify-between items-start">';
-        h += '<div><span class="text-[10px] text-slate-400 uppercase tracking-tighter">' + it.dn + '</span><h4 class="font-bold text-slate-800">' + it.nm + '</h4></div>';
-        h += '<div class="text-right"><div class="text-2xl font-black text-indigo-600">' + it.score + '<span class="text-[10px] ml-0.5">점</span></div><div class="text-[10px] text-slate-400">투자 매력도</div></div>';
+        var bgGradients = [
+            'from-yellow-50 to-white border-yellow-200',
+            'from-slate-50 to-white border-slate-200',
+            'from-orange-50 to-white border-orange-200'
+        ];
+        var bgClass = idx < 3 ? bgGradients[idx] : 'bg-white border-slate-100';
+        var badge = idx === 0 ? '🏆 최우수 투자지' : idx === 1 ? '🥈 핵심 우량지' : idx === 2 ? '🥉 주요 관심지' : '';
+        
+        h += '<div class="glass p-7 rounded-3xl flex flex-col gap-5 relative overflow-hidden group hover:border-indigo-400 transition-all border-2 bg-gradient-to-br '+bgClass+' shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300">';
+        if(badge) h += '<div class="absolute top-4 right-4 text-[9px] font-black px-2.5 py-1.5 rounded-full bg-white/90 shadow-sm border border-slate-100 z-20 flex items-center gap-1.5 backdrop-blur-sm">' + badge + '</div>';
+        h += '<div class="flex justify-between items-start z-10">';
+        h += '  <div class="flex items-center gap-4">';
+        h += '    <div class="text-6xl font-black ' + rankColor + ' italic opacity-25 group-hover:opacity-40 transition-opacity select-none tracking-tighter">' + (idx+1) + '</div>';
+        h += '    <div><span class="text-[9px] font-black text-indigo-500/70 uppercase tracking-[0.2em] mb-1 block">' + it.dn + '</span><h4 class="text-xl font-black text-slate-800 leading-tight">' + it.nm + '</h4></div>';
+        h += '  </div>';
+        h += '  <div class="text-right"><div class="text-4xl font-black text-indigo-600 tracking-tighter">' + it.score.toFixed(1) + '<span class="text-[10px] ml-1 font-black text-indigo-400 uppercase">pts</span></div><div class="text-[9px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Investment Score</div></div>';
         h += '</div>';
-        h += '<div class="grid grid-cols-2 gap-2 mt-3 text-[10px]">';
-        h += '<div class="bg-slate-50 p-2 rounded flex flex-col"><span class="text-slate-400">회복률</span><span class="font-bold">' + it.ratio + '%</span></div>';
-        h += '<div class="bg-slate-50 p-2 rounded flex flex-col"><span class="text-slate-400">하락폭</span><span class="font-bold text-red-500">' + it.drop + '%</span></div>';
-        h += '<div class="col-span-2 bg-indigo-50 text-indigo-700 p-2 rounded flex justify-between"><span>' + it.parking + '</span><span>' + it.hh + '세대</span></div>';
+        h += '<div class="grid grid-cols-2 gap-4 z-10">';
+        h += '  <div class="bg-white/60 backdrop-blur-md p-4 rounded-2xl border border-white/80 flex flex-col shadow-sm group-hover:bg-white transition-colors"><span class="text-slate-400 text-[9px] font-black uppercase mb-1.5 tracking-tight">Peak Price Drop</span><span class="text-xl font-black text-red-500">' + it.drop + '%</span></div>';
+        h += '  <div class="bg-white/60 backdrop-blur-md p-4 rounded-2xl border border-white/80 flex flex-col shadow-sm group-hover:bg-white transition-colors"><span class="text-slate-400 text-[9px] font-black uppercase mb-1.5 tracking-tight">Current Recovery</span><span class="text-xl font-black text-indigo-600">' + it.ratio + '%</span></div>';
+        h += '  <div class="col-span-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white p-4 rounded-2xl flex justify-between items-center shadow-lg shadow-indigo-200/50 group-hover:from-indigo-500 group-hover:to-violet-500 transition-all">';
+        h += '    <div class="flex flex-col"><span class="text-[9px] text-indigo-100 font-bold uppercase mb-1 opacity-80">Parking Space</span><span class="text-xs font-black flex items-center gap-1.5"><i data-lucide="car" class="w-3.5 h-3.5 text-indigo-200"></i>' + it.parking + '</span></div>';
+        h += '    <div class="flex flex-col text-right"><span class="text-[9px] text-indigo-100 font-bold uppercase mb-1 opacity-80">Scale</span><span class="text-xs font-black flex items-center gap-1.5 justify-end"><i data-lucide="users" class="w-3.5 h-3.5 text-indigo-200"></i>' + it.hh.toLocaleString() + '세대</span></div>';
+        h += '  </div>';
         h += '</div>';
-        h += '</div>';
-        h += '<div class="absolute -right-2 -bottom-2 w-12 h-12 bg-indigo-500/5 rounded-full group-hover:scale-150 transition-transform"></div>';
+        h += '<div class="absolute -right-10 -bottom-10 w-32 h-32 bg-indigo-500/5 rounded-full group-hover:scale-150 transition-transform duration-1000 ease-out"></div>';
         h += '</div>';
     });
     list.innerHTML = h;
+    if(typeof lucide !== 'undefined') lucide.createIcons();
 }
 
-document.addEventListener('DOMContentLoaded',function(){
+document.addEventListener('DOMContentLoaded', function() {
     if(INJECTED_DATA && INJECTED_MONTHS && !isDataEmpty(INJECTED_DATA)){
-        renderAll(INJECTED_DATA,INJECTED_MONTHS);
+        renderAll(INJECTED_DATA, INJECTED_MONTHS);
     } else {
-        // 데이터가 없는 경우 경고 메시지 표시 및 샘플 데이터 렌더링
         console.warn("Real data missing or empty. Showing sample data.");
         var d=new Date(),m=[];for(var i=11;i>=0;i--){var t=new Date(d.getFullYear(),d.getMonth()-i,1);var mm=t.getMonth()+1;m.push(t.getFullYear().toString()+(mm<10?'0'+mm:mm))}
         var b={mangpo_hillstate:85000,mangpo_ipark:80000,mangpo_skview:75000,mangpo_sujain:70000,yeongtong_edupark:65000,yeongtong_dongbo:55000,yeongtong_shinmyung:54000,maegyo_skview:90000,maegyo_hillstate:88000};var dm={};for(var k in b){dm[k]=[];var v=b[k];for(var j=0;j<12;j++){v+=Math.floor(Math.random()*1500-500);dm[k].push(v)}}
         renderAll(dm,m);
-        
-        // 상단에 안내 배너 추가
         var banner = document.createElement('div');
         banner.className = 'bg-amber-50 border-b border-amber-200 text-amber-800 px-4 py-2 text-center text-xs font-bold';
         banner.innerHTML = '⚠️ 현재 실시간 데이터를 불러올 수 없어 샘플 데이터를 표시하고 있습니다. 파이썬 스크립트 실행 결과를 확인해 주세요.';
@@ -823,6 +821,10 @@ document.addEventListener('DOMContentLoaded',function(){
     }
     rF=INJECTED_RAW||[];
     rRT();
+    
+    // Initial tab selection based on hash
+    var h = location.hash.replace('#','') || 'dash';
+    switchTab(h);
 });
 </script>
 </body>
