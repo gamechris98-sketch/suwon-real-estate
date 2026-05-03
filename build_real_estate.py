@@ -105,10 +105,21 @@ with open(html_path, 'r', encoding='utf-8') as f:
     content = f.read()
 
 ts = now.strftime('%Y-%m-%d %H:%M')
+
+# 뉴스/정책 (여기서 내용 수정하면 자동 반영)
+news = [
+    {"tag":"금리","title":"한국은행 기준금리 동결 (2.75%)","desc":"금통위 만장일치 동결. 하반기 인하 기대감 지속.","date":"2026.04","tc":"bg-amber-100 text-amber-700"},
+    {"tag":"정책","title":"스트레스 DSR 2단계 시행","desc":"변동금리 가산금리 적용, 대출 한도 축소.","date":"2026.03","tc":"bg-red-100 text-red-700"},
+    {"tag":"개발","title":"수원 매교역 역세권 개발 본격화","desc":"매교역 복합개발 순항. 인프라 확충 기대.","date":"2026.02","tc":"bg-emerald-100 text-emerald-700"},
+    {"tag":"교통","title":"GTX-A 수원 연장 추진","desc":"수원역 연장 타당성 조사 착수.","date":"2026.01","tc":"bg-blue-100 text-blue-700"},
+    {"tag":"공급","title":"영통구 2026년 신규 입주 물량","desc":"영통·망포 약 2,000세대 입주 예정.","date":"2025.12","tc":"bg-slate-100 text-slate-600"},
+]
+
 content = content.replace("const INJECTED_DATA = null;", f"const INJECTED_DATA = {json.dumps(data)};")
 content = content.replace("const INJECTED_MONTHS = null;", f"const INJECTED_MONTHS = {json.dumps(months)};")
 content = content.replace("const INJECTED_TIMESTAMP = null;", f"const INJECTED_TIMESTAMP = '{ts}';")
 content = content.replace("const INJECTED_RAW = null;", f"const INJECTED_RAW = {json.dumps(raw_items, ensure_ascii=False)};")
+content = content.replace("const INJECTED_NEWS = null;", f"const INJECTED_NEWS = {json.dumps(news, ensure_ascii=False)};")
 
 with open(html_path, 'w', encoding='utf-8') as f:
     f.write(content)
