@@ -208,6 +208,26 @@ for aid, meta in APT_FILTERS.items():
         'ratio': round(curr_p / hist_peak_p * 100, 1) if hist_peak_p else 0,
         'households': households, 'parking': f"주차 {parking_ratio} | {parking_conn}"
     }
+    
+    # 종합 점수 계산 (가성비 점수)
+    # 1. 회복률이 낮을수록(추후 상승 여력), 2. 세대수가 많을수록, 3. 주차가 편할수록, 4. 연식이 좋을수록 가점
+    recovery_score = (100 - analysis_data[aid]['ratio']) * 0.4
+    drop_score = abs(analysis_data[aid]['drop']) * 0.2
+    hh_score = (households / 4000) * 20
+    pk_val = float(parking_ratio.replace('대','')) if '대' in parking_ratio else 1.0
+    pk_score = (pk_val / 1.5) * 10
+    
+    # built 정보 추출 (trade_history 혹은 all_trades_10y에서 해당 아파트 데이터 확인)
+    apt_built = "2000"
+    for t in t10y_raw:
+        if t.get('built'):
+            apt_built = t['built']
+            break
+            
+    age_val = int(apt_built) if apt_built.isdigit() else 2000
+    age_score = ((age_val - 1990) / 40) * 10
+    
+    analysis_data[aid]['score'] = round(recovery_score + drop_score + hh_score + pk_score + age_score, 1)
 
 # 가상 전문가 의견 (다른 성향의 5인)
 experts = [
@@ -245,6 +265,13 @@ if not os.path.exists(html_path):
 with open(html_path, 'r', encoding='utf-8') as f:
     html = f.read()
 
+supply_data = {
+    "years": ["2022", "2023", "2024", "2025", "2026", "2027"],
+    "supply": [11500, 10800, 9200, 6500, 3200, 1800],
+    "demand": 6000,
+    "summary": "2025년 이후 수원시 입주 물량이 급감하며 공급 부족 단계에 진입할 것으로 예상됩니다."
+}
+
 import json
 injection = f"""
 const INJECTED_DATA = {json.dumps(chart_data)};
@@ -252,9 +279,11 @@ const INJECTED_ANALYSIS_DATA = {json.dumps(analysis_data, ensure_ascii=False)};
 const INJECTED_ANALYSIS = {json.dumps(mkt_summary, ensure_ascii=False)};
 const INJECTED_MONTHS = {json.dumps(months)};
 const INJECTED_TIMESTAMP = '{now.strftime('%Y-%m-%d %H:%M')}';
-const INJECTED_RAW = {json.dumps(raw_items, ensure_ascii=False)};
+const INJECTED_RAW = {json.dumps(raw_items[:1000], ensure_ascii=False)};
 const INJECTED_NEWS = {json.dumps(news_list, ensure_ascii=False)};
+const INJECTED_SUPPLY = {json.dumps(supply_data, ensure_ascii=False)};
 """
+
 
 import re
 html = re.sub(r"// ======== AUTO_UPDATE_ZONE_START ========.*?// ======== AUTO_UPDATE_ZONE_END ========", 
