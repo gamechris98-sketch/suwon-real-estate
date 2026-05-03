@@ -311,10 +311,10 @@ function renderAll(data,months){
     
     var pb='';
     [{l:'10년',v:120},{l:'5년',v:60},{l:'3년',v:36},{l:'12개월',v:12},{l:'6개월',v:6},{l:'3개월',v:3}].forEach(function(p){
-        pb+='<button class="pb'+(p.v===60?' active':'')+'" data-m="'+p.v+'" onclick="setPd('+p.v+')">'+p.l+'</button>';
+        pb+='<button class="pb'+(p.v===12?' active':'')+'" data-m="'+p.v+'" onclick="setPd('+p.v+')">'+p.l+'</button>';
     });
     document.getElementById('periodBtns').innerHTML=pb;
-    cPd = 60; // Default to 5y
+    cPd = 12; // Default to 12m for better focus
 
     var h='';
     D.forEach(function(dg){
@@ -327,7 +327,7 @@ function renderAll(data,months){
             var ar=diff>0?'↑':diff<0?'↓':'→';
             
             var aData = typeof INJECTED_ANALYSIS_DATA !== 'undefined' ? INJECTED_ANALYSIS_DATA[a.id] : null;
-            var peak = aData ? aData.peak : cur;
+            var peak = aData ? aData.hist_peak : cur;
             var drop = aData && peak > cur ? Math.round((cur - peak) / peak * 100) : 0;
             
             h+='<div onclick="oM(\''+a.id+'\')" class="cursor-pointer glass rounded-xl p-3 border-l-4 hover:-translate-y-1 transition-all hover:shadow-md relative overflow-hidden" style="border-left-color:'+a.c+'">';
@@ -472,31 +472,41 @@ function oM(id){
     var apt=A.find(function(a){return a.id===id});if(!apt)return;
     document.getElementById('mT').innerHTML='<span class="w-3 h-3 rounded-full inline-block mr-2" style="background:'+apt.c+'"></span>'+apt.dn+' · '+apt.nm;
     
+    // 더 정교한 이름 매칭 (공백 제거, 대소문자 무시, 뷰/VIEW 혼용 대응)
+    var normalize = function(s){ return (s||'').toUpperCase().replace(/\s/g,'').replace('VIEW','뷰'); };
+    var targetNm = normalize(apt.nm);
+    
     var raw=(INJECTED_RAW||[]).filter(function(r){
-        return r.dong===apt.dn && (r.apt===apt.nm || r.apt.indexOf(apt.nm)>=0);
+        if(r.dong!==apt.dn) return false;
+        var rnm = normalize(r.apt);
+        return rnm.indexOf(targetNm)>=0 || targetNm.indexOf(rnm)>=0;
     }).slice(0,20);
     
     var tb='';
     if(raw.length>0){
         raw.forEach(function(r){
-            tb+='<tr class="hover:bg-slate-50 border-b border-slate-50"><td class="px-2 py-2 text-[11px]">'+r.d+'</td><td class="px-2 py-2 text-right font-bold text-[11px]">'+(r.price/10000).toFixed(1)+'억</td><td class="px-2 py-2 text-right text-[11px]">'+r.area+'㎡</td><td class="px-2 py-2 text-right text-[11px]">'+r.floor+'층</td></tr>';
+            tb+='<tr class="hover:bg-slate-50 border-b border-slate-50"><td class="px-2 py-2 text-[11px]">'+r.d+'</td><td class="px-2 py-2 text-right font-bold text-[11px]">'+((r.price||0)/10000).toFixed(1)+'억</td><td class="px-2 py-2 text-right text-[11px]">'+r.area+'㎡</td><td class="px-2 py-2 text-right text-[11px]">'+r.floor+'층</td></tr>';
         });
     }else{
-        var prices=gD[id];
+        var prices=gD[id]||[];
         for(var i=prices.length-1;i>=0;i--){
             var ml=gM[i].substring(2,4)+'년'+parseInt(gM[i].substring(4,6))+'월';
-            tb+='<tr class="text-xs"><td class="px-2 py-2">'+ml+'</td><td class="px-2 py-2 text-right font-bold">'+(prices[i]/10000).toFixed(1)+'억</td><td class="px-2 py-2 text-right">-</td><td class="px-2 py-2 text-right">-</td></tr>';
+            tb+='<tr class="text-xs"><td class="px-2 py-2">'+ml+'</td><td class="px-2 py-2 text-right font-bold">'+((prices[i]||0)/10000).toFixed(1)+'억</td><td class="px-2 py-2 text-right">-</td><td class="px-2 py-2 text-right">-</td></tr>';
         }
     }
     document.getElementById('mB').innerHTML=tb;
     
-    var prices=gD[id]; var cur=prices[prices.length-1]; 
+    var prices=gD[id]||[]; 
+    var cur=prices.length > 0 ? prices[prices.length-1] : 0; 
     var aData = typeof INJECTED_ANALYSIS_DATA !== 'undefined' ? INJECTED_ANALYSIS_DATA[id] : null;
-    var peak = aData ? aData.peak : cur;
+    var peak = (aData && aData.hist_peak) ? aData.hist_peak : (cur || 0);
     var drop = aData && peak > cur ? Math.round((cur - peak) / peak * 100) : 0;
     var tagsHtml = apt.t ? apt.t.map(t=>'<span class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[10px] font-bold">'+t+'</span>').join('') : '';
-    document.getElementById('mSummary').innerHTML='<div class="mb-2 pb-2 border-b border-slate-200">연식: <b>'+apt.y+'</b> | 세대당 주차: <b>'+apt.p+'</b> | 용적률: <b>'+apt.f+'</b></div><div class="flex flex-wrap gap-1 mb-2">'+tagsHtml+'</div>최근 거래 <b>'+raw.length+'건</b> | 중위가 <b>'+(cur/10000).toFixed(1)+'억</b> | 10년 전고점 <b>'+(peak/10000).toFixed(1)+'억</b>';
-    var mom=cur-prices[Math.max(0,prices.length-4)];
+    
+    document.getElementById('mSummary').innerHTML='<div class="mb-2 pb-2 border-b border-slate-200">연식: <b>'+apt.y+'</b> | 세대당 주차: <b>'+apt.p+'</b> | 용적률: <b>'+apt.f+'</b></div><div class="flex flex-wrap gap-1 mb-2">'+tagsHtml+'</div>최근 거래 <b>'+raw.length+'건</b> | 최근가 <b>'+((cur||0)/10000).toFixed(1)+'억</b> | 10년 전고점 <b>'+((peak||0)/10000).toFixed(1)+'억</b>';
+    
+    var prevPrice = prices.length >= 4 ? prices[prices.length-4] : (prices[0] || 0);
+    var mom=(cur||0)-(prevPrice||0);
     var h_mom=mom>0?'<p><strong class="text-indigo-900">🔥 3개월 상승</strong><br>+'+(mom/10000).toFixed(1)+'억 상승</p>':mom<0?'<p><strong class="text-indigo-900">📉 3개월 조정</strong><br>'+(mom/10000).toFixed(1)+'억 하락</p>':'<p><strong class="text-indigo-900">⚖️ 보합</strong><br>박스권 흐름</p>';
     if(drop<=-5) h_mom+='<div class="mt-3 pt-3 border-t border-indigo-100 text-xs text-indigo-700">⚠️ 전고점 대비 <b>'+drop+'% 하락</b> 중입니다.</div>';
     document.getElementById('mI').innerHTML=h_mom;
@@ -588,7 +598,7 @@ function renderPeakAnalysis(){
         var a = x.a;
         var data = x.d;
         var cur = data.curr;
-        var peak = data.peak;
+        var peak = data.hist_peak;
         var diff = cur - peak;
         var max_drop_pct = data.drop;
         var ratio = data.ratio;
@@ -599,21 +609,21 @@ function renderPeakAnalysis(){
         ratios.push(ratio);
         colors.push(a.c);
 
-        var h_peak = data.hist_peak || data.peak;
-        var h_min = data.hist_min || data.min_after_peak;
-        var h_drop_amt = data.drop_amt || (h_peak - h_min);
+        var h_peak = (data.hist_peak || data.peak || 0);
+        var h_min = (data.hist_min || data.min_after_peak || 0);
+        var h_drop_amt = (data.drop_amt || (h_peak - h_min) || 0);
         var diff = cur - h_peak;
         
         h+='<tr class="hover:bg-slate-50 border-b border-slate-50">';
         h+='<td class="px-3 py-4 font-medium '+dc+'">'+a.dn+'</td>';
         h+='<td class="px-3 py-4 font-bold">'+a.nm+'</td>';
-        h+='<td class="px-3 py-4 text-right font-bold">'+(cur/10000).toFixed(1)+'억</td>';
-        h+='<td class="px-3 py-4 text-right text-indigo-600 font-bold">'+(h_peak/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-right font-bold">'+((cur||0)/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-right text-indigo-600 font-bold">'+((h_peak||0)/10000).toFixed(1)+'억</td>';
         h+='<td class="px-3 py-4 text-left text-slate-400 text-xs">'+(data.hist_peak_date || data.peak_date || '-')+'</td>';
-        h+='<td class="px-3 py-4 text-right text-blue-600 font-bold">'+(h_min/10000).toFixed(1)+'억</td>';
-        h+='<td class="px-3 py-4 text-right text-red-500 font-bold">'+(h_drop_amt/10000).toFixed(1)+'억</td>';
-        h+='<td class="px-3 py-4 text-right text-red-500 font-bold">'+max_drop_pct+'%</td>';
-        h+='<td class="px-3 py-4 text-right font-extrabold '+rc+'">'+ratio+'%</td>';
+        h+='<td class="px-3 py-4 text-right text-blue-600 font-bold">'+((h_min||0)/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-right text-red-500 font-bold">'+((h_drop_amt||0)/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-right text-red-500 font-bold">'+(max_drop_pct||0)+'%</td>';
+        h+='<td class="px-3 py-4 text-right font-extrabold '+rc+'">'+(ratio||0)+'%</td>';
         h+='</tr>';
     });
     document.getElementById('peakB').innerHTML=h;
