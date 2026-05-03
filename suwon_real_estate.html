@@ -4,7 +4,19 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;background:#f1f5f9}.glass{background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border:1px solid #fff;box-shadow:0 4px 6px -1px rgba(0,0,0,.05)}.tab-a{color:#4f46e5;border-bottom:2px solid #4f46e5;font-weight:700}.tab-i{color:#94a3b8;border-bottom:2px solid transparent}.tb{padding:10px 20px;cursor:pointer;font-size:14px}.tb:hover{color:#6366f1}.pb{padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer;transition:all .2s}.pb.active{background:#4f46e5;color:#fff}.pb:not(.active){background:#e2e8f0;color:#64748b}</style>
+<style>
+body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;background:#f8fafc;scroll-behavior:smooth}
+.glass{background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border:1px solid #fff;box-shadow:0 4px 20px -5px rgba(0,0,0,.05)}
+.tab-a{color:#4f46e5;border-bottom:2px solid #4f46e5;font-weight:800}
+.tab-i{color:#94a3b8;border-bottom:2px solid transparent}
+.tb{padding:10px 20px;cursor:pointer;font-size:14px;transition:all 0.2s}
+.tb:hover:not(.tab-a){color:#6366f1;background:rgba(99,102,241,0.05)}
+.pb{padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;transition:all .2s;font-weight:600}
+.pb.active{background:#4f46e5;color:#fff;box-shadow:0 4px 10px rgba(79,70,229,0.3)}
+.pb:not(.active){background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0}
+@keyframes tabIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.tab-fade { animation: tabIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+</style>
 </head><body class="text-slate-800 antialiased min-h-screen flex flex-col">
 <div class="sticky top-0 z-50 shadow-lg bg-white/80 backdrop-blur-md">
 <header class="bg-gradient-to-r from-indigo-700 via-indigo-600 to-violet-700 text-white border-b border-white/10">
@@ -235,6 +247,46 @@
 <table class="w-full text-sm"><thead class="bg-slate-50 text-slate-500"><tr><th class="px-2 py-2 text-left">거래일</th><th class="px-2 py-2 text-right">금액</th><th class="px-2 py-2 text-right">면적</th><th class="px-2 py-2 text-right">층</th></tr></thead><tbody id="mB" class="divide-y"></tbody></table>
 <div id="mI" class="bg-indigo-50 p-4 rounded-xl text-sm"></div>
 </div></div></div>
+
+<footer class="bg-slate-900 text-slate-400 py-16 mt-20 border-t border-slate-800">
+    <div class="container mx-auto px-4 max-w-7xl">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div class="space-y-6">
+                <div class="flex items-center gap-3 text-white">
+                    <div class="p-2 bg-indigo-600 rounded-lg"><i data-lucide="building-2" class="w-6 h-6"></i></div>
+                    <span class="font-black text-xl tracking-tighter">수원 부동산 모니터링</span>
+                </div>
+                <p class="text-xs leading-relaxed opacity-70">수원시 핵심 지역(망포, 영통, 매교)의 84㎡ 국민평수 실거래 데이터를 기반으로 정밀한 시장 분석과 투자 지표를 제공하는 전문 분석 플랫폼입니다.</p>
+                <div class="flex gap-4">
+                    <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center hover:bg-indigo-600 transition-colors cursor-pointer"><i data-lucide="github" class="w-4 h-4 text-white"></i></div>
+                    <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center hover:bg-indigo-600 transition-colors cursor-pointer"><i data-lucide="mail" class="w-4 h-4 text-white"></i></div>
+                </div>
+            </div>
+            <div class="space-y-6">
+                <h4 class="text-white font-black text-sm uppercase tracking-widest">데이터 소스 및 주기</h4>
+                <ul class="text-xs space-y-3 opacity-80">
+                    <li class="flex items-center gap-2"><span class="w-1 h-1 bg-indigo-500 rounded-full"></span>국토교통부 실거래가 공개시스템</li>
+                    <li class="flex items-center gap-2"><span class="w-1 h-1 bg-indigo-500 rounded-full"></span>공공데이터포털 부동산 통계 API</li>
+                    <li class="flex items-center gap-2"><span class="w-1 h-1 bg-indigo-500 rounded-full"></span>매일 새벽 04:00 자동 업데이트</li>
+                </ul>
+            </div>
+            <div class="space-y-6">
+                <h4 class="text-white font-black text-sm uppercase tracking-widest">Legal Disclaimer</h4>
+                <p class="text-[10px] leading-relaxed opacity-60">본 플랫폼에서 제공하는 모든 데이터 및 분석 결과는 투자 참고용으로만 사용하시기 바랍니다. 시스템상의 오류나 데이터 지연이 발생할 수 있으며, 모든 투자의 결정과 책임은 투자자 본인에게 귀속됩니다.</p>
+                <div class="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+                    <p class="text-[9px] font-bold text-indigo-400">Analysis Lab Beta v2.4.0</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-16 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold uppercase tracking-widest opacity-40">
+            <span>© 2026 SUWON REAL ESTATE MONITORING.</span>
+            <div class="flex gap-6">
+                <span>Terms of Service</span>
+                <span>Privacy Policy</span>
+            </div>
+        </div>
+    </div>
+</footer>
 <script>
 if(typeof lucide!=='undefined')lucide.createIcons();
 var D=[
@@ -245,6 +297,25 @@ var D=[
 var A=[];D.forEach(function(x){x.a.forEach(function(y){y.dn=x.n;A.push(y)})});
 var ch=null,vh=null,rh=null,gD=null,gM=null,rF=[],rK='d',rA=false,rPg=0,PS=50,cPd=12,PK={};
 function isDataEmpty(o){for(var k in o)return false;return true}
+Chart.register({
+    id: 'crosshair',
+    afterDraw: (chart) => {
+        if (chart.tooltip?._active?.length) {
+            let x = chart.tooltip._active[0].element.x;
+            let yAxis = chart.scales.y;
+            let ctx = chart.ctx;
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(x, yAxis.top);
+            ctx.lineTo(x, yAxis.bottom);
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'rgba(79, 70, 229, 0.2)';
+            ctx.setLineDash([3, 3]);
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+});
 // ======== AUTO_UPDATE_ZONE_START ========
 const INJECTED_DATA = {"mangpo_hillstate": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51000, 51000, 51000, 51000, 51000, 51000, 42176, 52900, 52900, 70000, 50500, 50500, 50500, 50500, 67500, 66500, 69500, 86200, 71900, 72400, 74500, 78000, 97500, 87000, 88000, 84000, 82000, 85500, 110000, 106500, 92500, 93000, 94000, 94500, 121000, 130000, 115000, 109000, 108500, 112000, 108500, 114000, 138000, 113500, 110000, 92000, 110000, 104500, 100500, 110000, 130000, 97400, 92800, 95500, 90000, 90000, 61500, 80000, 86000, 78000, 119000, 113800, 92000, 94300, 123500, 94500, 93900, 97500, 96000, 94000, 95000, 96000, 96000, 96500, 124000, 122500, 100000, 125700, 103600, 101000, 102500, 101000, 102000, 103000, 129000, 104000, 129000, 107000, 108500, 107000, 129200, 136000, 144000, 117300, 120000, 117500, 126500, 147000, 127800, 127800], "mangpo_ipark": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 75000, 62000, 62000, 58500, 55000, 59900, 71000, 71000, 61000, 61000, 80000, 84000, 88000, 88000, 88000, 64800, 95000, 103800, 103000, 97000, 89300, 100000, 101500, 101500, 125000, 106500, 107000, 100500, 87000, 84300, 70000, 90500, 97000, 120000, 81000, 66000, 75000, 83500, 73700, 73000, 76000, 65000, 100000, 107500, 84000, 104000, 87500, 110000, 78000, 110000, 87300, 108200, 88000, 104000, 110500, 76000, 113500, 115000, 104500, 95000, 118000, 86500, 116000, 119500, 122000, 95900, 106000, 98000, 87000, 118000, 97000, 96800, 97000, 99000, 103000, 133000, 124500, 107700, 133500, 116000, 119500, 119500], "mangpo_skview": [0, 0, 43365, 45400, 35500, 35500, 35500, 47200, 47200, 47200, 36800, 36800, 37300, 47200, 36500, 37000, 46800, 47000, 47500, 47300, 48000, 49500, 52000, 49900, 52000, 52000, 54800, 54750, 44500, 54300, 45700, 55000, 56000, 55500, 56000, 56300, 45500, 56500, 55800, 64000, 62900, 62900, 70000, 75000, 71000, 59500, 59500, 59500, 75500, 77000, 73000, 80500, 59500, 85000, 82000, 85000, 90000, 90000, 86000, 90500, 94000, 90500, 96300, 95000, 97500, 91500, 90000, 90000, 89000, 86600, 83000, 68000, 68000, 75000, 80000, 56000, 74700, 66700, 66700, 68800, 65000, 74000, 76000, 78800, 81500, 75000, 81500, 63000, 80000, 62000, 79300, 77000, 74500, 83500, 84500, 84500, 84000, 83300, 86200, 69000, 84800, 84800, 82000, 82000, 83000, 85000, 87500, 89500, 82700, 82700, 89000, 91000, 85500, 92000, 92500, 92500, 96800, 96800, 96800, 96800], "mangpo_sujain": [48800, 47900, 49300, 42700, 49000, 43200, 48700, 47500, 43200, 47700, 35500, 48200, 48500, 49700, 36500, 42800, 49300, 42400, 48400, 49000, 49800, 50500, 49500, 48500, 49400, 51300, 51750, 49000, 49800, 52000, 51800, 51800, 44000, 44000, 51000, 40500, 52600, 52500, 52000, 55000, 57000, 63800, 67500, 72800, 61000, 61000, 61000, 57000, 63500, 69500, 67500, 66800, 78000, 81500, 84500, 75000, 61700, 84500, 88800, 89500, 89500, 93000, 93000, 93000, 65500, 65500, 65500, 65500, 73500, 75000, 66000, 100000, 100000, 100000, 100000, 100000, 63000, 63000, 71000, 69000, 51500, 67000, 67000, 87500, 69300, 73500, 72500, 62000, 70500, 70500, 70500, 70500, 70500, 70500, 70500, 87000, 79700, 64800, 68000, 87500, 91000, 88000, 90000, 65500, 66500, 82500, 78500, 78000, 87500, 89300, 78500, 67800, 90500, 90000, 90500, 92900, 92900, 92500, 76500, 76500], "yeongtong_edupark": [41500, 41100, 41900, 41500, 42400, 43500, 43500, 43000, 43000, 41500, 41800, 42000, 44000, 42800, 43000, 43900, 43500, 42500, 45000, 40500, 44000, 45000, 43500, 43000, 44800, 44900, 44500, 44500, 47200, 47500, 39800, 38500, 48000, 48500, 44800, 46000, 46000, 48000, 49800, 50000, 50500, 52000, 53800, 58800, 63000, 50800, 62000, 60500, 66000, 69500, 68000, 58500, 70000, 71750, 74800, 77500, 74000, 83000, 80500, 77000, 82900, 84000, 82500, 84900, 90500, 90500, 84900, 75000, 75000, 73000, 72500, 72500, 74000, 74000, 75000, 52000, 72000, 64000, 54000, 75000, 67000, 65000, 72700, 59800, 74000, 72500, 75500, 75800, 71500, 71500, 70000, 72500, 66500, 66500, 70800, 69800, 70000, 72000, 75000, 74000, 74500, 74500, 74000, 79500, 75000, 79500, 76000, 81500, 85000, 80000, 69500, 82200, 83800, 87000, 74500, 84000, 86500, 86700, 88000, 88000], "yeongtong_dongbo": [33900, 33900, 34500, 37800, 35000, 35800, 37500, 35700, 35500, 36800, 35000, 35000, 35300, 35500, 35000, 35500, 34000, 34000, 34000, 33700, 33000, 35900, 38900, 35000, 35700, 37100, 37100, 38500, 41500, 42000, 42000, 43800, 40000, 40000, 40000, 40000, 38400, 44200, 37000, 41300, 40500, 43350, 43000, 51300, 54000, 54000, 48000, 50900, 51000, 51000, 52500, 56000, 56000, 57000, 64000, 65500, 66000, 69000, 69000, 71800, 69000, 73000, 75000, 75000, 73100, 72000, 72000, 72000, 70400, 70400, 70400, 70400, 70400, 70400, 57500, 57750, 57750, 57750, 57750, 57750, 57750, 57750, 55500, 54400, 57700, 55800, 64000, 62800, 62000, 62000, 62000, 62000, 62000, 62000, 62000, 59800, 58000, 59500, 59500, 59800, 62500, 62500, 62500, 62500, 62500, 59500, 59500, 61000, 61000, 60700, 62000, 62000, 61800, 63000, 62000, 68500, 67000, 67000, 68800, 68800], "yeongtong_shinmyung": [36200, 37300, 36300, 36800, 37000, 36900, 38000, 36000, 37000, 37950, 37200, 37200, 37200, 38000, 37000, 35000, 35000, 35000, 37000, 34750, 35200, 39700, 35500, 38200, 36500, 36500, 37300, 39800, 46000, 46000, 46000, 44000, 44000, 44000, 39000, 37200, 43500, 38000, 40500, 42500, 44800, 44200, 49400, 51000, 50500, 50800, 53000, 51600, 55000, 57500, 59700, 59700, 53000, 60500, 65000, 65000, 65000, 65000, 72000, 72000, 75000, 75000, 79500, 79500, 79500, 79500, 79500, 80500, 80500, 80500, 80500, 67000, 66000, 66000, 66000, 66000, 66000, 55000, 55000, 55000, 55000, 60000, 60000, 54000, 54000, 58000, 59000, 59500, 59500, 59500, 59500, 59500, 61000, 62000, 62500, 60300, 61450, 61500, 68800, 70200, 66000, 62000, 62000, 62000, 64500, 64500, 64500, 67900, 66000, 64900, 65000, 66000, 65000, 65000, 68300, 68300, 63000, 68000, 75000, 75000], "maegyo_skview": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81000, 81000, 81000, 59900, 59900, 76000, 87000, 100000, 100000, 83000, 88000, 110000, 91000, 46000, 46000, 93000, 75000, 95000, 108000, 95000, 117500, 103000, 107000, 98000, 97900, 83000, 70000, 90000, 98200, 93000, 105000, 95000, 93500, 94500, 114500, 99900, 107000, 105000, 102500, 110000, 104000, 109500, 109500], "maegyo_hillstate": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 73000, 73000, 73000, 73000, 69500, 69500, 93000, 93000, 93000, 93000, 93000, 93000, 67800, 66290, 66290, 67900, 69500, 68500, 83000, 83000, 86000, 105000, 88000, 88000, 83500, 77000, 84500, 76700, 76500, 99000, 84500, 74500, 81500, 83500, 83800, 86800, 85000, 83500, 105000, 90000, 89000, 89000]};
 const INJECTED_ANALYSIS_DATA = {"mangpo_hillstate": {"hist_peak": 115000, "hist_peak_date": "2021.02.02", "hist_min": 72000, "drop_amt": 43000, "recent_peak": 130000, "recent_peak_date": "2026.03.23", "curr": 127800, "curr_date": "", "drop": -37.4, "ratio": 111.1, "households": 2140, "parking": "주차 1.28대 | 연결 O", "score": 29.0}, "mangpo_ipark": {"hist_peak": 107000, "hist_peak_date": "2021.10.16", "hist_min": 65000, "drop_amt": 42000, "recent_peak": 119500, "recent_peak_date": "2026.04.09", "curr": 119500, "curr_date": "", "drop": -39.3, "ratio": 111.7, "households": 1783, "parking": "주차 1.21대 | 연결 O", "score": 27.4}, "mangpo_skview": {"hist_peak": 97500, "hist_peak_date": "2021.10.01", "hist_min": 65000, "drop_amt": 32500, "recent_peak": 96800, "recent_peak_date": "2026.02.25", "curr": 96800, "curr_date": "", "drop": -33.3, "ratio": 99.3, "households": 710, "parking": "주차 1.21대 | 연결 O", "score": 25.1}, "mangpo_sujain": {"hist_peak": 81000, "hist_peak_date": "2021.04.26", "hist_min": 60000, "drop_amt": 21000, "recent_peak": 83000, "recent_peak_date": "2025.12.29", "curr": 76500, "curr_date": "", "drop": -25.9, "ratio": 94.4, "households": 530, "parking": "주차 1.14대 | 연결 O", "score": 23.4}, "yeongtong_edupark": {"hist_peak": 90500, "hist_peak_date": "2021.10.08", "hist_min": 40000, "drop_amt": 50500, "recent_peak": 88000, "recent_peak_date": "2026.04.29", "curr": 88000, "curr_date": "", "drop": -55.8, "ratio": 97.2, "households": 1279, "parking": "주차 1.02대 | 연결 X", "score": 27.2}, "yeongtong_dongbo": {"hist_peak": 75000, "hist_peak_date": "2021.08.11", "hist_min": 43000, "drop_amt": 32000, "recent_peak": 68800, "recent_peak_date": "2026.04.30", "curr": 68800, "curr_date": "", "drop": -42.7, "ratio": 91.7, "households": 836, "parking": "주차 1.04대 | 연결 X", "score": 24.7}, "yeongtong_shinmyung": {"hist_peak": 80500, "hist_peak_date": "2022.01.18", "hist_min": 48800, "drop_amt": 31700, "recent_peak": 75000, "recent_peak_date": "2026.04.17", "curr": 75000, "curr_date": "", "drop": -39.4, "ratio": 93.2, "households": 384, "parking": "주차 1.02대 | 연결 X", "score": 21.1}, "maegyo_skview": {"hist_peak": 100000, "hist_peak_date": "2023.06.08", "hist_min": 65100, "drop_amt": 34900, "recent_peak": 104000, "recent_peak_date": "2026.03.17", "curr": 109500, "curr_date": "", "drop": -34.9, "ratio": 109.5, "households": 3603, "parking": "주차 1.25대 | 연결 O", "score": 37.8}, "maegyo_hillstate": {"hist_peak": 93000, "hist_peak_date": "2023.06.08", "hist_min": 59500, "drop_amt": 33500, "recent_peak": 90000, "recent_peak_date": "2026.03.11", "curr": 89000, "curr_date": "", "drop": -36.0, "ratio": 95.7, "households": 2586, "parking": "주차 1.25대 | 연결 O", "score": 38.4}};
@@ -859,7 +930,12 @@ function switchTab(t){
     
     const target = tabs[t];
     if(target) {
-        document.getElementById(target.page).classList.remove('hidden');
+        var page = document.getElementById(target.page);
+        page.classList.remove('hidden');
+        page.classList.remove('tab-fade');
+        void page.offsetWidth; // Force reflow
+        page.classList.add('tab-fade');
+        
         document.getElementById(target.btn).classList.add('tab-a');
         document.getElementById(target.btn).classList.remove('tab-i');
         if(target.func) target.func();
