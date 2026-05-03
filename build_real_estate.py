@@ -123,27 +123,7 @@ chart_data = {}
 # 데이터 가공 및 주입
 # -------------------------------------------------------------------------
 
-# 데이터가 없는 경우 가상 데이터 생성 (데모용)
-if not all_trades_10y:
-    print("API data missing, creating mock data...")
-    import random
-    for m in months_10y:
-        for aid, (dong, kw) in APT_FILTERS.items():
-            # 고점을 2021년~2022년에 형성하도록 로직 추가
-            year = int(m[:4])
-            base_p = 50000
-            if year <= 2019: base_p = 50000 + (year-2015)*3000
-            elif year <= 2021: base_p = 70000 + (year-2019)*15000
-            else: base_p = 100000 - (year-2021)*5000
-            
-            p = base_p + random.randint(-5000, 10000)
-            built_yr = random.choice(['2013', '2015', '2017', '2021'])
-            all_trades_10y.append({'d': f"{m[:4]}.{m[4:]}.{random.randint(1,28):02d}", 'm': m, 'umd': dong, 'apt': kw, 'area': 84.9, 'floor': str(random.randint(1,25)), 'p': p, 'built': built_yr})
-            
-            if m in months:
-                r_p = int(p * (0.6 + random.random()*0.2))
-                all_rents.append({'d': f"{m[:4]}.{m[4:]}.{random.randint(1,28):02d}", 'm': m, 'umd': dong, 'apt': kw, 'area': 84.9, 'floor': str(random.randint(1,25)), 'p': r_p, 'built': built_yr})
-                all_trades.append({'d': f"{m[:4]}.{m[4:]}.{random.randint(1,28):02d}", 'm': m, 'umd': dong, 'apt': kw, 'area': 84.9, 'floor': str(random.randint(1,25)), 'p': p, 'built': built_yr})
+# 데모 데이터 생성 로직 제거됨
 
 # Raw 데이터 목록 생성
 for t in all_trades:
