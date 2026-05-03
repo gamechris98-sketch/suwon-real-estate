@@ -720,37 +720,27 @@ function renderPeakAnalysis(){
         });
     }
 
-    // Recovery Trend Chart (Multi-line for individual apartments)
+    // Recovery Trend Chart (Using monthly average data for full 2021-present history)
     if(window.recTrendChartObj) window.recTrendChartObj.destroy();
     var trendCtx = document.getElementById('recoveryTrendChart');
-    if(trendCtx) {
-        var aptTrendData = {}; 
-        (INJECTED_RAW || []).forEach(function(r) {
-            var aptInfo = A.find(function(a) { return a.nm === r.apt });
-            if(!aptInfo) return;
-            var peak = data[aptInfo.id] ? data[aptInfo.id].hist_peak : 0;
-            if(!peak) return;
-            
-            var month = r.d.substring(0, 7);
-            var ratio = (r.price / peak) * 100;
-            
-            if(!aptTrendData[aptInfo.id]) aptTrendData[aptInfo.id] = {};
-            if(!aptTrendData[aptInfo.id][month]) aptTrendData[aptInfo.id][month] = [];
-            aptTrendData[aptInfo.id][month].push(ratio);
-        });
+    if(trendCtx && typeof gM !== 'undefined' && typeof gD !== 'undefined') {
+        var startMonth = "202101";
+        var startIdx = gM.findIndex(function(m) { return m >= startMonth });
+        if(startIdx === -1) startIdx = 0;
         
-        // Filter months from 2021 onwards
-        var allMonths = {};
-        for(var id in aptTrendData) { for(var m in aptTrendData[id]) allMonths[m] = true; }
-        var sortedMonths = Object.keys(allMonths).sort().filter(function(m) { return m >= "2021.01" });
-        var trendLabels = sortedMonths.map(function(m) { return m.substring(2) });
+        var displayMonths = gM.slice(startIdx);
+        var trendLabels = displayMonths.map(function(m) { return m.substring(2,4) + '.' + m.substring(4,6) });
         
         var datasets = [];
         A.forEach(function(a) {
-            var dataPoints = sortedMonths.map(function(m) {
-                var vals = (aptTrendData[a.id] && aptTrendData[a.id][m]) || [];
-                if(vals.length === 0) return null;
-                return (vals.reduce(function(s, v){return s + v}, 0) / vals.length).toFixed(1);
+            var prices = gD[a.id] || [];
+            var peak = (data[a.id] && data[a.id].hist_peak) ? data[a.id].hist_peak : 0;
+            if(!peak || !prices.length) return;
+            
+            var dataPoints = displayMonths.map(function(m, i) {
+                var price = prices[startIdx + i];
+                if(!price || price === 0) return null;
+                return ((price / peak) * 100).toFixed(1);
             });
             
             if(dataPoints.some(function(v){return v !== null})) {
@@ -761,9 +751,9 @@ function renderPeakAnalysis(){
                     backgroundColor: a.c,
                     borderWidth: 2,
                     fill: false,
-                    tension: 0.4,
-                    pointRadius: 3,
-                    pointHoverRadius: 6,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
                     spanGaps: true
                 });
             }
@@ -777,20 +767,33 @@ function renderPeakAnalysis(){
                 maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
                 plugins: { 
-                    legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9, weight: 'bold' } } },
+                    legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9, weight: 'bold' }, padding: 10 } },
                     tooltip: { 
-                        backgroundColor: 'rgba(255,255,255,0.95)', 
+                        backgroundColor: 'rgba(255,255,255,0.98)', 
                         titleColor: '#1e293b', 
                         bodyColor: '#475569',
                         borderColor: '#e2e8f0',
                         borderWidth: 1,
-                        padding: 10,
-                        callbacks: { label: function(c){ return c.dataset.label + ': ' + c.raw + '%' } }
+                        padding: 12,
+                        boxPadding: 5,
+                        usePointStyle: true,
+                        callbacks: { 
+                            title: function(items) { return '20' + items[0].label + ' 기준 회복률'; },
+                            label: function(c){ return c.dataset.label + ': ' + c.raw + '%' } 
+                        }
                     }
                 },
                 scales: {
-                    y: { min: 60, max: 100, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
-                    x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                    y: { 
+                        min: 60, 
+                        max: 105, 
+                        grid: { color: '#f1f5f9' }, 
+                        ticks: { font: { size: 10 }, callback: function(v){ return v + '%' } } 
+                    },
+                    x: { 
+                        grid: { display: false }, 
+                        ticks: { font: { size: 9 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 12 } 
+                    }
                 }
             }
         });
