@@ -116,10 +116,9 @@ for t in all_trades_10y:
         'floor': t['floor'], 'price': t['p'], 'type': '매매', 'py': py_price, 'built': t['built']
     })
 
-# 최근 12개월 데이터 분류 (차트용, 저층 제외)
+# 최근 60개월 데이터 분류 (차트용, 저층 제외)
 for t in all_trades_10y:
     if t['m'] in months:
-        # 저층(1~5층) 제외 필터 적용
         if t['floor'] and str(t['floor']).isdigit() and int(t['floor']) > 5:
             all_trades.append(t)
 
@@ -131,49 +130,52 @@ chart_data = {}
 # 데이터 가공 및 주입
 # -------------------------------------------------------------------------
 
-# 데모 데이터 생성 로직 제거됨
-
 # Raw 데이터 정렬 (최신순)
-raw_items.sort(key=lambda x: x['d'], reverse=True)
-
 raw_items.sort(key=lambda x: x['d'], reverse=True)
 
 # 차트 및 대시보드용 요약
 for aid, meta in APT_FILTERS.items():
-    dong, kw, households, parking = meta
+    dong, kw, households, parking_ratio, parking_conn = meta
     trade_history = []
     
-    # 10년치 매매 데이터 필터링 (저층 제외: 5층 초과만, 면적 80~86 기준 우선)
     t10y_raw = [x for x in all_trades_10y if x['umd'] == dong and kw in x['apt']]
-    # 분석용 데이터: 층수가 파악되고 5층 초과인 것 + 전용면적 80~86(국평) 기준
-    t10y = sorted([x for x in t10y_raw if x['floor'] and str(x['floor']).isdigit() and int(x['floor']) > 5 and 80 <= x['area'] <= 86], key=lambda x: x['d'])
+    # 전고점 비교용 데이터는 '전체' 반영 (저층 포함)
+    t10y = sorted([x for x in t10y_raw if 80 <= x['area'] <= 86], key=lambda x: x['d'])
     
-    # 만약 국평 데이터가 너무 적으면 면적 제한을 조금 완화하여 분석
-    if len(t10y) < 10:
-        t10y = sorted([x for x in t10y_raw if x['floor'] and str(x['floor']).isdigit() and int(x['floor']) > 5], key=lambda x: x['d'])
+    if len(t10y) < 5: # 데이터 부족 시 면적 제한 해제
+        t10y = sorted(t10y_raw, key=lambda x: x['d'])
     
-    max_p = 0
-    max_p_date = ""
-    min_after_max = 999999999
+    # 1. 역사적 전고점 (2년 이전)
+    hist_peak_p = 0
+    hist_peak_d = ""
+    # 2. 최근 전고점 (최근 2년)
+    recent_peak_p = 0
+    recent_peak_d = ""
+    # 3. 최근 1년 내 최고/최저 (하락률 계산용)
+    one_year_ago = (now - datetime.timedelta(days=365)).strftime('%Y.%m.%d')
+    two_years_ago = (now - datetime.timedelta(days=730)).strftime('%Y.%m.%d')
+    
+    max_p_1y = 0
+    min_p_1y = 999999999
 
-    # 전고점 탐색 기간 설정 (역사적 고점인 2~3년 전인 2020년~2022년 사이의 최고점 기준)
-    peak_period_start = "2020.01.01"
-    peak_period_end = "2022.12.31"
-    
     for t in t10y:
-        # 지정된 기간 내의 최고가를 전고점으로 설정
-        if peak_period_start <= t['d'] <= peak_period_end:
-            if t['p'] > max_p:
-                max_p = t['p']
-                max_p_date = t['d']
-                min_after_max = t['p']
+        # 역사적 전고점 (2년 이전)
+        if t['d'] < two_years_ago:
+            if t['p'] > hist_peak_p:
+                hist_peak_p = t['p']
+                hist_peak_d = t['d']
+        # 최근 전고점 (최근 2년)
+        else:
+            if t['p'] > recent_peak_p:
+                recent_peak_p = t['p']
+                recent_peak_d = t['d']
         
-        # 전고점 이후의 최저점 찾기 (전고점이 이미 정해진 상태에서만 작동)
-        if max_p > 0 and t['d'] > max_p_date:
-            if t['p'] < min_after_max:
-                min_after_max = t['p']
+        # 최근 1년 내 지표
+        if t['d'] >= one_year_ago:
+            if t['p'] > max_p_1y: max_p_1y = t['p']
+            if t['p'] < min_p_1y: min_p_1y = t['p']
             
-    # 최근 12개월 차트용
+    # 최근 60개월 차트용
     for m in months:
         t_matches = [x['p'] for x in all_trades if x['m'] == m and x['umd'] == dong and kw in x['apt']]
         tp = sorted(t_matches)[len(t_matches)//2] if t_matches else (trade_history[-1] if trade_history else 0)
@@ -182,30 +184,34 @@ for aid, meta in APT_FILTERS.items():
     curr_p = trade_history[-1] if trade_history else 0
     chart_data[aid] = trade_history
     analysis_data[aid] = {
-        'peak': max_p, 'peak_date': max_p_date, 'curr': curr_p,
-        'min_after_peak': min_after_max if min_after_max < 999999999 else 0,
-        'ratio': round(curr_p/max_p*100,1) if max_p else 0,
-        'drop': round((max_p-min_after_max)/max_p*100,1) if max_p and min_after_max < max_p else 0,
-        'households': households, 'parking': parking
+        'hist_peak': hist_peak_p, 'hist_peak_date': hist_peak_d,
+        'recent_peak': recent_peak_p, 'recent_peak_date': recent_peak_d,
+        'curr': curr_p,
+        'drop_1y': round((max_p_1y - min_p_1y) / max_p_1y * 100, 1) if max_p_1y > 0 else 0,
+        'ratio': round(curr_p / hist_peak_p * 100, 1) if hist_peak_p else 0,
+        'households': households, 'parking': f"{parking_ratio} | {parking_conn}"
     }
 
-# 가상 뉴스
-news_list = [
-    {'tag': '금리', 'title': '한국은행 기준금리 동결 (3.50%)', 'desc': '금통위 만장일치 동결. 하반기 인하 기대감 지속.', 'date': now.strftime('%Y.%m'), 'tc': 'bg-amber-100 text-amber-700'},
-    {'tag': '정책', 'title': '수원시, 노후계획도시 정비 기본계획 수립', 'desc': '영통지구 등 노후 단지 재건축 활성화 기대.', 'date': now.strftime('%Y.%m'), 'tc': 'bg-indigo-100 text-indigo-700'},
-    {'tag': '교통', 'title': '인동선/월판선 공사 순항 중', 'desc': '망포역, 영통역 주변 교통 접근성 대폭 개선 전망.', 'date': now.strftime('%Y.%m'), 'tc': 'bg-emerald-100 text-emerald-700'}
+# 가상 전문가 의견 (다른 성향의 5인)
+experts = [
+    {"nm": "김성실", "role": "공격적 투자자", "c": "text-red-600", "m": "현재 수원은 전고점 대비 충분히 매력적인 가격대입니다. 공급 절벽이 예상되는 2-3년 뒤를 생각하면 지금이 가장 저렴한 시점일 수 있습니다."},
+    {"nm": "이지적인", "role": "데이터 분석가", "c": "text-blue-600", "m": "거래량이 전년 대비 완만하게 회복 중이나, 아직 전고점 돌파를 논하기엔 이릅니다. 급매물이 소진된 후 호가가 유지되는지 확인이 필요합니다."},
+    {"nm": "박현장", "role": "공인중개사", "c": "text-amber-600", "m": "망포와 영통의 대장 단지들은 이미 실거주 수요로 인해 바닥을 확인했습니다. 중층 이상의 로열동 급매물은 나오는 즉시 거래되는 분위기입니다."},
+    {"nm": "최보수", "role": "자산관리사", "c": "text-emerald-600", "m": "DSR 규제와 고금리가 여전한 상황에서 무리한 영끌은 위험합니다. 자금 계획을 보수적으로 잡고, 경매나 급급매 위주로 선별 접근하세요."},
+    {"nm": "한가치", "role": "가치투자자", "c": "text-violet-600", "m": "입지 가치는 변하지 않습니다. 신축급인 매교역 주변과 학군이 우수한 영통의 핵심 입지는 시장 회복기 때 가장 먼저 튀어오를 곳들입니다."}
 ]
 
 # 시장 분석 요약
 up_count = sum(1 for d in chart_data.values() if d[-1] > d[-4]) if len(months)>=4 else 0
 mkt_summary = {
     'bull': up_count > len(chart_data)/2,
-    'summary': '📈 수원 영통 시장 완만한 회복세' if up_count > len(chart_data)/2 else '📉 시장 조정 및 관망세 지속',
+    'summary': '📈 수원 영통 시장 완만한 회복세 (저층 제외)' if up_count > len(chart_data)/2 else '📉 시장 조정 및 관망세 지속 (저층 제외)',
     'details': [
         f'주요 {len(chart_data)}개 단지 중 {up_count}개 최근 3개월 반등.',
         '전세가 상승에 따른 매수 전환 수요 관찰됨.',
-        '특정 대단지 급매물 소진 후 호가 상승 중.'
-    ]
+        '중층/고층 실거래 데이터 기반 분석 결과임.'
+    ],
+    'experts': experts
 }
 
 # HTML 주입 (상대 경로로 수정하여 깃허브 호환성 확보)
