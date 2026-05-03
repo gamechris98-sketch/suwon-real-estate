@@ -359,19 +359,19 @@ function drawVolChart(){
     if(!vh) vh = document.getElementById('volChart').getContext('2d');
     if(!window.volChartObj) {
         var vD=[], pD=[];
-        INJECTED_MONTHS.forEach(m=>{
-            var matches = (INJECTED_RAW||[]).filter(r=>r.d.startsWith(m.substring(0,4)+'.'+m.substring(4,6)));
+        INJECTED_MONTHS.forEach(function(m){
+            var matches = (INJECTED_RAW||[]).filter(function(r){return r.d.indexOf(m.substring(0,4)+'.'+m.substring(4,6)) === 0});
             vD.push(matches.length);
-            var avg = matches.length ? matches.reduce((sum, item) => sum + item.price, 0) / matches.length : 0;
+            var avg = matches.length ? matches.reduce(function(sum, item) { return sum + item.price }, 0) / matches.length : 0;
             pD.push(avg);
         });
         window.volChartObj = new Chart(vh, {
             type: 'bar',
             data: {
-                labels: INJECTED_MONTHS.map(m=>m.substring(2,4)+'년'+parseInt(m.substring(4,6))+'월'),
+                labels: INJECTED_MONTHS.map(function(m){return m.substring(2,4)+'년'+parseInt(m.substring(4,6))+'월'}),
                 datasets: [
                     { label:'거래량', data:vD, backgroundColor:'#6366f1', order:2, yAxisID:'y' },
-                    { label:'평균가(억)', data:pD.map(p=>(p/10000).toFixed(2)), type:'line', borderColor:'#f43f5e', backgroundColor:'#f43f5e', fill:false, order:1, yAxisID:'y1', tension: 0.3 }
+                    { label:'평균가(억)', data:pD.map(function(p){return (p/10000).toFixed(2)}), type:'line', borderColor:'#f43f5e', backgroundColor:'#f43f5e', fill:false, order:1, yAxisID:'y1', tension: 0.3 }
                 ]
             },
             options: {
@@ -398,12 +398,13 @@ function drawVolChart(){
             }
         });
 
-        var sortedHot = Object.keys(recentApts).map(k => ({nm:k, c:recentApts[k]}))
-            .sort((a,b) => b.c - a.c).slice(0, 5);
+        var sortedHot = Object.keys(recentApts).map(function(k) { return {nm:k, c:recentApts[k]} })
+            .sort(function(a,b) { return b.c - a.c }).slice(0, 5);
         
         var hotHtml = '';
-        sortedHot.forEach((apt, idx) => {
-            var color = A.find(a => a.nm === apt.nm)?.c || '#cbd5e1';
+        sortedHot.forEach(function(apt, idx) {
+            var found = A.find(function(a) { return a.nm === apt.nm });
+            var color = (found && found.c) ? found.c : '#cbd5e1';
             hotHtml += '<div class="flex items-center justify-between text-xs p-2 bg-slate-50 rounded border-l-2" style="border-left-color:'+color+'">';
             hotHtml += '<span class="font-bold truncate max-w-[120px]">' + (idx+1) + '. ' + apt.nm + '</span>';
             hotHtml += '<span class="text-slate-500">' + apt.c + '건</span>';
@@ -411,8 +412,8 @@ function drawVolChart(){
         });
         document.getElementById('hotApts').innerHTML = hotHtml || '<p class="text-xs text-slate-400">데이터 없음</p>';
 
-        A.forEach(a=>{
-            var count = (INJECTED_RAW||[]).filter(r=>r.apt===a.nm).length;
+        A.forEach(function(a){
+            var count = (INJECTED_RAW||[]).filter(function(r){return r.apt===a.nm}).length;
             if(count>0){
                 labels.push(a.nm);
                 counts.push(count);
@@ -442,8 +443,8 @@ function rAn(data){
     (an.details || []).forEach(d=>{ h+='<p>• '+d+'</p>'; });
     h+='</div>';
     h+='<div class="space-y-1.5 text-[11px] border-t '+(an.bull?'border-red-100':'border-blue-100')+' pt-3">';
-    var sorted = A.map(a=>({nm:a.nm, p:data[a.id]})).filter(x=>x.p&&x.p.length>=4);
-    sorted.sort((a,b)=>(b.p[b.p.length-1]-b.p[b.p.length-4])-(a.p[a.p.length-1]-a.p[a.p.length-4]));
+    var sorted = A.map(function(a){return {nm:a.nm, p:data[a.id]}}).filter(function(x){return x.p&&x.p.length>=4});
+    sorted.sort(function(a,b){return (b.p[b.p.length-1]-b.p[b.p.length-4])-(a.p[a.p.length-1]-a.p[a.p.length-4])});
     sorted.slice(0,5).forEach(function(d){
         var diff = d.p[d.p.length-1]-d.p[d.p.length-4];
         var c=diff>0?'text-red-600':diff<0?'text-blue-600':'text-slate-500';
@@ -519,7 +520,7 @@ function oM(id){
 function initCalcTab(){
     var sel = document.getElementById('calcAptSelect');
     if(sel.options.length <= 1) {
-        A.forEach(a => {
+        A.forEach(function(a) {
             var opt = document.createElement('option');
             opt.value = a.id;
             opt.textContent = a.dn + ' ' + a.nm;
@@ -592,10 +593,10 @@ function renderPeakAnalysis(){
     if(typeof INJECTED_ANALYSIS_DATA === 'undefined') return;
     
     // 회복률 높은 순 정렬
-    var sorted = [...A].map(a=>({a:a, d:INJECTED_ANALYSIS_DATA[a.id]})).filter(x=>x.d);
-    sorted.sort((a,b)=>b.d.ratio - a.d.ratio);
+    var sorted = A.slice().map(function(a){return {a:a, d:INJECTED_ANALYSIS_DATA[a.id]}}).filter(function(x){return x.d});
+    sorted.sort(function(a,b){return b.d.ratio - a.d.ratio});
 
-    sorted.forEach(x=>{
+    sorted.forEach(function(x){
         var a = x.a;
         var data = x.d;
         var cur = data.curr;
@@ -682,7 +683,7 @@ function renderTimingAnalysis() {
 
     h += '<h4 class="text-lg font-bold text-slate-800 mb-2 mt-8 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-indigo-500"></i>5인의 가상 전문가 의견</h4>';
     h += '<div class="grid grid-cols-1 md:grid-cols-5 gap-3">';
-    experts.forEach(ex => {
+    experts.forEach(function(ex) {
         var sBadge = ex.s ? '<div class="mt-2 text-center text-[10px] font-bold text-white py-1 rounded '+ex.sc+'">'+ex.s+'</div>' : '';
         h += '<div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">'+
              '<div class="flex items-center gap-2 mb-2"><span class="w-2 h-2 rounded-full bg-current '+ex.c+'"></span><span class="text-xs font-black '+ex.c+'">'+ex.nm+'</span><span class="text-[9px] text-slate-400">'+ex.role+'</span></div>'+
@@ -693,11 +694,11 @@ function renderTimingAnalysis() {
     h += '</div>';
 
     h += '<div class="bg-slate-50 p-6 rounded-2xl mt-6"><h4 class="text-slate-800 font-bold mb-4 flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4"></i> 세부 지표 분석</h4><div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">';
-    var recentVol = (INJECTED_RAW || []).filter(r => { var d = new Date(); var threeMonthsAgo = new Date(d.setMonth(d.getMonth() - 3)); return new Date(r.d.replace(/\\./g, '-')) > threeMonthsAgo; }).length;
+    var recentVol = (INJECTED_RAW || []).filter(function(r) { var d = new Date(); var threeMonthsAgo = new Date(d.setMonth(d.getMonth() - 3)); return new Date(r.d.replace(/\./g, '-')) > threeMonthsAgo; }).length;
     h += '<div class="bg-white p-4 rounded-xl border border-slate-200"> <p class="text-slate-400 text-[10px] mb-1">최근 3개월 거래</p> <p class="text-xl font-black text-slate-900">' + recentVol + '건</p> <p class="text-[10px] text-indigo-500 mt-1 font-bold">심리 회복 중</p> </div>';
-    var nearPeak = count > 0 ? Object.values(peakData).filter(d => d.ratio >= 98).length : 0;
+    var nearPeak = count > 0 ? Object.values(peakData).filter(function(d){return d.ratio >= 98}).length : 0;
     h += '<div class="bg-white p-4 rounded-xl border border-slate-200"> <p class="text-slate-400 text-[10px] mb-1">전고점 근접 단지</p> <p class="text-xl font-black text-slate-900">' + nearPeak + '개</p> <p class="text-[10px] text-red-500 mt-1 font-bold">대장주 선도 중</p> </div>';
-    var maxDrop = 0; if(count > 0) { var drops = Object.values(peakData).map(d => Math.abs(d.drop || 0)); maxDrop = Math.max(...drops); }
+    var maxDrop = 0; if(count > 0) { var drops = Object.values(peakData).map(function(d){return Math.abs(d.drop || 0)}); maxDrop = Math.max.apply(Math, drops); }
     h += '<div class="bg-white p-4 rounded-xl border border-slate-200"> <p class="text-slate-400 text-[10px] mb-1">1년 내 최대 하락폭</p> <p class="text-xl font-black text-slate-900">-' + maxDrop + '%</p> <p class="text-[10px] text-emerald-500 mt-1 font-bold">바닥 다지기 완료</p> </div>';
     h += '</div></div></div>';
     
@@ -745,7 +746,7 @@ function renderSupplyAnalysis() {
             datasets: [{
                 label: '공급 물량 (세대)',
                 data: data.supply,
-                backgroundColor: data.supply.map(v => v > data.demand ? '#cbd5e1' : '#6366f1'),
+                backgroundColor: data.supply.map(function(v) { return v > data.demand ? '#cbd5e1' : '#6366f1' }),
                 borderRadius: 8
             }, {
                 label: '적정 수요량',
@@ -776,14 +777,14 @@ function renderRankAnalysis() {
     var data = typeof INJECTED_ANALYSIS_DATA !== 'undefined' ? INJECTED_ANALYSIS_DATA : {};
     var sorted = [];
     for(var k in data) {
-        var aptInfo = A.find(a => a.id === k);
+        var aptInfo = A.find(function(a){return a.id === k});
         if(!aptInfo) continue;
         sorted.push({ id: k, nm: aptInfo.nm, dn: aptInfo.dn, score: data[k].score, drop: data[k].drop, ratio: data[k].ratio, parking: data[k].parking, hh: data[k].households });
     }
-    sorted.sort((a,b) => b.score - a.score);
+    sorted.sort(function(a,b){return b.score - a.score});
     
     var h = '';
-    sorted.forEach((it, idx) => {
+    sorted.forEach(function(it, idx){
         var rankColor = idx < 3 ? (idx===0?'text-yellow-500':idx===1?'text-slate-400':'text-orange-400') : 'text-slate-300';
         h += '<div class="glass p-5 rounded-2xl flex items-center gap-4 relative overflow-hidden group hover:border-indigo-300 transition-all cursor-default">';
         h += '<div class="text-4xl font-black ' + rankColor + ' w-12 italic">' + (idx+1) + '</div>';
@@ -810,7 +811,7 @@ document.addEventListener('DOMContentLoaded',function(){
     } else {
         // 데이터가 없는 경우 경고 메시지 표시 및 샘플 데이터 렌더링
         console.warn("Real data missing or empty. Showing sample data.");
-        var d=new Date(),m=[];for(var i=11;i>=0;i--){var t=new Date(d.getFullYear(),d.getMonth()-i,1);m.push(t.getFullYear().toString()+(t.getMonth()+1).toString().padStart(2,'0'))}
+        var d=new Date(),m=[];for(var i=11;i>=0;i--){var t=new Date(d.getFullYear(),d.getMonth()-i,1);var mm=t.getMonth()+1;m.push(t.getFullYear().toString()+(mm<10?'0'+mm:mm))}
         var b={mangpo_hillstate:85000,mangpo_ipark:80000,mangpo_skview:75000,mangpo_sujain:70000,yeongtong_edupark:65000,yeongtong_dongbo:55000,yeongtong_shinmyung:54000,maegyo_skview:90000,maegyo_hillstate:88000};var dm={};for(var k in b){dm[k]=[];var v=b[k];for(var j=0;j<12;j++){v+=Math.floor(Math.random()*1500-500);dm[k].push(v)}}
         renderAll(dm,m);
         
