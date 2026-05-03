@@ -77,16 +77,50 @@
 
 </div>
 <div id="p4" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
-<div class="glass rounded-2xl p-6">
-<h2 class="text-lg font-bold flex items-center justify-between mb-5 pb-4 border-b border-slate-100">
-    <div class="flex items-center gap-2"><i data-lucide="arrow-up-circle" class="w-5 h-5 text-indigo-500"></i>단지별 전고점 대비 회복률 비교</div>
-    <span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-bold">전체 층 데이터 반영</span>
-</h2>
-<div class="relative h-[300px] mb-8"><canvas id="recoveryChart"></canvas></div>
-<h2 class="text-lg font-bold flex items-center gap-2 mb-5 pb-4 border-b border-slate-100"><i data-lucide="list" class="w-5 h-5 text-indigo-500"></i>전고점 상세 분석 (10년 기준)</h2>
-<div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-slate-600 text-xs"><tr><th class="px-3 py-3 text-left">동</th><th class="px-3 py-3 text-left">아파트명</th><th class="px-3 py-3 text-right">최근 최고가</th><th class="px-3 py-3 text-right text-indigo-600">전고점(2년이전)</th><th class="px-3 py-3 text-left">전고점일</th><th class="px-3 py-3 text-right text-blue-600">역대 최저가</th><th class="px-3 py-3 text-right text-red-500">최대 하락액</th><th class="px-3 py-3 text-right text-red-500">최대 하락률</th><th class="px-3 py-3 text-right">현재 회복률</th></tr></thead>
-<tbody id="peakB" class="divide-y divide-slate-100"></tbody></table></div>
-</div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="glass rounded-2xl p-6">
+            <h3 class="text-sm font-black mb-4 flex items-center gap-2 text-slate-700">
+                <div class="p-1.5 bg-indigo-50 rounded-lg text-indigo-600"><i data-lucide="bar-chart-2" class="w-4 h-4"></i></div>
+                단지별 현재 회복률 (%)
+            </h3>
+            <div class="relative h-[300px]"><canvas id="recoveryChart"></canvas></div>
+        </div>
+        <div class="glass rounded-2xl p-6">
+            <h3 class="text-sm font-black mb-4 flex items-center gap-2 text-slate-700">
+                <div class="p-1.5 bg-rose-50 rounded-lg text-rose-600"><i data-lucide="trending-up" class="w-4 h-4"></i></div>
+                시장 전체 회복 추이 (%)
+            </h3>
+            <div class="relative h-[300px]"><canvas id="recoveryTrendChart"></canvas></div>
+        </div>
+    </div>
+
+    <div class="glass rounded-2xl p-6 overflow-hidden">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-sm font-black flex items-center gap-2 text-slate-700">
+                <div class="p-1.5 bg-slate-100 rounded-lg text-slate-600"><i data-lucide="list" class="w-4 h-4"></i></div>
+                상세 분석 데이터 테이블
+            </h3>
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Market Comparison Table</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="bg-slate-50 text-slate-500 font-black uppercase text-[10px] tracking-tight">
+                        <th class="px-3 py-4 text-left border-b border-slate-100">동</th>
+                        <th class="px-3 py-4 text-left border-b border-slate-100">단지명</th>
+                        <th class="px-3 py-4 text-right border-b border-slate-100">최근가</th>
+                        <th class="px-3 py-4 text-right text-indigo-600 border-b border-indigo-100 bg-indigo-50/30">전고점(10y)</th>
+                        <th class="px-3 py-4 text-center border-b border-slate-100">전고점일</th>
+                        <th class="px-3 py-4 text-right border-b border-slate-100">최저점</th>
+                        <th class="px-3 py-4 text-right border-b border-slate-100 text-red-500">하락액</th>
+                        <th class="px-3 py-4 text-right border-b border-slate-100 text-red-500">하락률</th>
+                        <th class="px-3 py-4 text-right border-b border-slate-100">회복률</th>
+                    </tr>
+                </thead>
+                <tbody id="peakB" class="divide-y divide-slate-100"></tbody>
+            </table>
+        </div>
+    </div>
 </div>
 <div id="p6" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
 <div class="grid lg:grid-cols-2 gap-6">
@@ -664,18 +698,78 @@ function renderPeakAnalysis(){
             data: {
                 labels: labels,
                 datasets: [{
-                    label: '전고점 대비 회복률 (%)',
+                    label: '회복률 (%)',
                     data: ratios,
                     backgroundColor: colors,
-                    borderRadius: 5
+                    borderRadius: 6
                 }]
             },
             options: {
                 indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { x: { min: 50, max: 100, grid: { color: '#f1f5f9' } }, y: { grid: { display: false } } }
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 10 }
+                },
+                scales: { 
+                    x: { min: 60, max: 100, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10, weight: 'bold' } } }, 
+                    y: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } } 
+                }
+            }
+        });
+    }
+
+    // Recovery Trend Chart
+    if(window.recTrendChartObj) window.recTrendChartObj.destroy();
+    var trendCtx = document.getElementById('recoveryTrendChart');
+    if(trendCtx) {
+        var trendData = {};
+        (INJECTED_RAW || []).forEach(function(r) {
+            var aptInfo = A.find(function(a) { return a.nm === r.apt });
+            if(!aptInfo) return;
+            var peak = data[aptInfo.id] ? data[aptInfo.id].hist_peak : 0;
+            if(!peak) return;
+            
+            var month = r.d.substring(0, 7); // "2024.04"
+            var ratio = (r.price / peak) * 100;
+            
+            if(!trendData[month]) trendData[month] = { sum: 0, count: 0 };
+            trendData[month].sum += ratio;
+            trendData[month].count++;
+        });
+        
+        var sortedMonths = Object.keys(trendData).sort().slice(-24); // Show last 24 months
+        var trendLabels = sortedMonths.map(function(m) { return m.substring(2) });
+        var trendValues = sortedMonths.map(function(m) { return (trendData[m].sum / trendData[m].count).toFixed(1) });
+        
+        window.recTrendChartObj = new Chart(trendCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: trendLabels,
+                datasets: [{
+                    label: '시장 평균 회복률 (%)',
+                    data: trendValues,
+                    borderColor: '#f43f5e',
+                    backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#f43f5e'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: {
+                    y: { min: 60, max: 100, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                }
             }
         });
     }
