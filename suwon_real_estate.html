@@ -71,7 +71,7 @@
 </h2>
 <div class="relative h-[300px] mb-8"><canvas id="recoveryChart"></canvas></div>
 <h2 class="text-lg font-bold flex items-center gap-2 mb-5 pb-4 border-b border-slate-100"><i data-lucide="list" class="w-5 h-5 text-indigo-500"></i>전고점 상세 분석 (10년 기준)</h2>
-<div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-slate-600 text-xs"><tr><th class="px-3 py-3 text-left">동</th><th class="px-3 py-3 text-left">아파트명</th><th class="px-3 py-3 text-right">최근 거래가</th><th class="px-3 py-3 text-right text-indigo-600">전고점</th><th class="px-3 py-3 text-left">전고점일</th><th class="px-3 py-3 text-right text-red-500">최대 하락률</th><th class="px-3 py-3 text-right">현재 하락액</th><th class="px-3 py-3 text-right">회복률</th></tr></thead>
+<div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50 text-slate-600 text-xs"><tr><th class="px-3 py-3 text-left">동</th><th class="px-3 py-3 text-left">아파트명</th><th class="px-3 py-3 text-right">최근 거래가</th><th class="px-3 py-3 text-right text-indigo-600">전고점</th><th class="px-3 py-3 text-left">전고점일</th><th class="px-3 py-3 text-right text-blue-600">최저가</th><th class="px-3 py-3 text-right text-red-500">최대 하락률</th><th class="px-3 py-3 text-right">현재 하락액</th><th class="px-3 py-3 text-right">회복률</th></tr></thead>
 <tbody id="peakB" class="divide-y divide-slate-100"></tbody></table></div>
 </div>
 </div>
@@ -271,7 +271,7 @@ function renderAll(data,months){
     if(INJECTED_TIMESTAMP)document.getElementById('updateTime').innerText='업데이트: '+INJECTED_TIMESTAMP;
     
     var pb='';
-    [{l:'5년',v:60},{l:'3년',v:36},{l:'12개월',v:12},{l:'6개월',v:6}].forEach(function(p){
+    [{l:'10년',v:120},{l:'5년',v:60},{l:'3년',v:36},{l:'12개월',v:12}].forEach(function(p){
         pb+='<button class="pb'+(p.v===60?' active':'')+'" data-m="'+p.v+'" onclick="setPd('+p.v+')">'+p.l+'</button>';
     });
     document.getElementById('periodBtns').innerHTML=pb;
@@ -301,7 +301,12 @@ function renderAll(data,months){
             var hh = aData && aData.households ? aData.households + '세대' : '-';
             var pk = aData && aData.parking ? aData.parking : '-';
             h+='<div class="text-[10px] text-slate-400 mt-1 flex flex-wrap gap-x-2"><span>연식 '+a.y+'</span><span>| '+hh+'</span><span>| '+pk+'</span></div>';
-            h+='<div class="text-xl font-extrabold mt-1">'+(cur/10000).toFixed(1)+'<span class="text-sm text-slate-400 ml-1">억</span></div><div class="text-xs font-bold '+tc+' mt-1">'+ar+' '+(Math.abs(diff/10000)).toFixed(1)+'억 ('+pct+'%)</div></div>';
+            var cDate = aData && aData.curr_date ? aData.curr_date.substring(5) : '';
+            h+='<div class="flex items-center gap-1.5 mt-1">';
+            h+='<div class="text-xl font-extrabold">'+(cur/10000).toFixed(1)+'<span class="text-sm text-slate-400 ml-1">억</span></div>';
+            if(cDate) h+='<span class="text-[9px] text-indigo-600 bg-indigo-50 px-1 py-0.5 rounded font-bold">최근 최고가 '+cDate+'</span>';
+            h+='</div>';
+            h+='<div class="text-xs font-bold '+tc+' mt-1">'+ar+' '+(Math.abs(diff/10000)).toFixed(1)+'억 ('+pct+'%)</div></div>';
         });
         h+='</div></div>';
     });
@@ -561,7 +566,8 @@ function renderPeakAnalysis(){
         h+='<td class="px-3 py-4 text-right font-bold">'+(cur/10000).toFixed(1)+'억</td>';
         h+='<td class="px-3 py-4 text-right text-indigo-600 font-bold">'+(peak/10000).toFixed(1)+'억</td>';
         h+='<td class="px-3 py-4 text-left text-slate-400 text-xs">'+(data.peak_date || '-')+'</td>';
-        h+='<td class="px-3 py-4 text-right text-red-500 font-bold">-'+max_drop_pct+'%</td>';
+        h+='<td class="px-3 py-4 text-right text-blue-600 font-bold">'+((data.hist_min || cur)/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-right text-red-500 font-bold">'+max_drop_pct+'%</td>';
         h+='<td class="px-3 py-4 text-right '+(diff<0?'text-blue-500':'text-slate-400')+'">'+(diff/10000).toFixed(1)+'억</td>';
         h+='<td class="px-3 py-4 text-right font-extrabold '+rc+'">'+ratio+'%</td>';
         h+='</tr>';
