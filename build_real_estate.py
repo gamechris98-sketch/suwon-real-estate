@@ -177,12 +177,7 @@ for aid, meta in APT_FILTERS.items():
             
     # 4. 역사적 최저점 (전고점 이후)
     hist_min_p = 999999999
-    for t in t10y:
-        if hist_peak_d and t['d'] > hist_peak_d:
-            if t['p'] < hist_min_p:
-                hist_min_p = t['p']
-    if hist_min_p == 999999999: hist_min_p = curr_p
-
+    
     # 최근 60개월 차트용
     curr_peak_d = ""
     for m in months:
@@ -197,14 +192,21 @@ for aid, meta in APT_FILTERS.items():
         trade_history.append(tp)
 
     curr_p = trade_history[-1] if trade_history else 0
+
+    for t in t10y:
+        if hist_peak_d and t['d'] > hist_peak_d:
+            if t['p'] < hist_min_p:
+                hist_min_p = t['p']
+    if hist_min_p == 999999999: hist_min_p = curr_p
+
     chart_data[aid] = trade_history
     analysis_data[aid] = {
         'hist_peak': hist_peak_p, 'hist_peak_date': hist_peak_d,
         'hist_min': hist_min_p,
-        'drop_amt': hist_peak_p - hist_min_p,
+        'drop_amt': hist_peak_p - curr_p,
         'recent_peak': recent_peak_p, 'recent_peak_date': recent_peak_d,
         'curr': curr_p, 'curr_date': curr_peak_d,
-        'drop': round((hist_min_p - hist_peak_p) / hist_peak_p * 100, 1) if hist_peak_p > 0 else 0,
+        'drop': round((curr_p - hist_peak_p) / hist_peak_p * 100, 1) if hist_peak_p > 0 else 0,
         'ratio': round(curr_p / hist_peak_p * 100, 1) if hist_peak_p else 0,
         'households': households, 'parking': f"주차 {parking_ratio} | {parking_conn}"
     }
