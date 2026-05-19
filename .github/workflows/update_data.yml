@@ -29,10 +29,14 @@ jobs:
         run: |
           python build_real_estate.py
 
+      - name: Copy Dashboard to index.html
+        run: |
+          cp suwon_real_estate.html index.html
+
       - name: Commit and Push changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add suwon_real_estate.html
+          git add real_estate_data.js suwon_real_estate.csv suwon_real_estate.html index.html
           git commit -m "Auto update: Real estate data [$(date +'%Y-%m-%d %H:%M')]" || exit 0
           git push

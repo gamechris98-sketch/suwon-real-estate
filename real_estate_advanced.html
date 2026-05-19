@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부동산 실거래가 고급 분석 시스템</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Multiple Select Styling */
+        select[multiple] {
+            scrollbar-width: thin;
+        }
+        select[multiple] option {
+            padding: 8px 12px;
+            margin-bottom: 2px;
+            border-radius: 4px;
+        }
+        select[multiple] option:checked {
+            background-color: #e0e7ff linear-gradient(0deg, #e0e7ff 0%, #e0e7ff 100%);
+            color: #3730a3;
+            font-weight: bold;
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 250px; /* Base height for each row */
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex text-slate-800">
+
+    <!-- Sidebar -->
+    <aside class="w-80 bg-white border-r border-slate-200 flex flex-col h-full shrink-0 shadow-sm z-10">
+        <div class="p-5 border-b border-slate-200 bg-indigo-600 text-white">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <i data-lucide="bar-chart-2"></i> Real Estate Pro
+            </h1>
+            <p class="text-indigo-200 text-xs mt-1">실거래가 다차원 분석 대시보드</p>
+        </div>
+        
+        <div class="p-5 overflow-y-auto flex-grow space-y-6">
+            
+            <!-- 지역 필터 -->
+            <div class="space-y-3">
+                <h3 class="font-bold text-sm text-slate-700 flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4"></i> 지역 선택</h3>
+                
+                <div>
+                    <label class="text-xs text-slate-500 block mb-1">시도</label>
+                    <select id="sidoFilter" class="w-full text-sm border-slate-300 rounded-md bg-slate-50 border p-2 focus:ring-2 focus:ring-indigo-500 outline-none" onchange="updateSigungu()">
+                        <option value="서울특별시">서울특별시</option>
+                        <option value="경기도">경기도</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="text-xs text-slate-500 block mb-1">시군구</label>
+                    <select id="sigunguFilter" class="w-full text-sm border-slate-300 rounded-md bg-slate-50 border p-2 focus:ring-2 focus:ring-indigo-500 outline-none" onchange="updateDong()">
+                        <!-- dynamically filled -->
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="text-xs text-slate-500 block mb-1">읍면동 (다중선택: Ctrl/Cmd+클릭)</label>
+                    <select id="dongFilter" multiple class="w-full text-sm border-slate-300 rounded-md bg-white border p-2 h-24 focus:ring-2 focus:ring-indigo-500 outline-none" onchange="updateDanji()">
+                        <!-- dynamically filled -->
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-xs text-slate-500 block mb-1">단지 (다중선택)</label>
+                    <select id="danjiFilter" multiple class="w-full text-sm border-slate-300 rounded-md bg-white border p-2 h-32 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <!-- dynamically filled -->
+                    </select>
+                </div>
+            </div>
+
+            <hr class="border-slate-200">
+
+            <!-- 거래 유형 -->
+            <div>
+                <h3 class="font-bold text-sm text-slate-700 flex items-center gap-2 mb-3"><i data-lucide="arrow-left-right" class="w-4 h-4"></i> 거래 유형</h3>
+                <div class="flex flex-col gap-2 text-sm">
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="tradeType" value="all" checked class="text-indigo-600 focus:ring-indigo-500"> 매매 + 전세 모두 보기</label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="tradeType" value="sale" class="text-indigo-600 focus:ring-indigo-500"> 매매만 보기</label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="tradeType" value="jeonse" class="text-indigo-600 focus:ring-indigo-500"> 전세만 보기</label>
+                </div>
+            </div>
+
+            <!-- 평형 필터 -->
+            <div>
+                <h3 class="font-bold text-sm text-slate-700 flex items-center gap-2 mb-3"><i data-lucide="scaling" class="w-4 h-4"></i> 평형대 (다중선택)</h3>
+                <select id="pyeongFilter" multiple class="w-full text-sm border-slate-300 rounded-md bg-white border p-2 h-32 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="10미만">10평 미만</option>
+                    <option value="10대">10평대</option>
+                    <option value="20대">20평대</option>
+                    <option value="30대" selected>30평대</option>
+                    <option value="40대">40평대</option>
+                    <option value="50대">50평대</option>
+                    <option value="60이상">60평 이상</option>
+                </select>
+            </div>
+
+            <!-- 기간 및 기타 -->
+            <div class="space-y-4">
+                <div>
+                    <h3 class="font-bold text-sm text-slate-700 flex items-center gap-2 mb-3"><i data-lucide="calendar" class="w-4 h-4"></i> 거래 연도</h3>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="yearStart" class="w-full text-sm border-slate-300 rounded-md bg-slate-50 border p-2" value="2020" min="2006" max="2026">
+                        <span class="text-slate-500">~</span>
+                        <input type="number" id="yearEnd" class="w-full text-sm border-slate-300 rounded-md bg-slate-50 border p-2" value="2026" min="2006" max="2026">
+                    </div>
+                </div>
+                
+                <label class="flex items-center gap-2 text-sm cursor-pointer">
+                    <input type="checkbox" id="includeDirect" class="rounded text-indigo-600 focus:ring-indigo-500">
+                    직거래 포함
+                </label>
+            </div>
+            
+        </div>
+        
+        <div class="p-5 border-t border-slate-200 bg-slate-50">
+            <button onclick="applyFilters()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all flex justify-center items-center gap-2">
+                <i data-lucide="search" class="w-5 h-5"></i> 조건 적용 및 조회
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col h-full bg-slate-100 overflow-hidden relative">
+        
+        <!-- Top Navigation (View Switcher) -->
+        <header class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center shrink-0">
+            <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200">
+                <button onclick="switchView('scatter')" id="btnViewScatter" class="px-6 py-2 rounded-md text-sm font-bold bg-white text-indigo-700 shadow-sm transition-all">개별 실거래가 (산점도)</button>
+                <button onclick="switchView('line')" id="btnViewLine" class="px-6 py-2 rounded-md text-sm font-medium text-slate-500 hover:text-slate-800 transition-all">평균 실거래가 (추세선)</button>
+            </div>
+            <div class="text-sm text-slate-500" id="dataCountInfo">
+                조건에 맞는 데이터가 없습니다.
+            </div>
+        </header>
+
+        <!-- Summary Section -->
+        <div id="summarySection" class="px-8 mt-6 shrink-0 hidden">
+            <h2 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-indigo-600"></i> 매매 기준 요약</h2>
+            <div class="grid grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="text-xs text-slate-500 font-bold mb-1">총 매매 거래건수</div>
+                    <div class="text-2xl font-black text-slate-800" id="sumCount">0<span class="text-sm font-medium text-slate-500 ml-1">건</span></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="text-xs text-red-500 font-bold mb-1">기간 내 최고가</div>
+                    <div class="text-2xl font-black text-slate-800" id="sumMax">0<span class="text-sm font-medium text-slate-500 ml-1">억</span></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="text-xs text-blue-500 font-bold mb-1">기간 내 최저가</div>
+                    <div class="text-2xl font-black text-slate-800" id="sumMin">0<span class="text-sm font-medium text-slate-500 ml-1">억</span></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="text-xs text-slate-500 font-bold mb-2">최근 매매 거래 (최대 3건)</div>
+                    <ul class="text-xs space-y-1" id="sumRecent">
+                        <!-- Filled dynamically -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Area -->
+        <div class="flex-grow overflow-y-auto px-8 py-6" id="chartsWrapper">
+            <!-- 4행의 차트가 여기에 동적으로 생성됩니다 -->
+            <div id="row1" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-4"><h3 class="text-sm font-bold text-slate-700 mb-2">매매 가격</h3><div class="chart-container"><canvas id="canvas1"></canvas></div></div>
+            <div id="row2" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-4"><h3 class="text-sm font-bold text-slate-700 mb-2">전세 가격</h3><div class="chart-container"><canvas id="canvas2"></canvas></div></div>
+            <div id="row3" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-4"><h3 class="text-sm font-bold text-slate-700 mb-2">매매 거래량</h3><div class="chart-container h-[150px]"><canvas id="canvas3"></canvas></div></div>
+            <div id="row4" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-4"><h3 class="text-sm font-bold text-slate-700 mb-2">전세 거래량</h3><div class="chart-container h-[150px]"><canvas id="canvas4"></canvas></div></div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center hidden">
+            <i data-lucide="loader-2" class="w-12 h-12 text-indigo-600 animate-spin mb-4"></i>
+            <p class="font-bold text-slate-700 text-lg">데이터를 분석하고 있습니다...</p>
+        </div>
+
+    </main>
+
+    <script>
+        if(typeof lucide !== 'undefined') lucide.createIcons();
+
+        // ------------------------------------------------------------------
+        // 1. Data Mocking & Generation
+        // ------------------------------------------------------------------
+        // To build a robust demo without API keys, we generate a highly detailed mocked dataset.
+        const REGIONS = {
+            '서울특별시': {
+                '강남구': {
+                    '대치동': ['은마', '래미안대치팰리스', '선경1차'],
+                    '도곡동': ['타워팰리스1차', '도곡렉슬']
+                },
+                '송파구': {
+                    '잠실동': ['잠실엘스', '리센츠', '트리지움']
+                }
+            },
+            '경기도': {
+                '수원시 영통구': {
+                    '영통동': ['영통 에듀파크', '황골마을주공1단지'],
+                    '망포동': ['망포 힐스테이트', '망포 한양수자인', '아이파크캐슬 1단지']
+                },
+                '수원시 팔달구': {
+                    '매교동': ['매교 SK뷰', '힐스테이트 푸르지오 수원']
+                }
+            }
+        };
+
+        const PYEONG_COLORS = {
+            '10미만': '#94a3b8', // slate-400
+            '10대': '#38bdf8', // sky-400
+            '20대': '#a78bfa', // violet-400
+            '30대': '#f472b6', // pink-400
+            '40대': '#fb923c', // orange-400
+            '50대': '#fbbf24', // amber-400
+            '60이상': '#ef4444' // red-500
+        };
+
+        let RAW_DATA = [];
+
+        function generateMockData() {
+            RAW_DATA = [];
+            const types = ['sale', 'jeonse'];
+            const pyeongs = ['10미만', '10대', '20대', '30대', '40대', '50대', '60이상'];
+            
+            for (let sido in REGIONS) {
+                for (let sigungu in REGIONS[sido]) {
+                    for (let dong in REGIONS[sido][sigungu]) {
+                        for (let danji of REGIONS[sido][sigungu][dong]) {
+                            // Base price based on region
+                            let basePrice = sido === '서울특별시' ? 150000 : 70000;
+                            if(sigungu === '강남구') basePrice += 50000;
+                            
+                            // Generate random transactions for last 5 years
+                            for(let i=0; i<300; i++) {
+                                const year = Math.floor(Math.random() * 5) + 2021; // 2021~2025
+                                const month = Math.floor(Math.random() * 12) + 1;
+                                const day = Math.floor(Math.random() * 28) + 1;
+                                const dateStr = \`\${year}-\${month.toString().padStart(2, '0')}-\${day.toString().padStart(2, '0')}\`;
+                                const timestamp = new Date(dateStr).getTime();
+                                
+                                const type = Math.random() > 0.4 ? 'sale' : 'jeonse'; // 60% sale, 40% jeonse
+                                const pyeongIdx = Math.floor(Math.random() * 5) + 1; // mostly 10~50
+                                const pyeong = pyeongs[pyeongIdx];
+                                const isDirect = Math.random() > 0.95; // 5% direct
+                                
+                                // Price logic
+                                let priceMultiplier = 1 + (pyeongIdx * 0.3); // bigger = expensive
+                                let marketTrend = (year - 2021) * 0.05; // 5% increase per year roughly
+                                if (year === 2023) marketTrend -= 0.1; // 2023 dip
+                                
+                                let finalPrice = basePrice * priceMultiplier * (1 + marketTrend) * (0.9 + Math.random() * 0.2); // 10% variance
+                                if (type === 'jeonse') finalPrice *= 0.6; // Jeonse is ~60% of sale
+                                
+                                RAW_DATA.push({
+                                    sido, sigungu, dong, danji,
+                                    type, pyeong, isDirect,
+                                    date: dateStr,
+                                    timestamp: timestamp,
+                                    year, month,
+                                    price: Math.floor(finalPrice),
+                                    floor: Math.floor(Math.random() * 30) + 1
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            RAW_DATA.sort((a,b) => b.timestamp - a.timestamp); // newest first
+        }
+
+        // ------------------------------------------------------------------
+        // 2. UI Filtering Logic (Sidebar)
+        // ------------------------------------------------------------------
+        function initFilters() {
+            const sidoSel = document.getElementById('sidoFilter');
+            sidoSel.innerHTML = '';
+            for(let s in REGIONS) sidoSel.add(new Option(s, s));
+            sidoSel.value = '서울특별시';
+            updateSigungu();
+        }
+
+        function updateSigungu() {
+            const sido = document.getElementById('sidoFilter').value;
+            const sigSel = document.getElementById('sigunguFilter');
+            sigSel.innerHTML = '';
+            if(REGIONS[sido]) {
+                for(let sig in REGIONS[sido]) sigSel.add(new Option(sig, sig));
+            }
+            updateDong();
+        }
+
+        function updateDong() {
+            const sido = document.getElementById('sidoFilter').value;
+            const sig = document.getElementById('sigunguFilter').value;
+            const dongSel = document.getElementById('dongFilter');
+            dongSel.innerHTML = '<option value="all">전체 (모든 동)</option>';
+            if(REGIONS[sido] && REGIONS[sido][sig]) {
+                for(let d in REGIONS[sido][sig]) dongSel.add(new Option(d, d));
+            }
+            updateDanji();
+        }
+
+        function updateDanji() {
+            const sido = document.getElementById('sidoFilter').value;
+            const sig = document.getElementById('sigunguFilter').value;
+            const dongSel = document.getElementById('dongFilter');
+            const dongs = Array.from(dongSel.selectedOptions).map(o => o.value);
+            
+            const danjiSel = document.getElementById('danjiFilter');
+            danjiSel.innerHTML = '<option value="all">전체 (모든 단지)</option>';
+            
+            if(REGIONS[sido] && REGIONS[sido][sig]) {
+                let targetDongs = dongs.includes('all') || dongs.length === 0 ? Object.keys(REGIONS[sido][sig]) : dongs;
+                for(let d of targetDongs) {
+                    if(REGIONS[sido][sig][d]) {
+                        for(let danji of REGIONS[sido][sig][d]) {
+                            danjiSel.add(new Option(\`[\${d}] \${danji}\`, danji));
+                        }
+                    }
+                }
+            }
+        }
+
+        // ------------------------------------------------------------------
+        // 3. Main Chart Control & Application Logic
+        // ------------------------------------------------------------------
+        let currentView = 'scatter'; // 'scatter' or 'line'
+        let charts = { c1: null, c2: null, c3: null, c4: null };
+        let currentFilteredData = [];
+
+        function switchView(view) {
+            currentView = view;
+            
+            // UI Toggle
+            const btnS = document.getElementById('btnViewScatter');
+            const btnL = document.getElementById('btnViewLine');
+            if(view === 'scatter') {
+                btnS.className = "px-6 py-2 rounded-md text-sm font-bold bg-white text-indigo-700 shadow-sm transition-all";
+                btnL.className = "px-6 py-2 rounded-md text-sm font-medium text-slate-500 hover:text-slate-800 transition-all";
+            } else {
+                btnL.className = "px-6 py-2 rounded-md text-sm font-bold bg-white text-indigo-700 shadow-sm transition-all";
+                btnS.className = "px-6 py-2 rounded-md text-sm font-medium text-slate-500 hover:text-slate-800 transition-all";
+            }
+            
+            // Re-render charts with current data
+            renderCharts();
+        }
+
+        function getSelectedValues(id) {
+            const sel = document.getElementById(id);
+            const vals = Array.from(sel.selectedOptions).map(o => o.value);
+            return vals.length > 0 ? vals : ['all'];
+        }
+
+        function applyFilters() {
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+            
+            setTimeout(() => {
+                // Read filter values
+                const sido = document.getElementById('sidoFilter').value;
+                const sigungu = document.getElementById('sigunguFilter').value;
+                const dongs = getSelectedValues('dongFilter');
+                const danjis = getSelectedValues('danjiFilter');
+                
+                const tradeType = document.querySelector('input[name="tradeType"]:checked').value; // all, sale, jeonse
+                const pyeongs = getSelectedValues('pyeongFilter');
+                const yStart = parseInt(document.getElementById('yearStart').value);
+                const yEnd = parseInt(document.getElementById('yearEnd').value);
+                const incDirect = document.getElementById('includeDirect').checked;
+
+                // Filter Data
+                currentFilteredData = RAW_DATA.filter(d => {
+                    if(d.sido !== sido) return false;
+                    if(d.sigungu !== sigungu) return false;
+                    if(!dongs.includes('all') && !dongs.includes(d.dong)) return false;
+                    if(!danjis.includes('all') && !danjis.includes(d.danji)) return false;
+                    
+                    if(tradeType !== 'all' && d.type !== tradeType) return false;
+                    if(!pyeongs.includes('all') && !pyeongs.includes(d.pyeong)) return false;
+                    
+                    if(d.year < yStart || d.year > yEnd) return false;
+                    if(!incDirect && d.isDirect) return false;
+                    
+                    return true;
+                });
+
+                document.getElementById('dataCountInfo').innerText = \`필터링된 데이터: \${currentFilteredData.length.toLocaleString()}건\`;
+
+                updateSummaryInfo(tradeType);
+                updateRowVisibility(tradeType);
+                renderCharts();
+                
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            }, 300); // Small delay to allow UI to show loader
+        }
+
+        function updateRowVisibility(tradeType) {
+            const r1 = document.getElementById('row1');
+            const r2 = document.getElementById('row2');
+            const r3 = document.getElementById('row3');
+            const r4 = document.getElementById('row4');
+            
+            r1.style.display = (tradeType === 'all' || tradeType === 'sale') ? 'block' : 'none';
+            r2.style.display = (tradeType === 'all' || tradeType === 'jeonse') ? 'block' : 'none';
+            r3.style.display = (tradeType === 'all' || tradeType === 'sale') ? 'block' : 'none';
+            r4.style.display = (tradeType === 'all' || tradeType === 'jeonse') ? 'block' : 'none';
+        }
+
+        function updateSummaryInfo(tradeType) {
+            const section = document.getElementById('summarySection');
+            if(tradeType === 'jeonse') {
+                section.classList.add('hidden');
+                return;
+            }
+            
+            section.classList.remove('hidden');
+            const sales = currentFilteredData.filter(d => d.type === 'sale');
+            
+            document.getElementById('sumCount').innerHTML = \`\${sales.length.toLocaleString()}<span class="text-sm font-medium text-slate-500 ml-1">건</span>\`;
+            
+            if(sales.length > 0) {
+                let max = -1, min = Infinity;
+                sales.forEach(s => {
+                    if(s.price > max) max = s.price;
+                    if(s.price < min) min = s.price;
+                });
+                document.getElementById('sumMax').innerHTML = \`\${(max/10000).toFixed(1)}<span class="text-sm font-medium text-slate-500 ml-1">억</span>\`;
+                document.getElementById('sumMin').innerHTML = \`\${(min/10000).toFixed(1)}<span class="text-sm font-medium text-slate-500 ml-1">억</span>\`;
+                
+                // Recent 3
+                const recents = sales.slice(0, 3);
+                let rHtml = '';
+                recents.forEach(r => {
+                    rHtml += \`<li class="flex justify-between items-center border-b border-slate-100 pb-1">
+                        <span class="text-slate-600 truncate w-24" title="\${r.danji}">\${r.danji}</span>
+                        <span class="font-bold text-slate-800">\${(r.price/10000).toFixed(1)}억 <span class="text-[10px] font-normal text-slate-400">(\${r.pyeong})</span></span>
+                        <span class="text-slate-400">\${r.date.substr(2)}</span>
+                    </li>\`;
+                });
+                document.getElementById('sumRecent').innerHTML = rHtml;
+            } else {
+                document.getElementById('sumMax').innerHTML = \`0<span class="text-sm font-medium text-slate-500 ml-1">억</span>\`;
+                document.getElementById('sumMin').innerHTML = \`0<span class="text-sm font-medium text-slate-500 ml-1">억</span>\`;
+                document.getElementById('sumRecent').innerHTML = '<li class="text-slate-400">거래 내역 없음</li>';
+            }
+        }
+
+        // ------------------------------------------------------------------
+        // 4. Chart Rendering
+        // ------------------------------------------------------------------
+        function destroyCharts() {
+            if(charts.c1) charts.c1.destroy();
+            if(charts.c2) charts.c2.destroy();
+            if(charts.c3) charts.c3.destroy();
+            if(charts.c4) charts.c4.destroy();
+        }
+
+        function calculateDateBounds() {
+            if(currentFilteredData.length === 0) return { min: new Date(), max: new Date() };
+            let minTime = Infinity;
+            let maxTime = -Infinity;
+            currentFilteredData.forEach(d => {
+                if(d.timestamp < minTime) minTime = d.timestamp;
+                if(d.timestamp > maxTime) maxTime = d.timestamp;
+            });
+            // padding of 1 month
+            const padding = 30 * 24 * 60 * 60 * 1000;
+            return { min: minTime - padding, max: maxTime + padding };
+        }
+
+        function renderCharts() {
+            destroyCharts();
+            
+            const sales = currentFilteredData.filter(d => d.type === 'sale');
+            const jeonses = currentFilteredData.filter(d => d.type === 'jeonse');
+            const dateBounds = calculateDateBounds();
+
+            const commonOptions = {
+                responsive: true, maintainAspectRatio: false,
+                animation: false, // Turn off for speed with large datasets
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: { unit: 'month', displayFormats: { month: 'yy.MM' } },
+                        min: dateBounds.min,
+                        max: dateBounds.max,
+                        grid: { display: false }
+                    }
+                },
+                plugins: { legend: { display: true, position: 'top' } }
+            };
+
+            if(currentView === 'scatter') {
+                renderScatterView(sales, jeonses, commonOptions);
+            } else {
+                renderLineView(sales, jeonses, commonOptions);
+            }
+        }
+
+        // --- Scatter View ---
+        function applyJitter(timestamp) {
+            // Jitter X axis slightly (±15 days max) so points don't perfectly overlap
+            const jitterMs = (Math.random() - 0.5) * 15 * 24 * 60 * 60 * 1000;
+            return timestamp + jitterMs;
+        }
+
+        function buildScatterDatasets(data) {
+            const sets = {};
+            data.forEach(d => {
+                if(!sets[d.pyeong]) {
+                    sets[d.pyeong] = {
+                        label: d.pyeong,
+                        data: [],
+                        backgroundColor: PYEONG_COLORS[d.pyeong] + '99', // alpha
+                        borderColor: PYEONG_COLORS[d.pyeong],
+                        borderWidth: 1,
+                        pointRadius: 4,
+                        pointHoverRadius: 7
+                    };
+                }
+                sets[d.pyeong].data.push({
+                    x: applyJitter(d.timestamp),
+                    y: d.price,
+                    raw: d
+                });
+            });
+            return Object.values(sets);
+        }
+
+        function getScatterTooltip() {
+            return {
+                callbacks: {
+                    label: function(ctx) {
+                        const d = ctx.raw.raw;
+                        return \`[\${d.danji}] \${d.date} | \${(d.price/10000).toFixed(2)}억 | \${d.pyeong} | \${d.floor}층\`;
+                    }
+                }
+            };
+        }
+
+        // --- Volume Bar View ---
+        function buildVolumeData(data, color) {
+            // Aggregate by Year-Month
+            const volMap = {};
+            data.forEach(d => {
+                const key = \`\${d.year}-\${d.month.toString().padStart(2, '0')}-01\`;
+                volMap[key] = (volMap[key] || 0) + 1;
+            });
+            const plotData = Object.keys(volMap).map(k => ({ x: new Date(k).getTime(), y: volMap[k] }));
+            plotData.sort((a,b) => a.x - b.x);
+            return [{
+                label: '거래량(건)',
+                data: plotData,
+                backgroundColor: color,
+                barPercentage: 0.8,
+                categoryPercentage: 0.9
+            }];
+        }
+
+        // --- Line View (Medians) ---
+        function buildMedianLineData(data, label, color) {
+            const volMap = {};
+            data.forEach(d => {
+                const key = \`\${d.year}-\${d.month.toString().padStart(2, '0')}-01\`;
+                if(!volMap[key]) volMap[key] = [];
+                volMap[key].push(d.price);
+            });
+            
+            const plotData = Object.keys(volMap).map(k => {
+                const arr = volMap[k].sort((a,b)=>a-b);
+                const median = arr[Math.floor(arr.length/2)];
+                return { x: new Date(k).getTime(), y: median };
+            });
+            plotData.sort((a,b) => a.x - b.x);
+            
+            return [{
+                label: label + ' 평균(중위)가',
+                data: plotData,
+                borderColor: color,
+                backgroundColor: color + '20',
+                borderWidth: 2,
+                pointRadius: 4,
+                tension: 0.2
+            }];
+        }
+
+
+        function renderScatterView(sales, jeonses, commonOpts) {
+            const tradeType = document.querySelector('input[name="tradeType"]:checked').value;
+            
+            // 1. Sale Scatter
+            if(tradeType === 'all' || tradeType === 'sale') {
+                const ctx1 = document.getElementById('canvas1').getContext('2d');
+                let opt1 = JSON.parse(JSON.stringify(commonOpts));
+                opt1.plugins.tooltip = getScatterTooltip();
+                opt1.scales.y = { ticks: { callback: v => v/10000 + '억' } };
+                charts.c1 = new Chart(ctx1, { type: 'scatter', data: { datasets: buildScatterDatasets(sales) }, options: opt1 });
+                
+                // 3. Sale Volume
+                const ctx3 = document.getElementById('canvas3').getContext('2d');
+                let opt3 = JSON.parse(JSON.stringify(commonOpts));
+                opt3.plugins.legend.display = false;
+                charts.c3 = new Chart(ctx3, { type: 'bar', data: { datasets: buildVolumeData(sales, '#ef4444') }, options: opt3 });
+            }
+
+            // 2. Jeonse Scatter
+            if(tradeType === 'all' || tradeType === 'jeonse') {
+                const ctx2 = document.getElementById('canvas2').getContext('2d');
+                let opt2 = JSON.parse(JSON.stringify(commonOpts));
+                opt2.plugins.tooltip = getScatterTooltip();
+                opt2.scales.y = { ticks: { callback: v => v/10000 + '억' } };
+                charts.c2 = new Chart(ctx2, { type: 'scatter', data: { datasets: buildScatterDatasets(jeonses) }, options: opt2 });
+                
+                // 4. Jeonse Volume
+                const ctx4 = document.getElementById('canvas4').getContext('2d');
+                let opt4 = JSON.parse(JSON.stringify(commonOpts));
+                opt4.plugins.legend.display = false;
+                charts.c4 = new Chart(ctx4, { type: 'bar', data: { datasets: buildVolumeData(jeonses, '#3b82f6') }, options: opt4 });
+            }
+        }
+
+        function renderLineView(sales, jeonses, commonOpts) {
+            const tradeType = document.querySelector('input[name="tradeType"]:checked').value;
+            
+            // 1. Sale Line
+            if(tradeType === 'all' || tradeType === 'sale') {
+                const ctx1 = document.getElementById('canvas1').getContext('2d');
+                let opt1 = JSON.parse(JSON.stringify(commonOpts));
+                opt1.scales.y = { ticks: { callback: v => v/10000 + '억' } };
+                charts.c1 = new Chart(ctx1, { type: 'line', data: { datasets: buildMedianLineData(sales, '매매', '#ef4444') }, options: opt1 });
+                
+                const ctx3 = document.getElementById('canvas3').getContext('2d');
+                let opt3 = JSON.parse(JSON.stringify(commonOpts));
+                opt3.plugins.legend.display = false;
+                charts.c3 = new Chart(ctx3, { type: 'bar', data: { datasets: buildVolumeData(sales, '#ef4444') }, options: opt3 });
+            }
+
+            // 2. Jeonse Line
+            if(tradeType === 'all' || tradeType === 'jeonse') {
+                const ctx2 = document.getElementById('canvas2').getContext('2d');
+                let opt2 = JSON.parse(JSON.stringify(commonOpts));
+                opt2.scales.y = { ticks: { callback: v => v/10000 + '억' } };
+                charts.c2 = new Chart(ctx2, { type: 'line', data: { datasets: buildMedianLineData(jeonses, '전세', '#3b82f6') }, options: opt2 });
+                
+                const ctx4 = document.getElementById('canvas4').getContext('2d');
+                let opt4 = JSON.parse(JSON.stringify(commonOpts));
+                opt4.plugins.legend.display = false;
+                charts.c4 = new Chart(ctx4, { type: 'bar', data: { datasets: buildVolumeData(jeonses, '#3b82f6') }, options: opt4 });
+            }
+        }
+
+        // Initialize App
+        window.onload = () => {
+            generateMockData();
+            initFilters();
+            applyFilters();
+        };
+
+    </script>
+</body>
+</html>
