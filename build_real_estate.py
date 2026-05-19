@@ -185,8 +185,8 @@ for aid, meta in APT_FILTERS.items():
     for m in months:
         t_matches = [x for x in all_trades if x['m'] == m and x['umd'] == dong and kw in x['apt']]
         if t_matches:
-            # 해당 월의 최고가 거래 추출
-            top_t = max(t_matches, key=lambda x: x['p'])
+            # 해당 월의 가장 최근(최신) 거래 추출 (최고가 대신 최신 실거래가 반영)
+            top_t = max(t_matches, key=lambda x: x['d'])
             tp = top_t['p']
             if m == months[-1]: curr_peak_d = top_t['d']
         else:
