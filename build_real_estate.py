@@ -147,10 +147,10 @@ for aid, meta in APT_FILTERS.items():
     if len(t10y) < 5: # 데이터 부족 시 면적 제한 해제
         t10y = sorted(t10y_raw, key=lambda x: x['d'])
     
-    # 1. 역사적 전고점 (2년 이전)
+    # 1. 역사적 전고점 (10년 전체 최고가)
     hist_peak_p = 0
     hist_peak_d = ""
-    # 2. 최근 전고점 (최근 2년)
+    # 2. 최근 전고점 (최근 2년 내 최고가)
     recent_peak_p = 0
     recent_peak_d = ""
     # 3. 최근 1년 내 최고/최저 (하락률 계산용)
@@ -161,13 +161,13 @@ for aid, meta in APT_FILTERS.items():
     min_p_1y = 999999999
 
     for t in t10y:
-        # 역사적 전고점 (2년 이전)
-        if t['d'] < two_years_ago:
-            if t['p'] > hist_peak_p:
-                hist_peak_p = t['p']
-                hist_peak_d = t['d']
-        # 최근 전고점 (최근 2년)
-        else:
+        # 역사적 전고점 (10년 전체 최고가)
+        if t['p'] > hist_peak_p:
+            hist_peak_p = t['p']
+            hist_peak_d = t['d']
+            
+        # 최근 전고점 (최근 2년 내 최고가)
+        if t['d'] >= two_years_ago:
             if t['p'] > recent_peak_p:
                 recent_peak_p = t['p']
                 recent_peak_d = t['d']
@@ -190,10 +190,14 @@ for aid, meta in APT_FILTERS.items():
             tp = top_t['p']
             if m == months[-1]: curr_peak_d = top_t['d']
         else:
-            tp = trade_history[-1] if trade_history else 0
+            tp = trade_history[-1] if (trade_history and trade_history[-1] is not None) else None
         trade_history.append(tp)
 
-    curr_p = trade_history[-1] if trade_history else 0
+    curr_p = 0
+    for price in reversed(trade_history):
+        if price is not None:
+            curr_p = price
+            break
 
     for t in t10y:
         if hist_peak_d and t['d'] > hist_peak_d:
