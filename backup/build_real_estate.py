@@ -403,23 +403,15 @@ const INJECTED_ANALYSIS_DATA = {json.dumps(analysis_data, ensure_ascii=False)};
 const INJECTED_ANALYSIS = {json.dumps(mkt_summary, ensure_ascii=False)};
 const INJECTED_MONTHS = {json.dumps(months)};
 const INJECTED_TIMESTAMP = '{now.strftime('%Y-%m-%d %H:%M')}';
+const INJECTED_RAW = {json.dumps(raw_items, ensure_ascii=False)};
 const INJECTED_NEWS = {json.dumps(news_list, ensure_ascii=False)};
 const INJECTED_SUPPLY = {json.dumps(supply_data, ensure_ascii=False)};
-// ======== AUTO_UPDATE_ZONE_END ========"""
-
-raw_injection = f"""// ======== AUTO_UPDATE_RAW_ZONE_START ========
-const INJECTED_RAW = {json.dumps(raw_items, ensure_ascii=False)};
-// ======== AUTO_UPDATE_RAW_ZONE_END ========"""
-
-raw_js_path = js_path.replace("real_estate_data.js", "real_estate_raw.js")
+// ======== AUTO_UPDATE_ZONE_END ========"""""
 
 with open(js_path, 'w', encoding='utf-8') as f:
     f.write(injection)
 
-with open(raw_js_path, 'w', encoding='utf-8') as f:
-    f.write(raw_injection)
-
-print(f"Update Complete: trade {len(all_trades)}. JS and Raw JS updated!")
+print(f"Update Complete: trade {len(all_trades)}. JS updated!")
 
 # FULL CSV 자동 생성 (Excel 친화적인 UTF-8-sig 인코딩)
 csv_path = "suwon_real_estate.csv"

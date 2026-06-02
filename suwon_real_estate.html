@@ -880,45 +880,112 @@ function renderPeakAnalysis(){
     }
 }
 
+var isRawLoaded = false;
+var isLoadingRaw = false;
+
+function loadRawData(callback) {
+    if (isRawLoaded) {
+        if (callback) callback();
+        return;
+    }
+    if (isLoadingRaw) {
+        // 이미 로딩 중이라면 로딩이 끝날 때까지 대기 대기열 추가
+        var interval = setInterval(function() {
+            if (isRawLoaded) {
+                clearInterval(interval);
+                if (callback) callback();
+            }
+        }, 100);
+        return;
+    }
+    
+    isLoadingRaw = true;
+    
+    // 이쁘고 모던한 프리미엄 로딩 스피너 오버레이 추가
+    var overlay = document.createElement('div');
+    overlay.id = 'rawLoadingOverlay';
+    overlay.className = 'fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-900/60 backdrop-blur-md transition-all duration-300';
+    overlay.innerHTML = '<div class="glass p-8 rounded-3xl border border-white/20 flex flex-col items-center gap-4 bg-white/90 shadow-2xl max-w-xs text-center"><div class="relative w-16 h-16"><div class="absolute inset-0 rounded-full border-4 border-slate-100"></div><div class="absolute inset-0 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin"></div></div><h4 class="text-slate-800 font-black text-sm tracking-tight">상세 실거래 데이터 로딩 중</h4><p class="text-[10px] text-slate-400 font-medium leading-relaxed">대용량 10개년 실거래 통계 데이터베이스(1.2MB)를 연동 및 캐싱하고 있습니다. 잠시만 기다려 주세요.</p></div>';
+    document.body.appendChild(overlay);
+
+    var script = document.createElement('script');
+    script.src = 'real_estate_raw.js';
+    script.onload = function() {
+        isRawLoaded = true;
+        isLoadingRaw = false;
+        
+        // 메모리 전역 바인딩 및 캐시 동기화
+        if (typeof INJECTED_RAW !== 'undefined') {
+            rF = INJECTED_RAW;
+            rRT(); // 테이블 바인딩 1회 수행
+        }
+        
+        // 오버레이 스무스하게 제거
+        var el = document.getElementById('rawLoadingOverlay');
+        if (el) {
+            el.classList.add('opacity-0');
+            setTimeout(function() { el.parentNode.removeChild(el); }, 300);
+        }
+        
+        if (callback) callback();
+    };
+    script.onerror = function() {
+        isLoadingRaw = false;
+        var el = document.getElementById('rawLoadingOverlay');
+        if (el) el.parentNode.removeChild(el);
+        alert("실거래 상세 데이터를 비동기 로드하는데 실패했습니다. 오프라인 상태이거나 네트워크 에러일 수 있습니다.");
+    };
+    document.head.appendChild(script);
+}
+
 function switchTab(t){
     const tabs = {
         'dash': {btn: 't1', page: 'p1', title: '대시보드'},
-        'raw':  {btn: 't2', page: 'p2', title: '실거래 데이터'},
-        'vol':  {btn: 't3', page: 'p3', func: renderVolAnalysis, title: '거래량 분석'},
+        'raw':  {btn: 't2', page: 'p2', title: '실거래 데이터', requiresRaw: true},
+        'vol':  {btn: 't3', page: 'p3', func: renderVolAnalysis, title: '거래량 분석', requiresRaw: true},
         'peak': {btn: 't4', page: 'p4', func: renderPeakAnalysis, title: '전고점 비교'},
         'calc': {btn: 't6', page: 'p6', func: initCalcTab, title: '매수 계산기'},
         'timing': {btn: 't7', page: 'p7', func: renderTimingAnalysis, title: '매수 타이밍'},
         'rank': {btn: 't8', page: 'p8', func: renderRankAnalysis, title: '종합 점수'},
         'supply': {btn: 't9', page: 'p9', func: renderSupplyAnalysis, title: '공급 분석'},
-        'ai': {btn: 't10', page: 'p10', func: initAiTab, title: 'AI 멀티 에이전트'},
+        'ai': {btn: 't10', page: 'p10', func: initAiTab, title: 'AI 멀티 에이전트', requiresRaw: true},
         'news': {btn: 't11', page: 'p11', func: renderNewsTab, title: '관련 뉴스룸'},
         'history': {btn: 't12', page: 'p12', func: renderHistoryTab, title: '업데이트 히스토리'}
     };
+    
+    const target = tabs[t];
+    if(!target) return;
+    
+    // 만약 상세 실거래 데이터가 필요한 탭인데 아직 데이터가 없다면 비동기 로딩 트리거 작동
+    if (target.requiresRaw && !isRawLoaded) {
+        loadRawData(function() {
+            switchTab(t); // 로드 완료 후 재귀적으로 switchTab 호출
+        });
+        return;
+    }
     
     // Hide all pages and deactivate all buttons
     document.querySelectorAll('.tab-page').forEach(function(c) { c.classList.add('hidden'); });
     document.querySelectorAll('.tb').forEach(function(b) { b.classList.remove('tab-a'); b.classList.add('tab-i'); });
     
-    const target = tabs[t];
-    if(target) {
-        var page = document.getElementById(target.page);
-        var btn = document.getElementById(target.btn);
-        if(!page) { console.warn('Tab page not found:', target.page); return; }
-        if(!btn) { console.warn('Tab button not found:', target.btn); return; }
-        page.classList.remove('hidden');
-        page.classList.remove('tab-fade');
-        void page.offsetWidth; // Force reflow
-        page.classList.add('tab-fade');
-        
-        btn.classList.add('tab-a');
-        btn.classList.remove('tab-i');
-        if(target.func) target.func();
-        window.scrollTo({top:0, behavior:'smooth'});
-        
-        // Update hash without jumping
-        if(history.pushState) history.pushState(null, null, '#'+t);
-        else location.hash = t;
-    }
+    var page = document.getElementById(target.page);
+    var btn = document.getElementById(target.btn);
+    if(!page) { console.warn('Tab page not found:', target.page); return; }
+    if(!btn) { console.warn('Tab button not found:', target.btn); return; }
+    page.classList.remove('hidden');
+    page.classList.remove('tab-fade');
+    void page.offsetWidth; // Force reflow
+    page.classList.add('tab-fade');
+    
+    btn.classList.add('tab-a');
+    btn.classList.remove('tab-i');
+    if(target.func) target.func();
+    window.scrollTo({top:0, behavior:'smooth'});
+    
+    // Update hash without jumping
+    if(history.pushState) history.pushState(null, null, '#'+t);
+    else location.hash = t;
+    
     if(typeof lucide !== 'undefined') lucide.createIcons();
 }
 
@@ -2224,8 +2291,11 @@ document.addEventListener('DOMContentLoaded', function() {
         banner.innerHTML = '⚠️ 현재 실시간 데이터를 불러올 수 없어 샘플 데이터를 표시하고 있습니다. 파이썬 스크립트 실행 결과를 확인해 주세요.';
         document.body.prepend(banner);
     }
-    rF=INJECTED_RAW||[];
-    rRT();
+    rF=(typeof INJECTED_RAW !== 'undefined') ? INJECTED_RAW : [];
+    if (rF.length > 0) {
+        isRawLoaded = true;
+        rRT();
+    }
     
     // Initial tab selection is forced to dashboard on page start
     var h = 'dash';

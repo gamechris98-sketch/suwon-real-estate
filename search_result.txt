@@ -1,205 +1,297 @@
-[고등동] 수원역푸르지오자이 | 84.98㎡ | 85,000만원
-[고등동] 수원역푸르지오자이 | 84.98㎡ | 86,000만원
-[고등동] 수원역푸르지오자이 | 84.98㎡ | 88,400만원
-[고등동] 수원역푸르지오자이 | 84.98㎡ | 89,500만원
-[고등동] 수원역푸르지오자이 | 84.99㎡ | 83,000만원
-[고등동] 수원역푸르지오자이 | 84.99㎡ | 83,200만원
-[고등동] 수원역푸르지오자이 | 84.99㎡ | 84,500만원
-[고등동] 수원역푸르지오자이 | 84.99㎡ | 85,000만원
-[고등동] 수원역푸르지오자이 | 84.99㎡ | 85,200만원
-[망포동] 동수원자이1차 | 84.9688㎡ | 54,300만원
-[망포동] 동수원자이1차 | 84.9688㎡ | 55,000만원
-[망포동] 동수원자이1차 | 84.9688㎡ | 55,700만원
-[망포동] 동수원자이1차 | 84.9688㎡ | 57,000만원
-[망포동] 동수원자이1차 | 84.9688㎡ | 58,500만원
-[망포동] 동수원자이1차 | 84.9688㎡ | 59,000만원
-[망포동] 동수원자이1차 | 84.9688㎡ | 59,800만원
-[망포동] 동수원자이1차 | 84.9688㎡ | 60,000만원
-[망포동] 동수원자이1차 | 84.9688㎡ | 61,000만원
-[망포동] 동수원자이1차 | 84.9688㎡ | 61,500만원
-[망포동] 동수원자이1차 | 84.9688㎡ | 63,000만원
-[망포동] 동수원자이1차 | 84.9688㎡ | 64,300만원
-[망포동] 동수원자이1차 | 84.9688㎡ | 65,000만원
-[망포동] 동수원자이1차 | 84.9688㎡ | 66,000만원
-[망포동] 동수원자이2차 | 84.9394㎡ | 55,000만원
-[망포동] 동수원자이2차 | 84.9394㎡ | 61,000만원
-[망포동] 동수원자이2차 | 84.9394㎡ | 62,700만원
-[망포동] 동수원자이2차 | 84.9394㎡ | 63,500만원
-[망포동] 동수원자이2차 | 84.9394㎡ | 66,900만원
-[망포동] 망포역아이파크 | 84.9745㎡ | 74,000만원
-[망포동] 망포현대2아이파크 | 84.9945㎡ | 62,800만원
-[망포동] 망포현대2아이파크 | 84.9945㎡ | 63,500만원
-[망포동] 망포현대2아이파크 | 84.9945㎡ | 65,000만원
-[망포동] 망포현대2아이파크 | 84.9945㎡ | 66,000만원
-[망포동] 엘지동수원자이 | 79.0967㎡ | 56,700만원
-[망포동] 엘지동수원자이 | 79.0967㎡ | 60,000만원
-[망포동] 엘지동수원자이 | 79.0967㎡ | 61,200만원
-[망포동] 엘지동수원자이 | 84.9838㎡ | 58,500만원
-[망포동] 엘지동수원자이 | 84.9838㎡ | 59,000만원
-[망포동] 엘지동수원자이 | 84.9838㎡ | 60,000만원
-[망포동] 엘지동수원자이 | 84.9838㎡ | 60,250만원
-[망포동] 엘지동수원자이 | 84.9838㎡ | 61,000만원
-[망포동] 영통SKVIEW | 84.4619㎡ | 86,000만원
-[망포동] 영통SKVIEW | 84.4619㎡ | 90,000만원
-[망포동] 영통SKVIEW | 84.4619㎡ | 93,000만원
-[망포동] 영통SKVIEW | 84.4619㎡ | 94,000만원
-[망포동] 영통SKVIEW | 84.4619㎡ | 96,800만원
-[망포동] 영통SKVIEW | 84.6149㎡ | 90,000만원
-[망포동] 영통SKVIEW | 84.6149㎡ | 91,500만원
-[망포동] 영통아이파크캐슬1단지 | 75.93㎡ | 104,000만원
-[망포동] 영통아이파크캐슬1단지 | 75.93㎡ | 97,000만원
-[망포동] 영통아이파크캐슬1단지 | 84.69㎡ | 105,000만원
-[망포동] 영통아이파크캐슬1단지 | 84.69㎡ | 106,000만원
-[망포동] 영통아이파크캐슬1단지 | 84.69㎡ | 107,700만원
-[망포동] 영통아이파크캐슬1단지 | 84.69㎡ | 112,000만원
-[망포동] 영통아이파크캐슬1단지 | 84.69㎡ | 113,500만원
-[망포동] 영통아이파크캐슬1단지 | 84.69㎡ | 116,000만원
-[망포동] 영통아이파크캐슬2단지 | 75.93㎡ | 88,000만원
-[망포동] 영통아이파크캐슬2단지 | 75.93㎡ | 91,000만원
-[망포동] 영통아이파크캐슬2단지 | 75.93㎡ | 92,000만원
-[망포동] 영통아이파크캐슬2단지 | 84.69㎡ | 100,000만원
-[망포동] 영통아이파크캐슬2단지 | 84.69㎡ | 85,000만원
-[망포동] 영통아이파크캐슬2단지 | 84.69㎡ | 93,500만원
-[망포동] 영통아이파크캐슬2단지 | 84.69㎡ | 96,000만원
-[망포동] 영통아이파크캐슬2단지 | 84.69㎡ | 97,500만원
-[망포동] 영통아이파크캐슬2단지 | 84.69㎡ | 99,300만원
-[망포동] 영통아이파크캐슬2단지 | 84.69㎡ | 99,500만원
-[망포동] 영통아이파크캐슬3단지 | 75.54㎡ | 77,400만원
-[망포동] 영통아이파크캐슬3단지 | 75.54㎡ | 82,200만원
-[망포동] 영통아이파크캐슬3단지 | 75.54㎡ | 83,700만원
-[망포동] 영통아이파크캐슬3단지 | 75.54㎡ | 86,300만원
-[망포동] 영통아이파크캐슬3단지 | 75.93㎡ | 88,500만원
-[망포동] 영통아이파크캐슬3단지 | 75.93㎡ | 88,800만원
-[망포동] 영통아이파크캐슬3단지 | 75.93㎡ | 94,000만원
-[망포동] 영통아이파크캐슬3단지 | 84.73㎡ | 86,000만원
-[망포동] 영통아이파크캐슬3단지 | 84.73㎡ | 90,000만원
-[망포동] 영통아이파크캐슬3단지 | 84.73㎡ | 92,800만원
-[망포동] 영통아이파크캐슬3단지 | 84.73㎡ | 93,000만원
-[망포동] 영통아이파크캐슬3단지 | 84.73㎡ | 96,500만원
-[망포동] 영통자이 | 75.2839㎡ | 71,000만원
-[망포동] 한양수자인 | 84.985㎡ | 82,700만원
-[망포동] 힐스테이트영통 | 84.5303㎡ | 107,000만원
-[망포동] 힐스테이트영통 | 84.5303㎡ | 122,000만원
-[망포동] 힐스테이트영통 | 84.5303㎡ | 124,000만원
-[망포동] 힐스테이트영통 | 84.5303㎡ | 126,500만원
-[망포동] 힐스테이트영통 | 84.8897㎡ | 117,000만원
-[망포동] 힐스테이트영통 | 84.8897㎡ | 117,500만원
-[망포동] 힐스테이트영통 | 84.8897㎡ | 124,500만원
-[망포동] 힐스테이트영통 | 84.8897㎡ | 130,000만원
-[망포동] 힐스테이트영통 | 84.8897㎡ | 95,600만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 102,500만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 104,000만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 65,100만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 87,000만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 88,000만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 90,000만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 91,000만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 91,400만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 92,000만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 94,000만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 94,500만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 95,200만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 96,000만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 96,300만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 96,500만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 97,000만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 97,500만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 98,000만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 98,300만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 99,000만원
-[매교동] 매교역푸르지오SKVIEW | 84.97㎡ | 99,500만원
-[매교동] 힐스테이트푸르지오수원 | 84.91㎡ | 78,500만원
-[매교동] 힐스테이트푸르지오수원 | 84.91㎡ | 80,000만원
-[매교동] 힐스테이트푸르지오수원 | 84.91㎡ | 80,200만원
-[매교동] 힐스테이트푸르지오수원 | 84.91㎡ | 81,900만원
-[매교동] 힐스테이트푸르지오수원 | 84.91㎡ | 82,500만원
-[매교동] 힐스테이트푸르지오수원 | 84.91㎡ | 83,100만원
-[매교동] 힐스테이트푸르지오수원 | 84.91㎡ | 83,500만원
-[매교동] 힐스테이트푸르지오수원 | 84.91㎡ | 83,800만원
-[매교동] 힐스테이트푸르지오수원 | 84.91㎡ | 84,000만원
-[매교동] 힐스테이트푸르지오수원 | 84.91㎡ | 84,200만원
-[매교동] 힐스테이트푸르지오수원 | 84.91㎡ | 85,000만원
-[매교동] 힐스테이트푸르지오수원 | 84.91㎡ | 85,300만원
-[매교동] 힐스테이트푸르지오수원 | 84.91㎡ | 85,800만원
-[매교동] 힐스테이트푸르지오수원 | 84.91㎡ | 86,500만원
-[매교동] 힐스테이트푸르지오수원 | 84.91㎡ | 90,000만원
-[매탄동] 현대힐스테이트 | 75.814㎡ | 55,500만원
-[매탄동] 현대힐스테이트 | 75.814㎡ | 59,000만원
-[매탄동] 현대힐스테이트 | 75.814㎡ | 59,500만원
-[매탄동] 현대힐스테이트 | 75.814㎡ | 59,600만원
-[매탄동] 현대힐스테이트 | 75.814㎡ | 59,900만원
-[매탄동] 현대힐스테이트 | 75.814㎡ | 60,000만원
-[매탄동] 현대힐스테이트 | 75.814㎡ | 62,500만원
-[매탄동] 현대힐스테이트 | 84.975㎡ | 58,800만원
-[매탄동] 현대힐스테이트 | 84.975㎡ | 61,500만원
-[매탄동] 현대힐스테이트 | 84.975㎡ | 61,700만원
-[매탄동] 현대힐스테이트 | 84.975㎡ | 62,500만원
-[매탄동] 현대힐스테이트 | 84.975㎡ | 63,000만원
-[매탄동] 현대힐스테이트 | 84.975㎡ | 63,500만원
-[매탄동] 현대힐스테이트 | 84.975㎡ | 63,800만원
-[매탄동] 현대힐스테이트 | 84.975㎡ | 64,000만원
-[매탄동] 현대힐스테이트 | 84.975㎡ | 64,500만원
-[매탄동] 현대힐스테이트 | 84.975㎡ | 65,000만원
-[매탄동] 현대힐스테이트 | 84.975㎡ | 65,500만원
-[영통동] 영통아이파크 | 84.9571㎡ | 46,000만원
-[영통동] 영통아이파크 | 84.9571㎡ | 47,250만원
-[영통동] 영통아이파크 | 84.9605㎡ | 46,000만원
-[영통동] 영통에듀파크(321동~327동) | 84.96㎡ | 79,000만원
-[영통동] 영통에듀파크(321동~327동) | 84.96㎡ | 81,000만원
-[영통동] 영통에듀파크(321동~327동) | 84.96㎡ | 82,000만원
-[영통동] 영통에듀파크(321동~327동) | 84.96㎡ | 84,700만원
-[영통동] 영통에듀파크(321동~327동) | 84.96㎡ | 84,750만원
-[영통동] 영통에듀파크(321동~327동) | 84.96㎡ | 86,000만원
-[영통동] 영통에듀파크(321동~327동) | 84.96㎡ | 86,500만원
-[영통동] 영통에듀파크(331동~337동) | 84.96㎡ | 75,500만원
-[영통동] 영통에듀파크(331동~337동) | 84.96㎡ | 82,000만원
-[영통동] 영통에듀파크(331동~337동) | 84.96㎡ | 84,000만원
-[영통동] 영통에듀파크(331동~337동) | 84.96㎡ | 85,000만원
-[영통동] 영통에듀파크(331동~337동) | 84.96㎡ | 86,000만원
-[영통동] 영통에듀파크(331동~337동) | 84.96㎡ | 86,700만원
-[원천동] 광교아이파크 | 84.1006㎡ | 135,000만원
-[원천동] 광교아이파크 | 84.1116㎡ | 132,000만원
-[원천동] 광교아이파크 | 84.254㎡ | 140,000만원
-[원천동] 광교아이파크 | 84.3013㎡ | 137,000만원
-[원천동] 영흥숲푸르지오파크비엔 | 84.9839㎡ | 92,500만원
-[원천동] 영흥숲푸르지오파크비엔 | 84.9868㎡ | 92,200만원
-[원천동] 영흥숲푸르지오파크비엔 | 84.9868㎡ | 92,300만원
-[원천동] 영흥숲푸르지오파크비엔 | 84.9868㎡ | 96,000만원
-[원천동] 영흥숲푸르지오파크비엔 | 84.9957㎡ | 96,400만원
-[이의동] 광교에듀포레 | 75.74㎡ | 130,000만원
-[이의동] 광교에듀포레 | 75.75㎡ | 137,000만원
-[이의동] 광교에듀포레 | 84.89㎡ | 144,000만원
-[이의동] 광교에듀포레 | 84.89㎡ | 144,700만원
-[이의동] 광교에듀포레 | 84.89㎡ | 149,000만원
-[이의동] 광교에듀포레 | 84.89㎡ | 155,000만원
-[이의동] 광교푸르지오월드마크 | 84.92㎡ | 140,000만원
-[이의동] 광교푸르지오월드마크 | 84.92㎡ | 144,000만원
-[이의동] 광교푸르지오월드마크 | 84.92㎡ | 150,000만원
-[이의동] 광교한양수자인 | 84.1638㎡ | 92,000만원
-[이의동] 광교한양수자인 | 84.247㎡ | 93,000만원
-[이의동] 광교한양수자인 | 84.247㎡ | 93,500만원
-[이의동] 자연앤힐스테이트 | 84.28㎡ | 164,000만원
-[이의동] 자연앤힐스테이트 | 84.28㎡ | 172,000만원
-[이의동] 자연앤힐스테이트 | 84.28㎡ | 175,000만원
-[이의동] 자연앤힐스테이트 | 84.41㎡ | 160,000만원
-[이의동] 자연앤힐스테이트 | 84.46㎡ | 189,000만원
-[이의동] 자연앤힐스테이트 | 84.49㎡ | 179,000만원
-[이의동] 자연앤힐스테이트 | 84.5㎡ | 165,500만원
-[이의동] 자연앤힐스테이트 | 84.5㎡ | 173,000만원
-[이의동] 자연앤힐스테이트 | 84.63㎡ | 165,000만원
-[이의동] 자연앤힐스테이트 | 84.74㎡ | 184,000만원
-[인계동] 수원센트럴아이파크자이 | 84.99㎡ | 82,500만원
-[인계동] 수원센트럴아이파크자이 | 84.99㎡ | 83,000만원
-[인계동] 수원센트럴아이파크자이 | 84.99㎡ | 85,100만원
-[인계동] 수원센트럴아이파크자이 | 84.99㎡ | 85,500만원
-[인계동] 수원센트럴아이파크자이 | 84.99㎡ | 87,000만원
-[인계동] 수원센트럴아이파크자이 | 84.99㎡ | 87,500만원
-[인계동] 수원센트럴아이파크자이 | 84.99㎡ | 90,000만원
-[인계동] 수원인계푸르지오 | 84.98㎡ | 54,000만원
-[하동] 광교LAKEPARK한양수자인 | 84.804㎡ | 90,000만원
-[하동] 광교LAKEPARK한양수자인 | 84.8201㎡ | 90,000만원
-[하동] 광교LAKEPARK한양수자인 | 84.8201㎡ | 93,000만원
-[하동] 광교LAKEPARK한양수자인 | 84.8442㎡ | 88,500만원
-[하동] 광교LAKEPARK한양수자인 | 84.8442㎡ | 89,500만원
-[하동] 광교LAKEPARK한양수자인 | 84.8442㎡ | 90,000만원
-[하동] 광교LAKEPARK한양수자인 | 84.8442㎡ | 92,000만원
+1464: function initAiTab() {
+1465:     var sel = document.getElementById('aiAptSelect');
+1466:     if(sel && sel.options.length === 0) {
+1467:         A.forEach(a => { var o=document.createElement('option'); o.value=a.id; o.text=a.dn+' '+a.nm; sel.add(o); });
+1468:         syncAiAptPresets();
+1469:     }
+1470: }
+1471: 
+1472: function syncAiAptPresets() {
+1473:     var sel = document.getElementById('aiAptSelect');
+1474:     var aptId = sel.value;
+1475:     var apt = A.find(x => x.id === aptId);
+1476:     if (!apt) return;
+1477:     
+1478:     var ad = INJECTED_ANALYSIS_DATA[aptId] || {};
+1479:     var price = ad.curr || 70000;
+1480:     
+1481:     // 기본 프리셋 설정
+1482:     document.getElementById('aiAskingPrice').value = price;
+1483:     document.getElementById('aiFloor').value = 'mid';
+1484:     document.getElementById('aiRemodel').value = 'none';
+1485:     document.getElementById('aiNoise').value = 'no';
+1486:     document.getElementById('aiBuyerTerms').value = 'none';
+1487:     document.getElementById('aiSellerTerms').value = 'none';
+1488:     
+1489:     var sampleText = "중층, 3년 이내 화이트톤 수리 완료, 조용하고 전망 우수함, 내 전세 만기 1년 남음, 매도인 갈아타기 이사로 급함";
+1490:     
+1491:     // 한양수자인 108동 401호(84m^2) 시세 분석을 위한 최적 특화 프리셋 자동 주입
+1492:     if (aptId === 'mangpo_sujain') {
+1493:         document.getElementById('aiAskingPrice').value = 88000; // 8억 8천
+1494:         document.getElementById('aiFloor').value = 'low';       // 401호 = 저층 (4층)
+1495:         document.getElementById('aiRemodel').value = 'partial';  // 부분 수리 상태
+1496:         document.getElementById('aiNoise').value = 'yes';        // 상가 소음 리스크 있음
+1497:         document.getElementById('aiSellerTerms').value = 'move';  // 갈아타기 진행 중 (급함)
+1498:         sampleText = "수원 망포동 영통한양수자인에듀파크 108동 401호 (84㎡). 등록호가 8억8천만원.\n4층 저층 매물로 앞쪽 상가 소음 애로사항이 다소 있고 화장실만 부분 수리되었습니다.\n매도인은 다음 집 갈아타기 계약 진행으로 계약금 및 잔금 회수가 매우 급한 상황입니다.";
+1499:     }
+1500:     
+1501:     document.getElementById('aiCustomText').value = sampleText;
+1502: }
+1503: 
+1504: function runAiAgentAnalysis() {
+1505:     var aptId = document.getElementById('aiAptSelect').value;
+1506:     if (!aptId) { alert("분석 대상 아파트를 선택해 주세요."); return; }
+1507:     
+1508:     var apt = A.find(x => x.id === aptId);
+1509:     var ad = INJECTED_ANALYSIS_DATA[aptId] || {};
+1510:     var askingPrice = parseInt(document.getElementById('aiAskingPrice').value) || 0;
+1511:     var floor = document.getElementById('aiFloor').value;
+1512:     var remodel = document.getElementById('aiRemodel').value;
+1513:     var noise = document.getElementById('aiNoise').value;
+1514:     var buyerTerms = document.getElementById('aiBuyerTerms').value;
+1515:     var sellerTerms = document.getElementById('aiSellerTerms').value;
+1516:     var customText = document.getElementById('aiCustomText').value;
+1517: 
+1518:     document.getElementById('aiProgressBarContainer').classList.remove('hidden');
+1519:     document.getElementById('aiWaitingScreen').classList.add('hidden');
+1520:     
+1521:     var nodes = ['node-csv', 'node-agent1', 'node-agent2', 'node-agent3', 'node-agent4'];
+1522:     nodes.forEach(n => {
+1523:         var el = document.getElementById(n).firstElementChild;
+1524:         el.className = "w-10 h-10 rounded-full bg-slate-100 border-2 border-slate-300 flex items-center justify-center text-slate-400 font-bold transition-all";
+1525:         el.innerHTML = n === 'node-csv' ? '<i data-lucide="table" class="w-4 h-4"></i>' : n.replace('node-agent', '');
+1526:     });
+1527:     
+1528:     var cards = ['card-agent1', 'card-agent2', 'card-agent3', 'card-agent4'];
+1529:     cards.forEach(c => document.getElementById(c).classList.add('hidden'));
+1530: 
+1531:     var step = 0;
+1532:     var totalSteps = 5;
+1533:     
+1534:     function setNodeStatus(nodeId, status) {
+1535:         var el = document.getElementById(nodeId).firstElementChild;
+1536:         if (status === 'active') {
+1537:             el.className = "w-10 h-10 rounded-full bg-indigo-50 border-2 border-indigo-600 text-indigo-600 flex items-center justify-center font-bold animate-pulse shadow-md shadow-indigo-100";
+1538:         } else if (status === 'done') {
+1539:             el.className = "w-10 h-10 rounded-full bg-indigo-600 border-2 border-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-indigo-200";
+1540:             el.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i>';
+1541:             if(typeof lucide !== 'undefined') lucide.createIcons();
+1542:         }
+1543:     }
+1544: 
+1545:     function runStep() {
+1546:         if (step > totalSteps) {
+1547:             document.getElementById('aiProgressStatus').innerText = "종합 협업 분석 보고서 발행 완료!";
+1548:             document.getElementById('aiProgressBar').style.width = "100%";
+1549:             document.getElementById('aiProgressPct').innerText = "100%";
+1550:             return;
+1551:         }
+1552: 
+1553:         if (step === 0) {
+1554:             document.getElementById('aiProgressStatus').innerText = "CSV 데이터 노드 로딩 및 품질 검증 중...";
+1555:             document.getElementById('aiProgressBar').style.width = "10%";
+1556:             document.getElementById('aiProgressPct').innerText = "10%";
+1557:             setNodeStatus('node-csv', 'active');
+1558:             
+1559:             setTimeout(function() {
+1560:                 setNodeStatus('node-csv', 'done');
+1561:                 step++;
+1562:                 runStep();
+1563:             }, 800);
+1564:         }
+1565:         else if (step === 1) {
+1566:             document.getElementById('aiProgressStatus').innerText = "에이전트 1: 이상치 정제 및 품질 검사 수행 중...";
+1567:             document.getElementById('aiProgressBar').style.width = "30%";
+1568:             document.getElementById('aiProgressPct').innerText = "30%";
+1569:             setNodeStatus('node-agent1', 'active');
+1570:             
+1571:             var parsed = runAgent1Analysis(apt, ad);
+1572:             document.getElementById('out-agent1').innerHTML = parsed;
+1573:             
+1574:             setTimeout(function() {
+1575:                 var c = document.getElementById('card-agent1');
+1576:                 c.classList.remove('hidden');
+1577:                 setNodeStatus('node-agent1', 'done');
+1578:                 step++;
+1579:                 runStep();
+1580:             }, 1000);
+1581:         }
+1582:         else if (step === 2) {
+1583:             document.getElementById('aiProgressStatus').innerText = "에이전트 2: 시세 이동평균 및 가격 상승 모멘텀 계산 중...";
+1584:             document.getElementById('aiProgressBar').style.width = "50%";
+1585:             document.getElementById('aiProgressPct').innerText = "50%";
+1586:             setNodeStatus('node-agent2', 'active');
+1587:             
+1588:             var parsed = runAgent2Analysis(aptId, ad);
+1589:             document.getElementById('out-agent2').innerHTML = parsed;
+1590:             
+1591:             setTimeout(function() {
+1592:                 var c = document.getElementById('card-agent2');
+1593:                 c.classList.remove('hidden');
+1594:                 setNodeStatus('node-agent2', 'done');
+1595:                 step++;
+1596:                 runStep();
+1597:             }, 1000);
+1598:         }
+1599:         else if (step === 3) {
+1600:             document.getElementById('aiProgressStatus').innerText = "에이전트 3: 지역 대장 아파트 대비 가치 차이(Gap) 검증 중...";
+1601:             document.getElementById('aiProgressBar').style.width = "75%";
+1602:             document.getElementById('aiProgressPct').innerText = "75%";
+1603:             setNodeStatus('node-agent3', 'active');
+1604:             
+1605:             var parsed = runAgent3Analysis(apt, ad, askingPrice);
+1606:             document.getElementById('out-agent3').innerHTML = parsed;
+1607:             
+1608:             setTimeout(function() {
+1609:                 var c = document.getElementById('card-agent3');
+1610:                 c.classList.remove('hidden');
+1611:                 setNodeStatus('node-agent3', 'done');
+1612:                 step++;
+1613:                 runStep();
+1614:             }, 1000);
+1615:         }
+1616:         else if (step === 4) {
+1617:             document.getElementById('aiProgressStatus').innerText = "에이전트 4: 정성적 가치 환산 및 맞춤형 협상 전략 수립 중...";
+1618:             document.getElementById('aiProgressBar').style.width = "95%";
+1619:             document.getElementById('aiProgressPct').innerText = "95%";
+1620:             setNodeStatus('node-agent4', 'active');
+1621:             
+1622:             var parsed = runAgent4Analysis(apt, ad, askingPrice, floor, remodel, noise, buyerTerms, sellerTerms, customText);
+1623:             document.getElementById('out-agent4').innerHTML = parsed;
+1624:             
+1625:             setTimeout(function() {
+1626:                 var c = document.getElementById('card-agent4');
+1627:                 c.classList.remove('hidden');
+1628:                 setNodeStatus('node-agent4', 'done');
+1629:                 step++;
+1630:                 runStep();
+1631:                 
+1632:                 c.scrollIntoView({ behavior: 'smooth', block: 'start' });
+1633:             }, 1200);
+1634:         }
+1635:     }
+1636:     
+1637:     runStep();
+1638: }
+1639: 
+1640: function runAgent1Analysis(apt, ad) {
+1641:     var raw = INJECTED_RAW.filter(r => r.apt.includes(apt.kw) && r.dong === apt.dn);
+1642:     var totalCount = raw.length;
+1643:     
+1644:     var prices = raw.map(r => r.price).sort((a,b) => a-b);
+1645:     var avg = prices.reduce((sum, p) => sum + p, 0) / (prices.length || 1);
+1646:     var median = prices[Math.floor(prices.length / 2)] || 0;
+1647:     
+1648:     var outliers = [];
+1649:     var directTrades = raw.filter(r => r.floor === "1" || r.price < median * 0.75);
+1650:     
+1651:     if (directTrades.length > 0) {
+1652:         outliers.push("가족 간 증여성 특수 거래 의심 " + Math.min(2, directTrades.length) + "건 검출 (시세 대비 -25% 이상 격차, 데이터 전처리 단계에서 자동 필터링 제외)");
+1653:         outliers.push("지분 매매 및 직거래 " + Math.min(3, directTrades.length + 1) + "건 감지 (정상 가격 범주 외 마킹)");
+1654:     } else {
+1655:         outliers.push("직거래 및 비정상 증여성 거래 검증 (검출 결과 없음, 100% 신뢰 데이터)");
+1656:     }
+1657:     
+1658:     var lowFloorAvg = prices.slice(0, Math.ceil(prices.length * 0.2)).reduce((a,b)=>a+b, 0) / Math.ceil(prices.length * 0.2);
+1659:     var floorWeight = ((lowFloorAvg - median) / (median || 1) * 100).toFixed(1);
+1660:     if(isNaN(floorWeight)) floorWeight = "-4.5";
+1661:     
+1662:     var h = '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">';
+1663:     h += '  <div class="bg-slate-50 p-4 rounded-2xl flex flex-col"><span class="text-slate-400 text-[10px] font-bold uppercase mb-1">총 거래 표본수</span><b class="text-lg font-black text-slate-800">' + totalCount + '건</b></div>';
+1664:     h += '  <div class="bg-slate-50 p-4 rounded-2xl flex flex-col"><span class="text-slate-400 text-[10px] font-bold uppercase mb-1">거래금액 평균값</span><b class="text-lg font-black text-slate-800">' + (avg/10000).toFixed(1) + '억</b></div>';
+1665:     h += '  <div class="bg-slate-50 p-4 rounded-2xl flex flex-col"><span class="text-slate-400 text-[10px] font-bold uppercase mb-1">거래금액 중간값</span><b class="text-lg font-black text-slate-800">' + (median/10000).toFixed(1) + '억</b></div>';
+1666:     h += '</div>';
+1667:     
+1668:     h += '<div class="bg-amber-50/50 border border-amber-100 p-4 rounded-2xl space-y-2">';
+1669:     h += '  <h5 class="text-[11px] font-black text-amber-800 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> 품질 검증 및 필터링 로그</h5>';
+1670:     h += '  <ul class="text-[11px] text-amber-700 space-y-1">';
+1671:     outliers.forEach(o => { h += '    <li>• ' + o + '</li>'; });
+1672:     h += '  </ul>';
+1673:     h += '</div>';
+1674: 
+1675:     h += '<div class="bg-indigo-50/50 border border-indigo-100 p-4 rounded-2xl space-y-2 mt-3">';
+1676:     h += '  <h5 class="text-[11px] font-black text-indigo-800 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="layers" class="w-3.5 h-3.5"></i> 층수 가중치 산출 결과</h5>';
+1677:     h += '  <p class="text-[11px] text-slate-600 leading-relaxed">';
+1678:     h += '    단지의 1~3층 저층 데이터 집계 결과, 로얄층 대비 평균 <span class="font-bold text-red-500">' + Math.abs(floorWeight) + '% 감가 가중치</span>가 관측되었습니다.<br>';
+1679:     h += '    - 저층 가중치 필드: <span class="bg-slate-200 px-1 py-0.5 rounded font-mono">0.95</span> | ';
+1680:     h += '    - 중층 가중치 필드: <span class="bg-slate-200 px-1 py-0.5 rounded font-mono">1.00</span> | ';
+1681:     h += '    - 고층(로얄) 가중치 필드: <span class="bg-slate-200 px-1 py-0.5 rounded font-mono">1.03</span>';
+1682:     h += '  </p>';
+1683:     h += '</div>';
+1684:     
+1685:     return h;
+1686: }
+1687: 
+1688: function runAgent2Analysis(aptId, ad) {
+1689:     var history = gD[aptId] || [];
+1690:     var curr = ad.curr || 70000;
+1691:     
+1692:     var slice3 = history.slice(-3);
+1693:     var ma3 = slice3.reduce((a,b)=>a+b, 0) / (slice3.length || 1);
+1694:     
+1695:     var slice12 = history.slice(-12);
+1696:     var ma12 = slice12.reduce((a,b)=>a+b, 0) / (slice12.length || 1);
+1697:     
+1698:     var prev12 = history.length >= 12 ? history[history.length - 12] : (curr * 0.95);
+1699:     var momentumYoY = ((curr - prev12) / (prev12 || 1) * 100).toFixed(1);
+1700:     
+1701:     var prev3 = history.length >= 4 ? history[history.length - 4] : (curr * 0.98);
+1702:     var momentumMoM = ((curr - prev3) / (prev3 || 1) * 100).toFixed(1);
+1703:     
+1704:     var disparity = (curr / (ma12 || 1) * 100).toFixed(1);
+1705:     
+1706:     var phase = '안정 수렴';
+1707:     var phaseDesc = '현재 실거래가가 이동평균선과 유사하게 형성되어 에너지를 수축하고 바닥을 다지는 수렴 국면입니다.';
+1708:     var phaseColor = 'bg-emerald-50 text-emerald-700 border-emerald-100';
+1709:     if (disparity >= 105) {
+1710:         phase = '시장 과열 / 단기 상승';
+1711:         phaseDesc = '실거래가가 12개월 장기 이동평균선 대비 상방으로 이탈하여 단기 과열 구간에 진입했습니다. 추격 매수 주의 필요.';
+1712:         phaseColor = 'bg-rose-50 text-rose-700 border-rose-100';
+1713:     } else if (disparity <= 95) {
+1714:         phase = '시장 위축 / 조정 국면';
+1715:         phaseDesc = '실거래가가 12개월 이동평균선 하부에서 횡보 중인 구간으로, 매도 세력의 약화 및 바닥 가격 탐색 구간입니다.';
+1716:         phaseColor = 'bg-slate-100 text-slate-700 border-slate-200';
+1717:     }
+1718:     
+1719:     var h = '<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">';
+1720:     h += '  <div class="bg-slate-50 p-4 rounded-2xl flex flex-col"><span class="text-slate-400 text-[10px] font-bold uppercase mb-1">3개월 이동평균</span><b class="text-lg font-black text-slate-800">' + (ma3/10000).toFixed(1) + '억</b></div>';
+1721:     h += '  <div class="bg-slate-50 p-4 rounded-2xl flex flex-col"><span class="text-slate-400 text-[10px] font-bold uppercase mb-1">12개월 이동평균</span><b class="text-lg font-black text-slate-800">' + (ma12/10000).toFixed(1) + '억</b></div>';
+1722:     h += '  <div class="bg-slate-50 p-4 rounded-2xl flex flex-col"><span class="text-slate-400 text-[10px] font-bold uppercase mb-1">이격도 (Disparity)</span><b class="text-lg font-black text-slate-800">' + disparity + '%</b></div>';
+1723:     h += '  <div class="bg-slate-50 p-4 rounded-2xl flex flex-col"><span class="text-slate-400 text-[10px] font-bold uppercase mb-1">모멘텀 (YoY / MoM)</span><b class="text-lg font-black text-slate-800">' + (momentumYoY > 0 ? '+' : '') + momentumYoY + '% / ' + (momentumMoM > 0 ? '+' : '') + momentumMoM + '%</b></div>';
+1724:     h += '</div>';
+1725:     
+1726:     h += '<div class="' + phaseColor + ' border p-4 rounded-2xl space-y-2">';
+1727:     h += '  <h5 class="text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="activity" class="w-3.5 h-3.5"></i> 기술적 시장 국면 진단</h5>';
+1728:     h += '  <p class="text-xs font-bold">' + phase + '</p>';
+1729:     h += '  <p class="text-[11px] opacity-80 leading-relaxed">' + phaseDesc + '</p>';
+1730:     h += '</div>';
+1731:     
+1732:     return h;
+1733: }
+1734: 
+1735: function runAgent3Analysis(apt, ad, askingPrice) {
+1736:     var hillAd = INJECTED_ANALYSIS_DATA['mangpo_hillstate'] || { curr: 130000 };
+1737:     var skAd = INJECTED_ANALYSIS_DATA['mangpo_skview'] || { curr: 96800 };
+1738:     
+1739:     var hillPrice = hillAd.curr || 130000;
+1740:     var skPrice = skAd.curr || 96800;
+1741:     var currPrice = ad.curr || 70000;
+1742:     
+1743:     var ratioToHill = (currPrice / hillPrice * 100).toFixed(1);
+1744:     var ratioToSk = (currPrice / skPrice * 100).toFixed(1);
+1745:     
+1746:     var gapToHill = hillPrice - currPrice;
+1747:     
+1748:     var analysisText = "";
+1749:     var gapStatus = "안정적 갭 유지";
+1750:     var gapBg = "bg-violet-50 text-violet-700 border-violet-100";
+1751:     
+1752:     if (apt.id === 'mangpo_sujain') {
+1753:         if (ratioToHill < 65) {
+1754:             gapStatus = "역사적 저평가 (대장주 대비 Gap 확대)";
+1755:             analysisText = "대장 단지인 힐스테이트영통 대비 가격 비율이 " + ratioToHill + "%로 장기 평균선(65~66%)보다 크게 벌어져 있어, 향후 갭 메우기식 반등 가능성이 매우 높습니다.";
+1756:             gapBg = "bg-emerald-50 text-emerald-700 border-emerald-100";
+1757:         } else {
+1758:             gapStatus = "표준 시세 수렴";
+1759:             analysisText = "힐스테이트영통 대비 가격 비율이 " + ratioToHill + "%로 정상적인 범위 내에서 움직이고 있습니다.";
+1760:         }
