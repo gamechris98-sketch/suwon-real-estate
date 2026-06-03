@@ -1174,7 +1174,17 @@ var APT_COORDINATES = {
 
 function initKakaoMapGIS() {
     var container = document.getElementById('kakaoDashboardMap');
-    if (!container || typeof kakao === 'undefined' || typeof kakao.maps === 'undefined') return;
+    if (!container) return;
+    
+    if (typeof kakao === 'undefined' || typeof kakao.maps === 'undefined') {
+        container.innerHTML = '<div class="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 p-6 text-center text-slate-500 z-10">' +
+                              '  <div class="p-3 bg-red-50 text-red-500 rounded-full mb-3"><i data-lucide="map-pin-off" class="w-8 h-8"></i></div>' +
+                              '  <h4 class="text-xs font-black text-slate-700 mb-1">Kakao Map API 로드 실패</h4>' +
+                              '  <p class="text-[10px] max-w-xs leading-relaxed text-slate-400">카카오 개발자 센터에서 <b>앱 키(AppKey)</b>를 확인하거나, 플랫폼 설정에 현재 도메인(<b>' + window.location.hostname + '</b>)이 허용 등록되었는지 확인해 주세요.</p>' +
+                              '</div>';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        return;
+    }
     
     // 만약 이미 지도가 생성되어 있다면 리프레시 및 중심 재설정만 진행
     if (mapObj) {
