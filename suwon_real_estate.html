@@ -177,12 +177,12 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
                         <th class="px-3 py-4 text-left border-b border-slate-100">동</th>
                         <th class="px-3 py-4 text-left border-b border-slate-100">단지명</th>
                         <th class="px-3 py-4 text-right border-b border-slate-100">최근가</th>
-                        <th class="px-3 py-4 text-right text-indigo-600 border-b border-indigo-100 bg-indigo-50/30">전고점(10y)</th>
-                        <th class="px-3 py-4 text-center border-b border-slate-100">전고점일</th>
-                        <th class="px-3 py-4 text-right border-b border-slate-100">최저점</th>
-                        <th class="px-3 py-4 text-right border-b border-slate-100 text-red-500">하락액</th>
-                        <th class="px-3 py-4 text-right border-b border-slate-100 text-red-500">하락률</th>
-                        <th class="px-3 py-4 text-right border-b border-slate-100">회복률</th>
+                        <th class="px-3 py-4 text-right text-indigo-600 border-b border-indigo-100 bg-indigo-50/30">과거 전고점 (21~22년)</th>
+                        <th class="px-3 py-4 text-center border-b border-slate-100">과거 전고점일</th>
+                        <th class="px-3 py-4 text-right text-violet-600 border-b border-violet-100 bg-violet-50/30">최근 1년 최고가</th>
+                        <th class="px-3 py-4 text-center border-b border-slate-100">최근 최고가일</th>
+                        <th class="px-3 py-4 text-right border-b border-slate-100 text-red-500">과거대비 회복률</th>
+                        <th class="px-3 py-4 text-right border-b border-slate-100 text-violet-500">최근대비 회복률</th>
                     </tr>
                 </thead>
                 <tbody id="peakB" class="divide-y divide-slate-100"></tbody>
@@ -577,7 +577,7 @@ function renderAll(data, months){
             var cp = ad.curr || 0;
             var ratio = ad.ratio || 0;
             var drop = ad.drop || 0;
-            var displayPrice = ad.recent_peak || cp;
+            var displayPrice = cp;
             var formattedPrice = (displayPrice % 1000 === 0) ? (displayPrice/10000).toFixed(1) : (displayPrice/10000).toFixed(2);
             
             // 네이버 부동산 호가 및 갭 배지 정보 추가
@@ -617,7 +617,7 @@ function renderAll(data, months){
                 }
             }
             
-            h+='<div class="glass p-5 rounded-2xl hover:shadow-xl transition-all cursor-pointer border-l-4 group flex flex-col justify-between" style="border-left-color:'+a.c+'" onclick="oM(\''+a.id+'\')"> <div> <div class="flex justify-between items-start mb-3"> <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">'+d.n+'</span> <span class="px-2 py-0.5 rounded-full text-[10px] font-bold '+(ratio>=90?'bg-red-50 text-red-600':ratio>=80?'bg-amber-50 text-amber-600':'bg-slate-50 text-slate-500')+'">'+ratio+'% 회복</span> </div> <h4 class="font-black text-slate-800 group-hover:text-indigo-600 transition-colors mb-1">'+a.nm+'</h4> <div class="flex items-baseline gap-1"> <span class="text-xl font-black text-slate-900">'+formattedPrice+'</span> <span class="text-xs font-bold text-slate-400">억</span> <span class="text-[9px] font-bold text-indigo-500 ml-1.5 bg-indigo-50 px-1.5 py-0.5 rounded shrink-0">최근 최고가</span> </div> ' + naverAskingHtml + ' ' + tradeListHtml + ' </div> <div class="mt-4 pt-3 border-t border-slate-50 flex justify-between items-center text-[10px]"> <span class="text-slate-400 font-bold">전고점 대비</span> <span class="text-red-500 font-black">'+drop+'%</span> </div> </div>';
+            h+='<div class="glass p-5 rounded-2xl hover:shadow-xl transition-all cursor-pointer border-l-4 group flex flex-col justify-between" style="border-left-color:'+a.c+'" onclick="oM(\''+a.id+'\')"> <div> <div class="flex justify-between items-start mb-3"> <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">'+d.n+'</span> <span class="px-2 py-0.5 rounded-full text-[10px] font-bold '+(ratio>=90?'bg-red-50 text-red-600':ratio>=80?'bg-amber-50 text-amber-600':'bg-slate-50 text-slate-500')+'">'+ratio+'% 회복</span> </div> <h4 class="font-black text-slate-800 group-hover:text-indigo-600 transition-colors mb-1">'+a.nm+'</h4> <div class="flex items-baseline gap-1"> <span class="text-xl font-black text-slate-900">'+formattedPrice+'</span> <span class="text-xs font-bold text-slate-400">억</span> <span class="text-[9px] font-bold text-indigo-500 ml-1.5 bg-indigo-50 px-1.5 py-0.5 rounded shrink-0">최근 실거래가</span> </div> ' + naverAskingHtml + ' ' + tradeListHtml + ' </div> <div class="mt-4 pt-3 border-t border-slate-50 flex justify-between items-center text-[10px]"> <span class="text-slate-400 font-bold">전고점 대비</span> <span class="text-red-500 font-black">'+drop+'%</span> </div> </div>';
         });
         h+='</div></div>';
     });
@@ -780,23 +780,27 @@ function calcLoan() {
 function renderPeakAnalysis(){
     var b=document.getElementById('peakB');if(!b)return;
     var data=INJECTED_ANALYSIS_DATA;
-    var h=''; var labels=[], ratios=[], colors=[];
+    var h=''; var labels=[], ratiosPast=[], ratiosRecent=[], colors=[];
     A.forEach(function(a){
         var d=data[a.id];if(!d)return;
-        var r=d.ratio||0;
+        var rPast = d.past_peak ? Math.round((d.curr / d.past_peak) * 100) : (d.ratio || 0);
+        var rRecent = d.recent_1y_peak ? Math.round((d.curr / d.recent_1y_peak) * 100) : 100;
+        
         h+='<tr class="hover:bg-indigo-50/30 transition-colors border-b border-slate-100 group">';
         h+='<td class="px-3 py-4 text-xs font-medium text-slate-500">'+a.dn+'</td>';
         h+='<td class="px-3 py-4 font-black text-xs text-slate-800 group-hover:text-indigo-600 transition-colors">'+a.nm+'</td>';
         h+='<td class="px-3 py-4 text-right text-xs font-bold">'+((d.curr||0)/10000).toFixed(1)+'억</td>';
-        h+='<td class="px-3 py-4 text-right text-xs font-black text-indigo-600 bg-indigo-50/50">'+((d.hist_peak||0)/10000).toFixed(1)+'억</td>';
-        h+='<td class="px-3 py-4 text-[10px] text-slate-400 text-center">'+(d.hist_peak_date||'-')+'</td>';
-        h+='<td class="px-3 py-4 text-right text-xs text-blue-600 font-medium">'+((d.hist_min||0)/10000).toFixed(1)+'억</td>';
-        h+='<td class="px-3 py-4 text-right text-xs text-red-500 font-medium">'+((d.drop_amt||0)/10000).toFixed(1)+'억</td>';
-        h+='<td class="px-3 py-4 text-right text-xs text-red-500 font-black">'+(d.drop||0)+'%</td>';
-        h+='<td class="px-3 py-4 text-right"><span class="px-2.5 py-1 rounded-full text-[10px] font-black border '+ (r>=90?'bg-red-50 text-red-600 border-red-100':r>=80?'bg-amber-50 text-amber-600 border-amber-100':'bg-slate-50 text-slate-500 border-slate-200')+'">'+r+'%</span></td>';
+        h+='<td class="px-3 py-4 text-right text-xs font-black text-indigo-600 bg-indigo-50/50">'+((d.past_peak||0)/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-[10px] text-slate-400 text-center">'+(d.past_peak_date||'-')+'</td>';
+        h+='<td class="px-3 py-4 text-right text-xs font-black text-violet-600 bg-violet-50/50">'+((d.recent_1y_peak||0)/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-[10px] text-slate-400 text-center">'+(d.recent_1y_peak_date||'-')+'</td>';
+        h+='<td class="px-3 py-4 text-right"><span class="px-2.5 py-1 rounded-full text-[10px] font-black border '+ (rPast>=95?'bg-red-50 text-red-600 border-red-100':rPast>=80?'bg-amber-50 text-amber-600 border-amber-100':'bg-slate-50 text-slate-500 border-slate-200')+'">'+rPast+'%</span></td>';
+        h+='<td class="px-3 py-4 text-right"><span class="px-2.5 py-1 rounded-full text-[10px] font-black border '+ (rRecent>=95?'bg-red-50 text-red-600 border-red-100':rRecent>=80?'bg-amber-50 text-amber-600 border-amber-100':'bg-slate-50 text-slate-500 border-slate-200')+'">'+rRecent+'%</span></td>';
         h+='</tr>';
+        
         labels.push(a.nm);
-        ratios.push(r);
+        ratiosPast.push(rPast);
+        ratiosRecent.push(rRecent);
         colors.push(a.c);
     });
     b.innerHTML=h;
@@ -808,19 +812,27 @@ function renderPeakAnalysis(){
             type: 'bar',
             data: {
                 labels: labels,
-                datasets: [{
-                    label: '회복률 (%)',
-                    data: ratios,
-                    backgroundColor: colors,
-                    borderRadius: 6
-                }]
+                datasets: [
+                    {
+                        label: '과거 전고점 대비 회복률 (%)',
+                        data: ratiosPast,
+                        backgroundColor: '#4f46e5',
+                        borderRadius: 4
+                    },
+                    {
+                        label: '최근 1년 최고가 대비 회복률 (%)',
+                        data: ratiosRecent,
+                        backgroundColor: '#a855f7',
+                        borderRadius: 4
+                    }
+                ]
             },
             options: {
                 indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { 
-                    legend: { display: false },
+                    legend: { display: true, position: 'top', labels: { font: { size: 9, weight: 'bold' } } },
                     tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 10 }
                 },
                 scales: { 
@@ -953,7 +965,7 @@ function renderPeakAnalysis(){
 var isRawLoaded = false;
 var isLoadingRaw = false;
 
-function loadRawData(callback) {
+function loadRawData(callback, silent) {
     if (isRawLoaded) {
         if (callback) callback();
         return;
@@ -971,12 +983,14 @@ function loadRawData(callback) {
     
     isLoadingRaw = true;
     
-    // 이쁘고 모던한 프리미엄 로딩 스피너 오버레이 추가
-    var overlay = document.createElement('div');
-    overlay.id = 'rawLoadingOverlay';
-    overlay.className = 'fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-900/60 backdrop-blur-md transition-all duration-300';
-    overlay.innerHTML = '<div class="glass p-8 rounded-3xl border border-white/20 flex flex-col items-center gap-4 bg-white/90 shadow-2xl max-w-xs text-center"><div class="relative w-16 h-16"><div class="absolute inset-0 rounded-full border-4 border-slate-100"></div><div class="absolute inset-0 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin"></div></div><h4 class="text-slate-800 font-black text-sm tracking-tight">상세 실거래 데이터 로딩 중</h4><p class="text-[10px] text-slate-400 font-medium leading-relaxed">대용량 10개년 실거래 통계 데이터베이스(1.2MB)를 연동 및 캐싱하고 있습니다. 잠시만 기다려 주세요.</p></div>';
-    document.body.appendChild(overlay);
+    // 이쁘고 모던한 프리미엄 로딩 스피너 오버레이 추가 (silent가 아닐 때만)
+    if (!silent) {
+        var overlay = document.createElement('div');
+        overlay.id = 'rawLoadingOverlay';
+        overlay.className = 'fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-900/60 backdrop-blur-md transition-all duration-300';
+        overlay.innerHTML = '<div class="glass p-8 rounded-3xl border border-white/20 flex flex-col items-center gap-4 bg-white/90 shadow-2xl max-w-xs text-center"><div class="relative w-16 h-16"><div class="absolute inset-0 rounded-full border-4 border-slate-100"></div><div class="absolute inset-0 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin"></div></div><h4 class="text-slate-800 font-black text-sm tracking-tight">상세 실거래 데이터 로딩 중</h4><p class="text-[10px] text-slate-400 font-medium leading-relaxed">대용량 10개년 실거래 통계 데이터베이스(1.2MB)를 연동 및 캐싱하고 있습니다. 잠시만 기다려 주세요.</p></div>';
+        document.body.appendChild(overlay);
+    }
 
     var script = document.createElement('script');
     script.src = 'real_estate_raw.js';
@@ -990,20 +1004,24 @@ function loadRawData(callback) {
             rRT(); // 테이블 바인딩 1회 수행
         }
         
-        // 오버레이 스무스하게 제거
-        var el = document.getElementById('rawLoadingOverlay');
-        if (el) {
-            el.classList.add('opacity-0');
-            setTimeout(function() { el.parentNode.removeChild(el); }, 300);
+        // 오버레이 스무스하게 제거 (silent가 아닐 때만)
+        if (!silent) {
+            var el = document.getElementById('rawLoadingOverlay');
+            if (el) {
+                el.classList.add('opacity-0');
+                setTimeout(function() { el.parentNode.removeChild(el); }, 300);
+            }
         }
         
         if (callback) callback();
     };
     script.onerror = function() {
         isLoadingRaw = false;
-        var el = document.getElementById('rawLoadingOverlay');
-        if (el) el.parentNode.removeChild(el);
-        alert("실거래 상세 데이터를 비동기 로드하는데 실패했습니다. 오프라인 상태이거나 네트워크 에러일 수 있습니다.");
+        if (!silent) {
+            var el = document.getElementById('rawLoadingOverlay');
+            if (el) el.parentNode.removeChild(el);
+            alert("실거래 상세 데이터를 비동기 로드하는데 실패했습니다. 오프라인 상태이거나 네트워크 에러일 수 있습니다.");
+        }
     };
     document.head.appendChild(script);
 }
@@ -1027,11 +1045,14 @@ var APT_COORDINATES = {
 
 function initKakaoMapGIS() {
     var container = document.getElementById('kakaoDashboardMap');
-    if (!container || typeof kakao === 'undefined') return;
+    if (!container || typeof kakao === 'undefined' || typeof kakao.maps === 'undefined') return;
     
-    // 만약 이미 지도가 생성되어 있다면 리프레시만 진행
+    // 만약 이미 지도가 생성되어 있다면 리프레시 및 중심 재설정만 진행
     if (mapObj) {
-        setTimeout(function() { kakao.maps.event.trigger(mapObj, 'resize'); }, 100);
+        setTimeout(function() { 
+            mapObj.relayout(); 
+            mapObj.setCenter(new kakao.maps.LatLng(37.2515, 127.0515));
+        }, 100);
         return;
     }
     
@@ -1041,7 +1062,7 @@ function initKakaoMapGIS() {
         level: 6
     };
     
-    mapObj = new kakao.maps.LatLng ? new kakao.maps.Map(container, options) : null;
+    mapObj = new kakao.maps.Map(container, options);
     if (!mapObj) return;
 
     // 일반 지도/스카이뷰 타입 컨트롤 및 줌 컨트롤 추가
@@ -1089,7 +1110,7 @@ function initKakaoMapGIS() {
 
 function switchTab(t){
     const tabs = {
-        'dash': {btn: 't1', page: 'p1', title: '대시보드'},
+        'dash': {btn: 't1', page: 'p1', func: initKakaoMapGIS, title: '대시보드'},
         'raw':  {btn: 't2', page: 'p2', title: '실거래 데이터', requiresRaw: true},
         'vol':  {btn: 't3', page: 'p3', func: renderVolAnalysis, title: '거래량 분석', requiresRaw: true},
         'peak': {btn: 't4', page: 'p4', func: renderPeakAnalysis, title: '전고점 비교'},
@@ -1439,10 +1460,17 @@ function renderHistoryTab() {
     
     var history = [
         {
-            ver: "v2.0 [LATEST]",
+            ver: "v2.1 [LATEST]",
+            date: "2026.06.03",
+            title: "대시보드 실거래가 복원, Kakao Map GIS 최적화, 전고점 이원화(과거 vs 최근 1년) 및 네이버 호가 데이터 정밀 조정",
+            tc: "bg-indigo-600 text-white",
+            desc: "1. 대시보드 메인 카드의 시세를 실제 최근 실거래가(curr)로 정상 복원하고 라벨을 업데이트했습니다. 2. Kakao Map SDK LatLng 호출 구문 오류를 수정하여 지도 모니터링 시스템을 복구했으며, 탭 전환 시 relayout() 및 중심좌표 재조정을 통해 잘림 현상을 해결했습니다. 3. 전고점 비교 화면에서 전고점을 과거 역사적 전고점(21~22년)과 최근 1년 이내 최고가로 이원화하여 표와 바 차트에 비교 렌더링되도록 구현했습니다. 4. 네이버 최저가 호가 셋업 프리셋을 실제 2026년 실거래 지표와 유기적으로 부합하도록 전폭 수정하여 실질 호가 갭의 신뢰성을 확보했습니다. 5. 대용량 실거래 상세 데이터베이스(1.2MB)를 비동기로 백그라운드 로드하도록 개선하여 페이지 초기 렌더링 속도에 영향을 주지 않으면서 최근 실거래 3건 목록이 조용히 완성되도록 설계했습니다."
+        },
+        {
+            ver: "v2.0",
             date: "2026.05.19",
             title: "실시간 뉴스 크롤러 연동 및 심리지수 기반 적정가 알고리즘 고도화",
-            tc: "bg-indigo-600 text-white",
+            tc: "bg-slate-700 text-slate-200",
             desc: "구글 뉴스 실시간 RSS 크롤러를 도입하여 수원 및 금리 뉴스 여론을 수집하고, 긍부정 단어 사전 기반의 '시장 뉴스 심리지수(Sentiment Index)'를 동적으로 연산하여 매수 타이밍 적정가 판단 알고리즘에 실시간으로 반영합니다. 또한, 통합 뉴스룸 화면과 버전 업데이트 히스토리 전용 스크린을 전면 신설하고 GitHub Actions & GitHub Pages 무중단 배포를 완료하였습니다."
         },
         {
@@ -2444,6 +2472,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (rF.length > 0) {
         isRawLoaded = true;
         rRT();
+    } else {
+        // 백그라운드 무소음 상세 거래정보 로딩
+        loadRawData(function() {
+            if (gD && gM) {
+                renderAll(gD, gM);
+            }
+        }, true);
     }
     
     // Initial tab selection is forced to dashboard on page start

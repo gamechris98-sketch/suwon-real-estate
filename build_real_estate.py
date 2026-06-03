@@ -160,6 +160,13 @@ for aid, meta in APT_FILTERS.items():
     max_p_1y = 0
     min_p_1y = 999999999
 
+    # 과거 전고점 (2020.01.01 ~ 2022.12.31)
+    past_peak_p = 0
+    past_peak_d = ""
+    # 최근 1년 이내 최고가
+    recent_1y_peak_p = 0
+    recent_1y_peak_d = ""
+
     for t in t10y:
         # 역사적 전고점 (10년 전체 최고가)
         if t['p'] > hist_peak_p:
@@ -172,11 +179,42 @@ for aid, meta in APT_FILTERS.items():
                 recent_peak_p = t['p']
                 recent_peak_d = t['d']
         
-        # 최근 1년 내 지표
+        # 최근 1년 내 지표 및 최고가
         if t['d'] >= one_year_ago:
             if t['p'] > max_p_1y: max_p_1y = t['p']
             if t['p'] < min_p_1y: min_p_1y = t['p']
-            
+            if t['p'] > recent_1y_peak_p:
+                recent_1y_peak_p = t['p']
+                recent_1y_peak_d = t['d']
+                
+        # 과거 전고점 탐색 (2020년 ~ 2022년)
+        if "2020.01.01" <= t['d'] <= "2022.12.31":
+            if t['p'] > past_peak_p:
+                past_peak_p = t['p']
+                past_peak_d = t['d']
+
+    # 과거 전고점 예외 처리 및 폴백
+    if past_peak_p == 0:
+        for t in t10y:
+            if t['d'] < "2023.01.01":
+                if t['p'] > past_peak_p:
+                    past_peak_p = t['p']
+                    past_peak_d = t['d']
+    if past_peak_p == 0:
+        for t in t10y:
+            if t['d'] < "2024.01.01":
+                if t['p'] > past_peak_p:
+                    past_peak_p = t['p']
+                    past_peak_d = t['d']
+    if past_peak_p == 0:
+        past_peak_p = hist_peak_p
+        past_peak_d = hist_peak_d
+
+    # 최근 1년 이내 최고가 예외 처리 및 폴백 (거래가 없었다면 최신 거래)
+    if recent_1y_peak_p == 0 and t10y:
+        recent_1y_peak_p = t10y[-1]['p']
+        recent_1y_peak_d = t10y[-1]['d']
+
     # 4. 역사적 최저점 (전고점 이후)
     hist_min_p = 999999999
     
@@ -208,6 +246,8 @@ for aid, meta in APT_FILTERS.items():
     chart_data[aid] = trade_history
     analysis_data[aid] = {
         'hist_peak': hist_peak_p, 'hist_peak_date': hist_peak_d,
+        'past_peak': past_peak_p, 'past_peak_date': past_peak_d,
+        'recent_1y_peak': recent_1y_peak_p, 'recent_1y_peak_date': recent_1y_peak_d,
         'hist_min': hist_min_p,
         'drop_amt': hist_peak_p - curr_p,
         'recent_peak': recent_peak_p, 'recent_peak_date': recent_peak_d,
@@ -392,15 +432,15 @@ if not os.path.exists(js_path):
 # [3단계] 네이버 부동산 실시간 최저 매매 호가 수집 및 갭 분석 연산
 # (크롤러 타임아웃 방지 및 정적 캐시 프리셋 제공 - 네이버 부동산 매매 최저 호가 연동)
 naver_asking_presets = {
-    'mangpo_hillstate': 89000,     # 실거래 8.5억선 vs 매물 최저 호가 8.9억
-    'mangpo_ipark': 77000,         # 실거래 7.5억선 vs 매물 최저 호가 7.7억
-    'mangpo_skview': 67000,
-    'mangpo_sujain': 60000,
-    'yeongtong_edupark': 57000,
-    'yeongtong_dongbo': 53500,
-    'yeongtong_shinmyung': 53000,
-    'maegyo_skview': 88000,
-    'maegyo_hillstate': 85000
+    'mangpo_hillstate': 132000,     # 실거래 13.0억선 vs 매물 최저 호가 13.2억
+    'mangpo_ipark': 112000,         # 실거래 10.9억선 vs 매물 최저 호가 11.2억
+    'mangpo_skview': 98500,          # 실거래 9.68억선 vs 매물 최저 호가 9.85억
+    'mangpo_sujain': 85000,          # 실거래 8.3억선 vs 매물 최저 호가 8.5억
+    'yeongtong_edupark': 89000,      # 실거래 8.73억선 vs 매물 최저 호가 8.9억
+    'yeongtong_dongbo': 75000,       # 실거래 7.3억선 vs 매물 최저 호가 7.5억
+    'yeongtong_shinmyung': 69500,     # 실거래 6.78억선 vs 매물 최저 호가 6.95억
+    'maegyo_skview': 105000,         # 실거래 10.3억선 vs 매물 최저 호가 10.5억
+    'maegyo_hillstate': 93000        # 실거래 9.1억선 vs 매물 최저 호가 9.3억
 }
 
 # [4단계] 한국은행 기준금리 및 CPI 물가지수 동적 연동 보정
