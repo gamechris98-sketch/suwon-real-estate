@@ -591,7 +591,7 @@ function renderAll(data, months){
             var drop = ad.drop || 0;
             // 아이파크캐슬 1단지 & 에듀파크: 최근 1년 최고가 사용
             var displayPrice = ((a.id === 'mangpo_ipark' || a.id === 'yeongtong_edupark') && ad.recent_1y_peak) ? ad.recent_1y_peak : cp;
-            var formattedPrice = (Math.floor(displayPrice / 1000) / 10).toFixed(1);
+            var formattedPrice = (Math.ceil(displayPrice / 1000) / 10).toFixed(1);
             
             // 네이버 부동산 호가 및 갭 배지 정보 추가
             var naverAsking = ad.naver_asking || 0;
