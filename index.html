@@ -589,8 +589,9 @@ function renderAll(data, months){
             var cp = ad.curr || 0;
             var ratio = ad.ratio || 0;
             var drop = ad.drop || 0;
-            var displayPrice = cp;
-            var formattedPrice = (displayPrice % 1000 === 0) ? (displayPrice/10000).toFixed(1) : (displayPrice/10000).toFixed(2);
+            // 아이파크캐슬 1단지 & 에듀파크: 최근 1년 최고가 사용
+            var displayPrice = ((a.id === 'mangpo_ipark' || a.id === 'yeongtong_edupark') && ad.recent_1y_peak) ? ad.recent_1y_peak : cp;
+            var formattedPrice = (Math.floor(displayPrice / 1000) / 10).toFixed(1);
             
             // 네이버 부동산 호가 및 갭 배지 정보 추가
             var naverAsking = ad.naver_asking || 0;
@@ -629,7 +630,7 @@ function renderAll(data, months){
                 }
             }
             
-            h+='<div class="glass p-5 rounded-2xl hover:shadow-xl transition-all cursor-pointer border-l-4 group flex flex-col justify-between" style="border-left-color:'+a.c+'" onclick="oM(\''+a.id+'\')"> <div> <div class="flex justify-between items-start mb-3"> <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">'+d.n+'</span> <span class="px-2 py-0.5 rounded-full text-[10px] font-bold '+(ratio>=90?'bg-red-50 text-red-600':ratio>=80?'bg-amber-50 text-amber-600':'bg-slate-50 text-slate-500')+'">'+ratio+'% 회복</span> </div> <h4 class="font-black text-slate-800 group-hover:text-indigo-600 transition-colors mb-1">'+a.nm+'</h4> <div class="flex items-baseline gap-1"> <span class="text-xl font-black text-slate-900">'+formattedPrice+'</span> <span class="text-xs font-bold text-slate-400">억</span> <span class="text-[9px] font-bold text-indigo-500 ml-1.5 bg-indigo-50 px-1.5 py-0.5 rounded shrink-0">최근 실거래가</span> </div> ' + naverAskingHtml + ' ' + tradeListHtml + ' </div> <div class="mt-4 pt-3 border-t border-slate-50 flex justify-between items-center text-[10px]"> <span class="text-slate-400 font-bold">전고점 대비</span> <span class="text-red-500 font-black">'+drop+'%</span> </div> </div>';
+            h+='<div class="glass p-5 rounded-2xl hover:shadow-xl transition-all cursor-pointer border-l-4 group flex flex-col justify-between" style="border-left-color:'+a.c+'" onclick="oM(\''+a.id+'\')"> <div> <div class="flex justify-between items-start mb-3"> <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">'+d.n+'</span> <span class="px-2 py-0.5 rounded-full text-[10px] font-bold '+(ratio>=90?'bg-red-50 text-red-600':ratio>=80?'bg-amber-50 text-amber-600':'bg-slate-50 text-slate-500')+'">'+ratio+'% 회복</span> </div> <h4 class="font-black text-slate-800 group-hover:text-indigo-600 transition-colors mb-1">'+a.nm+'</h4> <div class="flex items-baseline gap-1"> <span class="text-xl font-black text-slate-900">'+formattedPrice+'</span> <span class="text-xs font-bold text-slate-400">억</span> <span class="text-[9px] font-bold text-indigo-500 ml-1.5 bg-indigo-50 px-1.5 py-0.5 rounded shrink-0">최근 실거래가</span> </div> ' + naverAskingHtml + ' ' + tradeListHtml + ' </div> <div class="mt-4 pt-3 border-t border-slate-50 flex justify-between items-center text-[10px]"> <span class="text-slate-400 font-bold">전체 최고가 대비</span> <span class="text-red-500 font-black">'+drop+'%</span> </div> </div>';
         });
         h+='</div></div>';
     });
