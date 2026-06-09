@@ -593,8 +593,24 @@ function renderAll(data, months){
             var displayPrice = cp;
             var formattedPrice = (displayPrice % 1000 === 0) ? (displayPrice/10000).toFixed(1) : (displayPrice/10000).toFixed(2);
             
-            // 네이버 부동산 호가 및 갭 배지 정보 숨김 처리
-            var naverAskingHtml = '';
+// 네이버 부동산 호가 및 갭 배지 정보: 최고 호가와 평균 호가를 계산하여 표시
+var naverAskingHtml = '';
+if (typeof INJECTED_RAW !== 'undefined') {
+    var rawTradesForApt = INJECTED_RAW.filter(function(r) {
+        return r.apt.includes(a.kw) && r.dong === a.dn;
+    });
+    if (rawTradesForApt.length > 0) {
+        var prices = rawTradesForApt.map(function(r) { return r.price; });
+        var maxPrice = Math.max.apply(null, prices);
+        var avgPrice = Math.round(prices.reduce(function(s, v) { return s + v; }, 0) / prices.length);
+        var maxFormatted = (maxPrice % 1000 === 0) ? (maxPrice/10000).toFixed(1) : (maxPrice/10000).toFixed(2);
+        var avgFormatted = (avgPrice % 1000 === 0) ? (avgPrice/10000).toFixed(1) : (avgPrice/10000).toFixed(2);
+        naverAskingHtml = '<div class="flex gap-2 text-[10px] mt-2">' +
+            '<span class="px-2 py-0.5 rounded bg-red-50 text-red-600 font-bold">최고 호가 ' + maxFormatted + '억</span>' +
+            '<span class="px-2 py-0.5 rounded bg-amber-50 text-amber-600 font-bold">평균 호가 ' + avgFormatted + '억</span>' +
+            '</div>';
+    }
+}
 
             // 최근 3건 실거래 리스트 HTML 연동
             var tradeListHtml = '';

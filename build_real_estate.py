@@ -141,8 +141,18 @@ for aid, meta in APT_FILTERS.items():
     trade_history = []
     
     t10y_raw = [x for x in all_trades_10y if x['umd'] == dong and kw in x['apt']]
-    # 전고점 비교용 데이터는 '전체' 반영 (저층 포함)
-    t10y = sorted([x for x in t10y_raw if 80 <= x['area'] <= 86], key=lambda x: x['d'])
+    
+    # [최고가 알고리즘 최적화] 84㎡ 기준 및 통계적 이상치(3-Sigma) 필터링 추가
+    t10y_filtered = [x for x in t10y_raw if 80 <= x['area'] <= 86]
+    if len(t10y_filtered) >= 5:
+        import statistics
+        prices = [x['p'] for x in t10y_filtered]
+        med_p = statistics.median(prices)
+        stdev_p = statistics.stdev(prices) if len(prices) > 1 else 1.0
+        # Z-Score 3.0 범위 외의 비정상 거래(가족 간 저가 증여 또는 고가 조작 의심 거래) 배제
+        t10y = sorted([x for x in t10y_filtered if abs(x['p'] - med_p) <= 3 * stdev_p and x['p'] > 2000], key=lambda x: x['d'])
+    else:
+        t10y = sorted(t10y_filtered, key=lambda x: x['d'])
     
     if len(t10y) < 5: # 데이터 부족 시 면적 제한 해제
         t10y = sorted(t10y_raw, key=lambda x: x['d'])
