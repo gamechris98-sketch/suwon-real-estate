@@ -593,21 +593,8 @@ function renderAll(data, months){
             var displayPrice = cp;
             var formattedPrice = (displayPrice % 1000 === 0) ? (displayPrice/10000).toFixed(1) : (displayPrice/10000).toFixed(2);
             
-            // 네이버 부동산 호가 및 갭 배지 정보 추가
-            var naverAsking = ad.naver_asking || 0;
-            var askingGapPct = ad.asking_gap_pct || 0;
+            // 네이버 부동산 호가 및 갭 배지 정보 숨김 처리
             var naverAskingHtml = '';
-            if (naverAsking > 0) {
-                var naverAskingStr = (naverAsking/10000).toFixed(1) + '억';
-                var gapColor = askingGapPct < 0 ? 'text-emerald-600 bg-emerald-50' : 'text-slate-500 bg-slate-50';
-                naverAskingHtml = '<div class="flex items-center justify-between text-[10px] mt-2.5 p-2 rounded-xl bg-slate-50 border border-slate-100/50">' +
-                                  '  <span class="text-slate-400 font-bold">네이버 최저 호가</span>' +
-                                  '  <div class="flex items-center gap-1.5 font-black">' +
-                                  '    <span class="text-slate-700">' + naverAskingStr + '</span>' +
-                                  '    <span class="px-1.5 py-0.5 rounded text-[8px] ' + gapColor + '">갭 ' + askingGapPct + '%</span>' +
-                                  '  </div>' +
-                                  '</div>';
-            }
 
             // 최근 3건 실거래 리스트 HTML 연동
             var tradeListHtml = '';
