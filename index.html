@@ -189,6 +189,8 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
                         <th class="px-3 py-4 text-center border-b border-slate-100">최근 최고가일</th>
                         <th class="px-3 py-4 text-right border-b border-slate-100 text-red-500">과거대비 회복률</th>
                         <th class="px-3 py-4 text-right border-b border-slate-100 text-violet-500">최근대비 회복률</th>
+                        <th class="px-3 py-4 text-center border-b border-slate-100 text-emerald-600">가격 적정성</th>
+                        <th class="px-3 py-4 text-center border-b border-slate-100">분석</th>
                     </tr>
                 </thead>
                 <tbody id="peakB" class="divide-y divide-slate-100"></tbody>
@@ -358,6 +360,24 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
                                 <option value="urgent">급매 처분 희망</option>
                                 <option value="move">갈아타기로 잔금 급함</option>
                             </select>
+<div class="mt-4">
+  <h3 class="text-sm font-bold">Gemma 질문</h3>
+  <textarea id="gemmaPrompt" rows="3" class="w-full p-2 border rounded" placeholder="예: 최근 전고점 회복 이유는?"></textarea>
+  <button onclick="runGemma()" class="mt-2 px-4 py-2 bg-indigo-600 text-white rounded">질문하기</button>
+  <pre id="gemmaResponse" class="mt-2 p-2 bg-gray-100 rounded"></pre>
+</div>
+<script>
+async function runGemma(){
+  const prompt=document.getElementById('gemmaPrompt').value;
+  const resp=await fetch('http://localhost:5002/gemma',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({prompt})
+  });
+  const data=await resp.json();
+  document.getElementById('gemmaResponse').textContent=data.answer||data.error||'Error';
+}
+</script>
                         </div>
                     </div>
 
@@ -496,7 +516,36 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
 <div id="mSummary" class="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg"></div>
 <table class="w-full text-sm"><thead class="bg-slate-50 text-slate-500"><tr><th class="px-2 py-2 text-left">거래일</th><th class="px-2 py-2 text-right">금액</th><th class="px-2 py-2 text-right">면적</th><th class="px-2 py-2 text-right">층</th></tr></thead><tbody id="mB" class="divide-y"></tbody></table>
 <div id="mI" class="bg-indigo-50 p-4 rounded-xl text-sm"></div>
-</div></div></div>
+<div id="priceAnalysisModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-[60] flex items-center justify-center p-4">
+<div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
+<div class="p-5 border-b flex justify-between items-center bg-slate-50"><h3 id="paTitle" class="text-lg font-bold text-slate-800">가격 적정성 및 향후 전망</h3><button onclick="closePriceAnalysisModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+<div class="p-6 space-y-4 text-sm">
+    <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+        <span class="text-slate-500">현재 최근가</span>
+        <span id="paCurr" class="font-black text-slate-900 text-base"></span>
+    </div>
+    <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+        <span class="text-slate-500">수원 전체 평균 대비</span>
+        <span id="paAvgRatio" class="font-bold text-slate-700"></span>
+    </div>
+    <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+        <span class="text-slate-500">역사적 최고가 대비</span>
+        <span id="paPeakRatio" class="font-bold text-slate-700"></span>
+    </div>
+    <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+        <span class="text-slate-500">12개월 가격 모멘텀</span>
+        <span id="paMomentum" class="font-bold text-slate-700"></span>
+    </div>
+    <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+        <span class="text-slate-500">다음 달 예측 추정가</span>
+        <span id="paForecast" class="font-bold text-indigo-600"></span>
+    </div>
+    <div class="p-4 rounded-xl bg-indigo-50/70 border border-indigo-100 text-center space-y-1">
+        <div class="text-xs font-bold text-indigo-500 uppercase tracking-wider">최종 매수 권고</div>
+        <div id="paRecommendation" class="text-xl font-black text-indigo-900"></div>
+    </div>
+</div>
+</div></div>
 <footer class="bg-slate-900 text-slate-400 py-16 mt-20 border-t border-slate-800 w-full overflow-hidden">
     <div class="container">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -793,6 +842,58 @@ function calcLoan() {
     h+='</div>';
     document.getElementById('calcResult').innerHTML=h;
 }
+function openPriceAnalysisModal(id){
+    var a = A.find(function(x){ return x.id === id; });
+    var d = INJECTED_ANALYSIS_DATA[id] || {};
+    if(!a || !d) return;
+
+    var allCurr = Object.values(INJECTED_ANALYSIS_DATA).map(function(v){ return v.curr; }).filter(Boolean);
+    var cityAvg = allCurr.length ? (allCurr.reduce(function(s,v){ return s+v; }, 0) / allCurr.length) : d.curr;
+    var ratioAvg = ((d.curr / cityAvg) * 100).toFixed(1);
+
+    var cityPeak = Math.max.apply(null, Object.values(INJECTED_ANALYSIS_DATA).map(function(v){ return v.past_peak || 0; }));
+    var ratioPeak = cityPeak ? ((d.curr / cityPeak) * 100).toFixed(1) : '-';
+
+    var history = (typeof gD !== 'undefined' && gD[id]) ? gD[id] : [];
+    var momentum = 0;
+    if(history.length >= 12) {
+        var price12 = history[history.length - 12];
+        momentum = (((d.curr - price12) / price12) * 100).toFixed(1);
+    }
+
+    var slope = 0;
+    if(history.length >= 12) {
+        var n = 12;
+        var ys = history.slice(-n);
+        var xMean = 6.5;
+        var yMean = ys.reduce(function(s,v){ return s+v; }, 0) / n;
+        var num = 0, den = 0;
+        for(var i=0; i<n; i++){
+            num += ((i+1) - xMean) * (ys[i] - yMean);
+            den += ((i+1) - xMean) * ((i+1) - xMean);
+        }
+        slope = den ? num / den : 0;
+    }
+    var nextMonth = Math.round((d.curr + slope) / 10000 * 10) / 10;
+
+    var status = ratioAvg < 90 ? 'underpriced' : ratioAvg > 110 ? 'overpriced' : 'fair';
+    var trend = momentum > 3 ? 'up' : momentum < -3 ? 'down' : 'stable';
+    var recommendation = (status === 'underpriced' && trend !== 'down') ? '매수 적합' : (status === 'overpriced' || trend === 'down') ? '보류' : '중립 / 현장 임장 권장';
+
+    document.getElementById('paTitle').innerText = a.dn + ' ' + a.nm + ' 가격 분석';
+    document.getElementById('paCurr').innerText = (d.curr / 10000).toFixed(1) + '억원';
+    document.getElementById('paAvgRatio').innerText = ratioAvg + '% (' + (status==='underpriced'?'저평가':status==='overpriced'?'고평가':'적정 수준') + ')';
+    document.getElementById('paPeakRatio').innerText = ratioPeak + '%';
+    document.getElementById('paMomentum').innerText = (momentum > 0 ? '+' : '') + momentum + '% (' + (trend==='up'?'상승세':trend==='down'?'하강세':'보합세') + ')';
+    document.getElementById('paForecast').innerText = nextMonth + '억원';
+    document.getElementById('paRecommendation').innerText = recommendation;
+
+    document.getElementById('priceAnalysisModal').classList.remove('hidden');
+    if(typeof lucide !== 'undefined') lucide.createIcons();
+}
+function closePriceAnalysisModal(){
+    document.getElementById('priceAnalysisModal').classList.add('hidden');
+}
 function renderPeakAnalysis(){
     var b=document.getElementById('peakB');if(!b)return;
     var data=INJECTED_ANALYSIS_DATA;
@@ -802,6 +903,13 @@ function renderPeakAnalysis(){
         var rPast = d.past_peak ? Math.round((d.curr / d.past_peak) * 100) : (d.ratio || 0);
         var rRecent = d.recent_1y_peak ? Math.round((d.curr / d.recent_1y_peak) * 100) : 100;
         
+        // 가격 적정성 계산 (수원시 전체 평균 대비)
+        var allCurr = Object.values(data).map(function(v){ return v.curr; }).filter(Boolean);
+        var cityAvg = allCurr.length ? (allCurr.reduce(function(s,v){ return s+v; }, 0) / allCurr.length) : d.curr;
+        var ratioAvg = (d.curr / cityAvg) * 100;
+        var fairnessText = ratioAvg < 90 ? '저평가' : ratioAvg > 110 ? '고평가' : '적정가';
+        var fairnessClass = ratioAvg < 90 ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : ratioAvg > 110 ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-blue-50 text-blue-600 border-blue-200';
+
         h+='<tr class="hover:bg-indigo-50/30 transition-colors border-b border-slate-100 group">';
         h+='<td class="px-3 py-4 text-xs font-medium text-slate-500">'+a.dn+'</td>';
         h+='<td class="px-3 py-4 font-black text-xs text-slate-800 group-hover:text-indigo-600 transition-colors">'+a.nm+'</td>';
@@ -812,6 +920,8 @@ function renderPeakAnalysis(){
         h+='<td class="px-3 py-4 text-[10px] text-slate-400 text-center">'+(d.recent_1y_peak_date||'-')+'</td>';
         h+='<td class="px-3 py-4 text-right"><span class="px-2.5 py-1 rounded-full text-[10px] font-black border '+ (rPast>=95?'bg-red-50 text-red-600 border-red-100':rPast>=80?'bg-amber-50 text-amber-600 border-amber-100':'bg-slate-50 text-slate-500 border-slate-200')+'">'+rPast+'%</span></td>';
         h+='<td class="px-3 py-4 text-right"><span class="px-2.5 py-1 rounded-full text-[10px] font-black border '+ (rRecent>=95?'bg-red-50 text-red-600 border-red-100':rRecent>=80?'bg-amber-50 text-amber-600 border-amber-100':'bg-slate-50 text-slate-500 border-slate-200')+'">'+rRecent+'%</span></td>';
+        h+='<td class="px-3 py-4 text-center"><span class="px-2.5 py-1 rounded-full text-[10px] font-black border '+fairnessClass+'">'+fairnessText+'</span></td>';
+        h+='<td class="px-3 py-4 text-center"><button onclick="openPriceAnalysisModal(\''+a.id+'\')" class="px-2.5 py-1 text-[10px] font-bold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">가격 평가</button></td>';
         h+='</tr>';
         
         labels.push(a.nm);
