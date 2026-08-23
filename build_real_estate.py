@@ -462,9 +462,14 @@ financial_indicators = {
     'cpi_index_2026': 116.80, # 2026년 누적 소비자물가 (약 14% 상승 보정값)
 }
 
-# 각 아파트별 네이버 호가 및 금융 보정 지표 인젝션
+# 각 아파트별 네이버 호가 및 층별 호가(저층/중층/고층) 지표 인젝션
 for aid in analysis_data:
-    analysis_data[aid]['naver_asking'] = naver_asking_presets.get(aid, analysis_data[aid]['curr'])
+    base_ask = naver_asking_presets.get(aid, analysis_data[aid]['curr'])
+    analysis_data[aid]['naver_asking'] = base_ask
+    analysis_data[aid]['ask_low'] = round(base_ask * 0.97)   # 저층 (1~5층)
+    analysis_data[aid]['ask_mid'] = base_ask                 # 중층 (6~15층)
+    analysis_data[aid]['ask_high'] = round(base_ask * 1.03)  # 고층 (16층 이상)
+
     # 명목 금액 차이를 넘어선 '실질 안전마진'과 호가 갭 계산
     price_gap = analysis_data[aid]['naver_asking'] - analysis_data[aid]['curr']
     analysis_data[aid]['asking_gap'] = price_gap
