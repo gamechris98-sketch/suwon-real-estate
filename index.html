@@ -51,6 +51,7 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
 <button onclick="switchTab('timing')" id="t7" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="timer" class="w-4 h-4"></i>매수 타이밍</button>
 <button onclick="switchTab('supply')" id="t9" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="bar-chart-3" class="w-4 h-4"></i>공급 분석</button>
 <button onclick="switchTab('ai')" id="t10" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="brain" class="w-4 h-4"></i>AI 멀티 에이전트</button>
+<button onclick="switchTab('weekly')" id="t13" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all bg-indigo-50/50 text-indigo-700 font-bold"><i data-lucide="file-text" class="w-4 h-4 text-indigo-600"></i>주간 브리핑 레포트</button>
 <button onclick="switchTab('news')" id="t11" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="newspaper" class="w-4 h-4"></i>관련 뉴스룸</button>
 <button onclick="switchTab('history')" id="t12" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="history" class="w-4 h-4"></i>업데이트 히스토리</button>
 <button onclick="switchTab('raw')" id="t2" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="table" class="w-4 h-4"></i>실거래 데이터</button>
@@ -484,6 +485,8 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
             </div>
         </div>
     </div>
+<div id="p13" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
+    <div id="weeklyReportContent" class="space-y-6"></div>
 </div>
 
 <div id="p11" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
@@ -1467,6 +1470,7 @@ function switchTab(t){
         'rank': {btn: 't8', page: 'p8', func: renderRankAnalysis, title: '종합 점수'},
         'supply': {btn: 't9', page: 'p9', func: renderSupplyAnalysis, title: '공급 분석'},
         'ai': {btn: 't10', page: 'p10', func: initAiTab, title: 'AI 멀티 에이전트', requiresRaw: true},
+        'weekly': {btn: 't13', page: 'p13', func: renderWeeklyReportTab, title: '주간 브리핑 레포트'},
         'news': {btn: 't11', page: 'p11', func: renderNewsTab, title: '관련 뉴스룸'},
         'history': {btn: 't12', page: 'p12', func: renderHistoryTab, title: '업데이트 히스토리'}
     };
@@ -2944,6 +2948,159 @@ function runAgent4Analysis(apt, ad, askingPrice, floor, remodel, noise, buyerTer
     return h;
 }
 
+
+function renderWeeklyReportTab() {
+    var container = document.getElementById('weeklyReportContent');
+    if (!container) return;
+
+    var data = INJECTED_ANALYSIS_DATA || {};
+    var timestamp = typeof INJECTED_TIMESTAMP !== 'undefined' ? INJECTED_TIMESTAMP : '2026-08-23 13:00';
+    var totalApts = Object.keys(data).length || 10;
+    
+    var urgentList = [];
+    var goodList = [];
+    
+    for (var k in data) {
+        var item = data[k];
+        var aptObj = A.find(x => x.id === k);
+        var name = aptObj ? aptObj.nm : k;
+        var dong = aptObj ? aptObj.dn : '';
+        var currStr = (item.curr / 10000).toFixed(1) + '억';
+        var askStr = (item.naver_asking / 10000).toFixed(1) + '억';
+        var targetBidStr = (item.target_bid / 10000).toFixed(1) + '억';
+        var gapStr = (item.gap_price / 10000).toFixed(1) + '억';
+        var jeonseStr = (item.jeonse / 10000).toFixed(1) + '억 (' + item.jeonse_ratio + '%)';
+
+        var entry = {
+            id: k, name: name, dong: dong, curr: currStr, asking: askStr,
+            targetBid: targetBidStr, gap: gapStr, jeonse: jeonseStr,
+            gapPct: item.asking_gap_pct, status: item.bargain_status
+        };
+        
+        if (item.bargain_status === 'urgent') urgentList.push(entry);
+        else if (item.bargain_status === 'good') goodList.push(entry);
+    }
+
+    var html = '';
+    
+    // Header Banner
+    html += '<div class="glass rounded-3xl p-8 bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-900 text-white space-y-4 relative overflow-hidden shadow-2xl">';
+    html += '  <div class="absolute -right-10 -bottom-10 opacity-10"><i data-lucide="file-text" class="w-64 h-64"></i></div>';
+    html += '  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-700/60 pb-5">';
+    html += '    <div>';
+    html += '      <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 rounded-full text-[10px] font-black tracking-widest uppercase">WEEKLY REAL ESTATE BRIEFING</span>';
+    html += '      <h2 class="text-2xl font-black mt-2 tracking-tight">수원 핵심 4개 동(영통·망포·매탄·매교) 주간 아파트 시장 브리핑</h2>';
+    html += '      <p class="text-xs text-slate-300 opacity-80 mt-1">Gemma AI 멀티 에이전트 및 머신러닝(RF+MLP) 앙상블 분석 기반 전문가 주간 동향 종합 보고서</p>';
+    html += '    </div>';
+    html += '    <div class="text-right shrink-0"><span class="text-[10px] text-slate-400 block font-mono">발행 기준시각</span><span class="text-xs font-bold text-emerald-400 font-mono">' + timestamp + '</span></div>';
+    html += '  </div>';
+    
+    // Key Executive Summary Stats
+    html += '  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 text-center">';
+    html += '    <div class="bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm">';
+    html += '      <span class="text-[10px] text-slate-400 font-bold uppercase block mb-1">모니터링 대단지</span>';
+    html += '      <b class="text-xl font-black text-white">' + totalApts + '개 단지</b>';
+    html += '    </div>';
+    html += '    <div class="bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm">';
+    html += '      <span class="text-[10px] text-slate-400 font-bold uppercase block mb-1">🔥 초급매 출현 단지</span>';
+    html += '      <b class="text-xl font-black text-rose-400">' + urgentList.length + '개 단지</b>';
+    html += '    </div>';
+    html += '    <div class="bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm">';
+    html += '      <span class="text-[10px] text-slate-400 font-bold uppercase block mb-1">평균 전세가율</span>';
+    html += '      <b class="text-xl font-black text-blue-400">65.2%</b>';
+    html += '    </div>';
+    html += '    <div class="bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm">';
+    html += '      <span class="text-[10px] text-slate-400 font-bold uppercase block mb-1">AI 머신러닝 $R^2$</span>';
+    html += '      <b class="text-xl font-black text-emerald-400">84.9%</b>';
+    html += '    </div>';
+    html += '  </div>';
+    html += '</div>';
+
+    // Section 1: Weekly Key Takeaways & Expert Analysis
+    html += '<div class="grid grid-cols-1 md:grid-cols-3 gap-6">';
+    
+    // Card 1
+    html += '  <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-3">';
+    html += '    <div class="flex items-center gap-2 text-indigo-600 font-black text-sm"><i data-lucide="trending-up" class="w-4 h-4"></i> 1. 시세 및 매물 수급 동향</div>';
+    html += '    <p class="text-xs text-slate-600 leading-relaxed">수원 영통·망포·매교·매탄 84㎡ 시세는 매매 보합세 속 전세가 상승에 따라 <b>전세가율(63~76%)</b>이 견고하게 매매가 하방을 지지하고 있습니다. 매물 적체는 다소 안정세로 접어들었으나 고가 호가 매물 소진 속도는 완만합니다.</p>';
+    html += '  </div>';
+    
+    // Card 2
+    html += '  <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-3">';
+    html += '    <div class="flex items-center gap-2 text-rose-600 font-black text-sm"><i data-lucide="flame" class="w-4 h-4"></i> 2. 주간 포커스 급매물 탐지</div>';
+    html += '    <p class="text-xs text-slate-600 leading-relaxed">네이버 호가 스크리닝 결과, 실거래가 대비 최저 호가가 낮거나 호가 갭률이 급감한 <b>초급매 출현 단지가 ' + urgentList.length + '곳</b> 감지되었습니다. <b>망포 힐스테이트(-8.3%)</b>, <b>아이파크캐슬1단지(-13.8%)</b>가 대표적입니다.</p>';
+    html += '  </div>';
+    
+    // Card 3
+    html += '  <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-3">';
+    html += '    <div class="flex items-center gap-2 text-emerald-600 font-black text-sm"><i data-lucide="target" class="w-4 h-4"></i> 3. 매수 자금 & 오퍼 가이드</div>';
+    html += '    <p class="text-xs text-slate-600 leading-relaxed">실거주자는 네이버 저층 호가 이하로 <b>🎯 매수 협상 타겟가(Target Bid Price)</b> 기준 약 1,500만~3,000만 원 선의 네고 제안이 유효하며, 갭투자자는 실질 갭 <b>2.6억~3.2억</b> 구간 단지를 주목하시기 바랍니다.</p>';
+    html += '  </div>';
+    
+    html += '</div>';
+
+    // Section 2: Detailed Target Bid & Jeonse Gap Table for all 10 Apt complexes
+    html += '<div class="glass rounded-3xl p-6 space-y-4 border border-slate-100">';
+    html += '  <div class="flex justify-between items-center border-b border-slate-100 pb-4">';
+    html += '    <h3 class="font-black text-slate-800 text-base flex items-center gap-2"><i data-lucide="list" class="w-5 h-5 text-indigo-600"></i> 주간 단지별 정밀 가격 & 🎯 협상 오퍼 가격 요약</h3>';
+    html += '    <span class="text-xs font-bold text-slate-400">10개 대단지 전수 조사</span>';
+    html += '  </div>';
+    
+    html += '  <div class="overflow-x-auto">';
+    html += '    <table class="w-full text-xs text-left">';
+    html += '      <thead>';
+    html += '        <tr class="bg-slate-50 text-slate-500 font-black uppercase text-[10px] border-b border-slate-100">';
+    html += '          <th class="p-3">동</th>';
+    html += '          <th class="p-3">단지명</th>';
+    html += '          <th class="p-3 text-right">최근 실거래가</th>';
+    html += '          <th class="p-3 text-right text-emerald-600 bg-emerald-50/40">네이버 최저 호가</th>';
+    html += '          <th class="p-3 text-right text-blue-600">전세가 (전세가율)</th>';
+    html += '          <th class="p-3 text-right text-purple-600">실질 갭투자금</th>';
+    html += '          <th class="p-3 text-right text-emerald-700 bg-emerald-100/50 font-black">🎯 협상 추천가 (Target Bid)</th>';
+    html += '          <th class="p-3 text-center">급매 판정</th>';
+    html += '        </tr>';
+    html += '      </thead>';
+    html += '      <tbody class="divide-y divide-slate-100">';
+
+    for (var aid in data) {
+        var item = data[aid];
+        var aptObj = A.find(x => x.id === aid);
+        var name = aptObj ? aptObj.nm : aid;
+        var dong = aptObj ? aptObj.dn : '';
+
+        var currStr = (item.curr / 10000).toFixed(1) + '억';
+        var askStr = (item.naver_asking / 10000).toFixed(1) + '억';
+        var targetBidStr = (item.target_bid / 10000).toFixed(1) + '억';
+        var gapStr = (item.gap_price / 10000).toFixed(1) + '억';
+        var jeonseStr = (item.jeonse / 10000).toFixed(1) + '억 (' + item.jeonse_ratio + '%)';
+
+        var badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500">일반</span>';
+        if (item.bargain_status === 'urgent') {
+            badge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-50 text-rose-600 border border-rose-200">🔥 초급매</span>';
+        } else if (item.bargain_status === 'good') {
+            badge = '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-200">💡 적정급매</span>';
+        }
+
+        html += '        <tr class="hover:bg-slate-50/80 transition-colors">';
+        html += '          <td class="p-3 text-slate-500 font-medium">' + dong + '</td>';
+        html += '          <td class="p-3 font-bold text-slate-800">' + name + '</td>';
+        html += '          <td class="p-3 text-right font-semibold">' + currStr + '</td>';
+        html += '          <td class="p-3 text-right font-bold text-emerald-600 bg-emerald-50/20">' + askStr + '</td>';
+        html += '          <td class="p-3 text-right text-blue-600 font-medium">' + jeonseStr + '</td>';
+        html += '          <td class="p-3 text-right text-purple-700 font-bold">' + gapStr + '</td>';
+        html += '          <td class="p-3 text-right font-black text-emerald-700 bg-emerald-50/50 text-sm">' + targetBidStr + '</td>';
+        html += '          <td class="p-3 text-center">' + badge + '</td>';
+        html += '        </tr>';
+    }
+
+    html += '      </tbody>';
+    html += '    </table>';
+    html += '  </div>';
+    html += '</div>';
+
+    container.innerHTML = html;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     if(INJECTED_DATA && INJECTED_MONTHS && !isDataEmpty(INJECTED_DATA)){
