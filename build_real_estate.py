@@ -96,7 +96,7 @@ def fetch_trade_worker(arg):
             floor = item.findtext('floor') or ''
             built = item.findtext('buildYear') or ''
             # 84㎡ 국민평수 단일 평형 기준 (80㎡ ~ 86㎡) 필터링 적용
-            if 80 <= area <= 86 and umd in ('망포동', '영통동', '매교동'):
+            if 80 <= area <= 86 and umd in ('망포동', '영통동', '매탄동', '매교동'):
                 res.append({'d': f"{mon[:4]}.{mon[4:6]}.{day.zfill(2)}", 'm': mon, 'umd': umd, 'apt': apt, 'p': price, 'area': area, 'floor': floor, 'built': built})
     return res
 
