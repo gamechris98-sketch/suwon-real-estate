@@ -43,18 +43,18 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
 </div></div></header>
 <div class="nav-container w-full border-b border-slate-100 bg-white">
 <div class="overflow-x-auto whitespace-nowrap no-scrollbar scroll-smooth flex items-center px-4">
-<button onclick="switchTab('dash')" id="t1" class="tb tab-a flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>대시보드</button>
-<button onclick="switchTab('peak')" id="t4" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="trending-up" class="w-4 h-4"></i>전고점 비교</button>
-<button onclick="switchTab('vol')" id="t3" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="bar-chart-big" class="w-4 h-4"></i>거래량 분석</button>
-<button onclick="switchTab('calc')" id="t6" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="calculator" class="w-4 h-4"></i>매수 계산기</button>
-<button onclick="switchTab('rank')" id="t8" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="award" class="w-4 h-4"></i>종합 점수</button>
-<button onclick="switchTab('timing')" id="t7" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="timer" class="w-4 h-4"></i>매수 타이밍</button>
-<button onclick="switchTab('supply')" id="t9" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="bar-chart-3" class="w-4 h-4"></i>공급 분석</button>
-<button onclick="switchTab('ai')" id="t10" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="brain" class="w-4 h-4"></i>AI 멀티 에이전트</button>
-<button onclick="switchTab('weekly')" id="t13" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all bg-indigo-50/50 text-indigo-700 font-bold"><i data-lucide="file-text" class="w-4 h-4 text-indigo-600"></i>주간 브리핑 레포트</button>
-<button onclick="switchTab('news')" id="t11" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="newspaper" class="w-4 h-4"></i>관련 뉴스룸</button>
-<button onclick="switchTab('history')" id="t12" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="history" class="w-4 h-4"></i>업데이트 히스토리</button>
-<button onclick="switchTab('raw')" id="t2" class="tb tab-i flex items-center gap-2 py-4 px-5 text-sm transition-all"><i data-lucide="table" class="w-4 h-4"></i>실거래 데이터</button>
+<button onclick="switchTab('dash')" id="t1" class="tb tab-a flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>대시보드</button>
+<button onclick="switchTab('weekly')" id="t13" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all text-indigo-700 font-bold bg-indigo-50/60 rounded-xl my-1 border border-indigo-100/80"><i data-lucide="file-text" class="w-4 h-4 text-indigo-600"></i>주간 브리핑 레포트</button>
+<button onclick="switchTab('news')" id="t11" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="newspaper" class="w-4 h-4"></i>관련 뉴스룸</button>
+<button onclick="switchTab('history')" id="t12" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="history" class="w-4 h-4"></i>업데이트 히스토리</button>
+<button onclick="switchTab('peak')" id="t4" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="trending-up" class="w-4 h-4"></i>전고점 비교</button>
+<button onclick="switchTab('ai')" id="t10" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="brain" class="w-4 h-4"></i>AI 멀티 에이전트</button>
+<button onclick="switchTab('vol')" id="t3" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="bar-chart-big" class="w-4 h-4"></i>거래량 분석</button>
+<button onclick="switchTab('calc')" id="t6" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="calculator" class="w-4 h-4"></i>매수 계산기</button>
+<button onclick="switchTab('rank')" id="t8" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="award" class="w-4 h-4"></i>종합 점수</button>
+<button onclick="switchTab('timing')" id="t7" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="timer" class="w-4 h-4"></i>매수 타이밍</button>
+<button onclick="switchTab('supply')" id="t9" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="bar-chart-3" class="w-4 h-4"></i>공급 분석</button>
+<button onclick="switchTab('raw')" id="t2" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="table" class="w-4 h-4"></i>실거래 데이터</button>
 </div></div></div>
 <main id="p1" class="tab-page flex-grow container mx-auto px-4 py-6 max-w-7xl space-y-6">
 <div class="flex flex-col gap-2">
