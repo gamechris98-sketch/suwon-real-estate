@@ -118,7 +118,7 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
 <h2 class="text-base font-black flex items-center gap-2"><i data-lucide="table" class="w-5 h-5 text-indigo-500"></i>실거래 데이터 <span id="rCnt" class="text-xs text-slate-400 font-normal"></span></h2>
 <div class="flex gap-2 flex-wrap">
-<select id="dF" class="text-sm border border-slate-200 rounded-lg px-3 py-2" onchange="fR()"><option value="">전체 동</option><option value="망포동">망포동</option><option value="영통동">영통동</option><option value="매교동">매교동</option></select>
+<select id="dF" class="text-sm border border-slate-200 rounded-lg px-3 py-2" onchange="fR()"><option value="">전체 동</option><option value="망포동">망포동</option><option value="영통동">영통동</option><option value="매탄동">매탄동</option><option value="매교동">매교동</option></select>
 <input type="text" id="sI" placeholder="단지명 검색" class="text-sm border border-slate-200 rounded-lg px-3 py-2 w-40" oninput="fR()">
 <select id="aF" class="text-sm border border-slate-200 rounded-lg px-3 py-2" onchange="fR()"><option value="">전체 아파트</option></select>
 <button onclick="dnCSV()" class="text-sm px-3 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700">CSV</button>
@@ -620,6 +620,13 @@ var D=[
       {id:'yeongtong_edupark',nm:'영통에듀파크',c:'#2563eb',d:[],kw:'에듀파크'},
       {id:'yeongtong_dongbo',nm:'신나무실동보',c:'#7c3aed',d:[6,3],kw:'신나무실동보'},
       {id:'yeongtong_shinmyung',nm:'신나무실신명',c:'#6366f1',d:[2,3],kw:'신나무실신명'}
+    ]
+  },
+  {
+    n:'매탄동',
+    i:'🟡',
+    a:[
+      {id:'maetan_weve',nm:'위브하늘채',c:'#eab308',d:[4,2],kw:'위브하늘채'}
     ]
   },
   {
@@ -1364,6 +1371,7 @@ var APT_COORDINATES = {
     'yeongtong_edupark':   { lat: 37.2512, lng: 127.0725, name: '영통에듀파크' },
     'yeongtong_dongbo':    { lat: 37.2531, lng: 127.0745, name: '신나무실동보' },
     'yeongtong_shinmyung': { lat: 37.2520, lng: 127.0732, name: '신나무실신명' },
+    'maetan_weve':         { lat: 37.2575, lng: 127.0425, name: '매탄위브하늘채' },
     'maegyo_skview':       { lat: 37.2655, lng: 127.0225, name: '매교역푸르지오SK뷰' },
     'maegyo_hillstate':    { lat: 37.2638, lng: 127.0205, name: '힐스테이트푸르지오' }
 };

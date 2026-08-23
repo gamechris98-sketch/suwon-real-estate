@@ -32,6 +32,7 @@ APT_FILTERS = {
     'yeongtong_edupark':   ('영통동', '에듀파크', 1279, '1.02대', '연결 X'),
     'yeongtong_dongbo':    ('영통동', '신나무실동보', 836, '1.04대', '연결 X'),
     'yeongtong_shinmyung': ('영통동', '신나무실신명', 384, '1.02대', '연결 X'),
+    'maetan_weve':         ('매탄동', '위브하늘채', 3391, '1.17대', '연결 O'),
     'maegyo_skview':       ('매교동', '푸르지오SKVIEW', 3603, '1.25대', '연결 O'),
     'maegyo_hillstate':    ('매교동', '힐스테이트푸르지오', 2586, '1.25대', '연결 O'),
 }
@@ -449,6 +450,7 @@ naver_asking_presets = {
     'yeongtong_edupark': 89000,      # 실거래 8.73억선 vs 매물 최저 호가 8.9억
     'yeongtong_dongbo': 75000,       # 실거래 7.3억선 vs 매물 최저 호가 7.5억
     'yeongtong_shinmyung': 69500,     # 실거래 6.78억선 vs 매물 최저 호가 6.95억
+    'maetan_weve': 79000,            # 매탄동 위브하늘채 매물 최저 호가 7.9억
     'maegyo_skview': 105000,         # 실거래 10.3억선 vs 매물 최저 호가 10.5억
     'maegyo_hillstate': 93000        # 실거래 9.1억선 vs 매물 최저 호가 9.3억
 }
@@ -472,6 +474,7 @@ jeonse_presets = {
     'yeongtong_edupark': 58000,     # 영통에듀파크 전세가 ~5.8억 (전세가율 ~66.4%)
     'yeongtong_dongbo': 49000,      # 신나무실동보 전세가 ~4.9억 (전세가율 ~67.1%)
     'yeongtong_shinmyung': 46000,    # 신나무실신명 전세가 ~4.6억 (전세가율 ~67.8%)
+    'maetan_weve': 53000,           # 매탄동 위브하늘채 전세가 ~5.3억 (전세가율 ~68.8%)
     'maegyo_skview': 64000,         # 푸르지오SKVIEW 전세가 ~6.4억 (전세가율 ~62.1%)
     'maegyo_hillstate': 58000       # 힐스테이트푸르지오 전세가 ~5.8억 (전세가율 ~63.7%)
 }
