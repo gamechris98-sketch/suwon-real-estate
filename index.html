@@ -190,6 +190,8 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
                         <th class="px-3 py-4 text-right border-b border-slate-100 text-red-500">과거대비 회복률</th>
                         <th class="px-3 py-4 text-right border-b border-slate-100 text-violet-500">최근대비 회복률</th>
                         <th class="px-3 py-4 text-right text-emerald-600 border-b border-emerald-100 bg-emerald-50/30">네이버 호가(저/중/고)</th>
+                        <th class="px-3 py-4 text-right text-blue-600 border-b border-blue-100 bg-blue-50/30">전세가 (전세가율)</th>
+                        <th class="px-3 py-4 text-right text-purple-600 border-b border-purple-100 bg-purple-50/30">실질 갭투자금</th>
                         <th class="px-3 py-4 text-center border-b border-slate-100 text-emerald-600">가격 적정성</th>
                         <th class="px-3 py-4 text-center border-b border-slate-100">분석</th>
                     </tr>
@@ -528,6 +530,25 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
                 <div id="paAskHigh" class="font-black text-slate-800"></div>
             </div>
         </div>
+    </div>
+
+    <!-- 갭투자 및 매수 협상 타겟 정보 -->
+    <div class="grid grid-cols-2 gap-2 text-xs bg-indigo-50/40 p-3 rounded-xl border border-indigo-100/60">
+        <div>
+            <div class="text-[10px] text-slate-500 font-bold">전세가 (전세가율)</div>
+            <div id="paJeonseInfo" class="font-bold text-blue-700 text-sm mt-0.5"></div>
+        </div>
+        <div>
+            <div class="text-[10px] text-slate-500 font-bold">실질 갭투자금</div>
+            <div id="paGapPrice" class="font-black text-purple-700 text-sm mt-0.5"></div>
+        </div>
+    </div>
+
+    <div class="flex justify-between items-center pb-3 border-b border-slate-100 bg-emerald-50/50 p-2.5 rounded-xl border border-emerald-100">
+        <div class="flex items-center gap-1.5">
+            <span class="text-xs font-bold text-emerald-800">🎯 매수 협상 추천 목표가 (Target Bid)</span>
+        </div>
+        <span id="paTargetBid" class="font-black text-emerald-700 text-base"></span>
     </div>
 
     <div class="flex justify-between items-center pb-3 border-b border-slate-100">
@@ -891,6 +912,12 @@ function openPriceAnalysisModal(id){
     var askMid = d.ask_mid || baseAsk;
     var askHigh = d.ask_high || Math.round(baseAsk * 1.03);
 
+    // 전세가, 실질 갭, 매수 협상 타겟가 (Target Bid)
+    var jeonseVal = d.jeonse || Math.round((d.curr||0) * 0.63);
+    var jeonseRatio = d.jeonse_ratio || 63.0;
+    var gapPrice = d.gap_price || (baseAsk - jeonseVal);
+    var targetBid = d.target_bid || Math.round(askLow * 0.985);
+
     var status = ratioAvg < 90 ? 'underpriced' : ratioAvg > 110 ? 'overpriced' : 'fair';
     var trend = momentum > 3 ? 'up' : momentum < -3 ? 'down' : 'stable';
     
@@ -898,20 +925,20 @@ function openPriceAnalysisModal(id){
     var advice = '';
 
     if (status === 'underpriced' && trend === 'up') {
-        recommendation = '🚀 적극 매수 검토';
-        advice = '<b>전문가 종합 분석:</b> 현재 ' + a.dn + ' 입지 평균 대비 매매가가 낮고 12개월 모멘텀(+' + momentum + '%) 상승세입니다. 네이버 저층 호가(' + (askLow/10000).toFixed(1) + '억) 중심의 급매 진입을 권장합니다.';
+        recommendation = '🚀 적극 매수 검토 (저평가+상승세)';
+        advice = '<b>전문가 종합 분석:</b> 현재 ' + a.dn + ' 입지 평균 대비 저평가 상태이며 12개월 모멘텀(+' + momentum + '%)이 가파릅니다. <b>협상 목표가(' + (targetBid/10000).toFixed(1) + '억)</b> 전후로 적극 오퍼를 제안하세요.';
     } else if (status === 'underpriced' && trend !== 'down') {
-        recommendation = '💡 매수 우수 (저평가)';
-        advice = '<b>전문가 종합 분석:</b> 동별 입지 평균 대비 저평가 구간이며 보합세를 보이고 있습니다. 중층 호가(' + (askMid/10000).toFixed(1) + '억) 대비 네고를 유도하는 전략이 유효합니다.';
+        recommendation = '💡 매수 우수 (저평가 구간)';
+        advice = '<b>전문가 종합 분석:</b> 동별 평균 대비 가격 메리트가 뛰어납니다. 갭투자금 약 ' + (gapPrice/10000).toFixed(1) + '억 수준으로 접근 가능하며, 타겟가(' + (targetBid/10000).toFixed(1) + '억) 기준 네고 협상을 추천합니다.';
     } else if (status === 'overpriced' && trend === 'down') {
-        recommendation = '⚠️ 매수 보류 (관망)';
-        advice = '<b>전문가 종합 분석:</b> 입지 평균 대비 고평가 상태이며 12개월 모멘텀이 조정을 받고 있습니다. 고층 매물 호가(' + (askHigh/10000).toFixed(1) + '억) 추이를 관망하며 분할 접근하세요.';
+        recommendation = '⚠️ 매수 보류 (관망 권장)';
+        advice = '<b>전문가 종합 분석:</b> 입지 평균 대비 고평가 상태이며 시세가 조정을 받고 있습니다. 타겟가(' + (targetBid/10000).toFixed(1) + '억) 수준까지 가격이 조정될 때까지 관망을 권장합니다.';
     } else if (trend === 'up') {
         recommendation = '📈 추세 추종 매수';
-        advice = '<b>전문가 종합 분석:</b> 시세가 우상향 추세에 있습니다. 로얄층(고층 호가 ' + (askHigh/10000).toFixed(1) + '억) 매물 위주로 현장 임장 후 매수를 검토하세요.';
+        advice = '<b>전문가 종합 분석:</b> 시세가 우상향 추세에 있습니다. 로얄층(고층 호가 ' + (askHigh/10000).toFixed(1) + '억) 매물 위주로 현장 임장을 추천합니다.';
     } else {
         recommendation = '⚖️ 중립 / 현장 임장 권장';
-        advice = '<b>전문가 종합 분석:</b> 시세가 박스권 횡보를 보이고 있습니다. 네이버 층별 호가 갭(저층 ' + (askLow/10000).toFixed(1) + '억 ~ 고층 ' + (askHigh/10000).toFixed(1) + '억)을 확인하고 단지별 임장을 추천합니다.';
+        advice = '<b>전문가 종합 분석:</b> 박스권 횡보 구간입니다. 갭투자금(' + (gapPrice/10000).toFixed(1) + '억) 및 네이버 저층 호가(' + (askLow/10000).toFixed(1) + '억) 대비 협상 여지를 체크하세요.';
     }
 
     document.getElementById('paTitle').innerText = a.dn + ' ' + a.nm + ' 전문가 가격 평가';
@@ -919,6 +946,10 @@ function openPriceAnalysisModal(id){
     document.getElementById('paAskLow').innerText = (askLow / 10000).toFixed(1) + '억';
     document.getElementById('paAskMid').innerText = (askMid / 10000).toFixed(1) + '억';
     document.getElementById('paAskHigh').innerText = (askHigh / 10000).toFixed(1) + '억';
+
+    document.getElementById('paJeonseInfo').innerText = (jeonseVal / 10000).toFixed(1) + '억원 (' + jeonseRatio + '%)';
+    document.getElementById('paGapPrice').innerText = (gapPrice / 10000).toFixed(1) + '억원';
+    document.getElementById('paTargetBid').innerText = (targetBid / 10000).toFixed(1) + '억원';
 
     document.getElementById('paDongRatio').innerText = ratioDong + '% (' + (ratioDong < 95 ? '동내 저평가' : ratioDong > 105 ? '동내 프리미엄' : '동 평균 수준') + ')';
     document.getElementById('paAvgRatio').innerText = ratioAvg + '% (' + (status==='underpriced'?'저평가':status==='overpriced'?'고평가':'적정 수준') + ')';
@@ -954,6 +985,10 @@ function renderPeakAnalysis(){
         var askMid = d.ask_mid || baseAsk;
         var askHigh = d.ask_high || Math.round(baseAsk * 1.03);
 
+        var jeonseVal = d.jeonse || Math.round((d.curr||0) * 0.63);
+        var jeonseRatio = d.jeonse_ratio || 63.0;
+        var gapPrice = d.gap_price || (baseAsk - jeonseVal);
+
         h+='<tr class="hover:bg-indigo-50/30 transition-colors border-b border-slate-100 group">';
         h+='<td class="px-3 py-4 text-xs font-medium text-slate-500">'+a.dn+'</td>';
         h+='<td class="px-3 py-4 font-black text-xs text-slate-800 group-hover:text-indigo-600 transition-colors">'+a.nm+'</td>';
@@ -965,6 +1000,8 @@ function renderPeakAnalysis(){
         h+='<td class="px-3 py-4 text-right"><span class="px-2.5 py-1 rounded-full text-[10px] font-black border '+ (rPast>=95?'bg-red-50 text-red-600 border-red-100':rPast>=80?'bg-amber-50 text-amber-600 border-amber-100':'bg-slate-50 text-slate-500 border-slate-200')+'">'+rPast+'%</span></td>';
         h+='<td class="px-3 py-4 text-right"><span class="px-2.5 py-1 rounded-full text-[10px] font-black border '+ (rRecent>=95?'bg-red-50 text-red-600 border-red-100':rRecent>=80?'bg-amber-50 text-amber-600 border-amber-100':'bg-slate-50 text-slate-500 border-slate-200')+'">'+rRecent+'%</span></td>';
         h+='<td class="px-3 py-4 text-right text-xs font-bold text-emerald-600 bg-emerald-50/20">'+(askLow/10000).toFixed(1)+'억 / '+(askMid/10000).toFixed(1)+'억 / '+(askHigh/10000).toFixed(1)+'억</td>';
+        h+='<td class="px-3 py-4 text-right text-xs font-bold text-blue-600 bg-blue-50/20">'+(jeonseVal/10000).toFixed(1)+'억 ('+jeonseRatio+'%)</td>';
+        h+='<td class="px-3 py-4 text-right text-xs font-black text-purple-700 bg-purple-50/30">'+(gapPrice/10000).toFixed(1)+'억</td>';
         h+='<td class="px-3 py-4 text-center"><span class="px-2.5 py-1 rounded-full text-[10px] font-black border '+fairnessClass+'">'+fairnessText+'</span></td>';
         h+='<td class="px-3 py-4 text-center"><button onclick="openPriceAnalysisModal(\''+a.id+'\')" class="px-2.5 py-1 text-[10px] font-bold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">가격 평가</button></td>';
         h+='</tr>';

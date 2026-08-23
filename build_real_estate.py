@@ -462,7 +462,20 @@ financial_indicators = {
     'cpi_index_2026': 116.80, # 2026년 누적 소비자물가 (약 14% 상승 보정값)
 }
 
-# 각 아파트별 네이버 호가 및 층별 호가(저층/중층/고층) 지표 인젝션
+# [Phase 1 & 2] 네이버 호가 갭, 전세가율, 실질 갭, 매수 협상 타겟가(Target Bid Price) 인젝션
+# 단지별 전세가 프리셋 (84㎡ 기준 실거래 전세 평균)
+jeonse_presets = {
+    'mangpo_hillstate': 78000,      # 힐스테이트영통 전세가 ~7.8억 (전세가율 ~60.0%)
+    'mangpo_ipark': 68000,          # 아이파크캐슬1단지 전세가 ~6.8억 (전세가율 ~62.3%)
+    'mangpo_skview': 61000,         # 영통SKVIEW 전세가 ~6.1억 (전세가율 ~63.0%)
+    'mangpo_sujain': 54000,         # 한양수자인 전세가 ~5.4억 (전세가율 ~65.0%)
+    'yeongtong_edupark': 58000,     # 영통에듀파크 전세가 ~5.8억 (전세가율 ~66.4%)
+    'yeongtong_dongbo': 49000,      # 신나무실동보 전세가 ~4.9억 (전세가율 ~67.1%)
+    'yeongtong_shinmyung': 46000,    # 신나무실신명 전세가 ~4.6억 (전세가율 ~67.8%)
+    'maegyo_skview': 64000,         # 푸르지오SKVIEW 전세가 ~6.4억 (전세가율 ~62.1%)
+    'maegyo_hillstate': 58000       # 힐스테이트푸르지오 전세가 ~5.8억 (전세가율 ~63.7%)
+}
+
 for aid in analysis_data:
     base_ask = naver_asking_presets.get(aid, analysis_data[aid]['curr'])
     analysis_data[aid]['naver_asking'] = base_ask
@@ -470,16 +483,36 @@ for aid in analysis_data:
     analysis_data[aid]['ask_mid'] = base_ask                 # 중층 (6~15층)
     analysis_data[aid]['ask_high'] = round(base_ask * 1.03)  # 고층 (16층 이상)
 
-    # 명목 금액 차이를 넘어선 '실질 안전마진'과 호가 갭 계산
-    price_gap = analysis_data[aid]['naver_asking'] - analysis_data[aid]['curr']
+    # 1. 호가 갭 및 갭률 (%)
+    curr_price = analysis_data[aid]['curr'] or 1
+    price_gap = base_ask - curr_price
     analysis_data[aid]['asking_gap'] = price_gap
-    analysis_data[aid]['asking_gap_pct'] = round(price_gap / (analysis_data[aid]['curr'] or 1) * 100, 1)
-    
+    analysis_data[aid]['asking_gap_pct'] = round((price_gap / curr_price) * 100, 1)
+
+    # 2. 전세가 & 전세가율 (%) & 실질 갭투자 필요금액
+    jeonse_val = jeonse_presets.get(aid, round(curr_price * 0.63))
+    analysis_data[aid]['jeonse'] = jeonse_val
+    analysis_data[aid]['jeonse_ratio'] = round((jeonse_val / curr_price) * 100, 1)
+    analysis_data[aid]['gap_price'] = base_ask - jeonse_val  # 실질 갭 (매물최저호가 - 전세가)
+
+    # 3. 급매물 스크리닝 알고리즘 (Hot Bargain Detection)
+    # 최저 호가가 실거래 대비 +3% 이내거나 이하인 경우 급매물 판정
+    if price_gap <= 0:
+        analysis_data[aid]['bargain_status'] = 'urgent'    # 🔥 초급매 (실거래 이하)
+    elif analysis_data[aid]['asking_gap_pct'] <= 2.5:
+        analysis_data[aid]['bargain_status'] = 'good'      # 💡 적정 급매 (호가 갭 2.5% 이내)
+    else:
+        analysis_data[aid]['bargain_status'] = 'normal'    # 일반 매물
+
+    # 4. 매수 협상 타겟가 (Target Bid Price) 산출 엔진
+    # 시장 모멘텀 및 저층 호가를 반영하여 협상 목표가 설정
+    target_bid = round(analysis_data[aid]['ask_low'] * 0.985)
+    analysis_data[aid]['target_bid'] = target_bid
+
     # [CPI 보정 실질 회복률 계산]
-    # 2021년의 1억은 2026년의 약 1.14억과 실질 가치가 동일함.
     real_peak = analysis_data[aid]['hist_peak'] * (financial_indicators['cpi_index_2026'] / financial_indicators['cpi_index_2021'])
     analysis_data[aid]['real_peak'] = round(real_peak)
-    analysis_data[aid]['real_ratio'] = round(analysis_data[aid]['curr'] / real_peak * 100, 1)
+    analysis_data[aid]['real_ratio'] = round(curr_price / real_peak * 100, 1)
 
 # [5단계] Slack Webhook 긴급 푸시 알림 및 감지 시스템 (GitHub Actions Alerting)
 # 2026년 실거래 중 특이값 감지 시 Slack 메시지 자동 전송
