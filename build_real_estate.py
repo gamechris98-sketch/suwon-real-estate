@@ -513,9 +513,10 @@ for aid in analysis_data:
     analysis_data[aid]['target_bid'] = target_bid
 
     # [CPI 보정 실질 회복률 계산]
-    real_peak = analysis_data[aid]['hist_peak'] * (financial_indicators['cpi_index_2026'] / financial_indicators['cpi_index_2021'])
+    hist_peak = analysis_data[aid].get('hist_peak', 0) or curr_price
+    real_peak = hist_peak * (financial_indicators['cpi_index_2026'] / financial_indicators['cpi_index_2021'])
     analysis_data[aid]['real_peak'] = round(real_peak)
-    analysis_data[aid]['real_ratio'] = round(curr_price / real_peak * 100, 1)
+    analysis_data[aid]['real_ratio'] = round(curr_price / (real_peak or 1) * 100, 1)
 
 # [5단계] Slack Webhook 긴급 푸시 알림 및 감지 시스템 (GitHub Actions Alerting)
 # 2026년 실거래 중 특이값 감지 시 Slack 메시지 자동 전송
