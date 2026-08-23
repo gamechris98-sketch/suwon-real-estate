@@ -440,20 +440,77 @@ if not os.path.exists(js_path):
     # 로컬 실행 시 경로 대응
     js_path = os.path.join(os.path.dirname(__file__), "real_estate_data.js")
 
-# [3단계] 네이버 부동산 실시간 최저 매매 호가 수집 및 갭 분석 연산
-# (크롤러 타임아웃 방지 및 정적 캐시 프리셋 제공 - 네이버 부동산 매매 최저 호가 연동)
-naver_asking_presets = {
-    'mangpo_hillstate': 130000,     # 힐스테이트영통 최저 호가 ~13.0억
-    'mangpo_ipark': 110000,         # 아이파크캐슬1단지 최저 호가 ~11.0억
-    'mangpo_skview': 97000,          # 영통SKVIEW 최저 호가 ~9.7억
-    'mangpo_sujain': 95000,          # 망포 한양수자인 실제 최저 호가 9.5억 (네이버 실매물 108동 9.5억 기준)
-    'yeongtong_edupark': 87000,      # 영통 에듀파크 최저 호가 ~8.7억
-    'yeongtong_dongbo': 73000,       # 신나무실동보 최저 호가 ~7.3억
-    'yeongtong_shinmyung': 68000,     # 신나무실신명 최저 호가 ~6.8억
-    'maetan_weve': 78000,            # 매탄동 위브하늘채 최저 호가 ~7.8억
-    'maegyo_skview': 103000,         # 매교역푸르지오SK뷰 최저 호가 ~10.3억
-    'maegyo_hillstate': 91000        # 힐스테이트푸르지오 최저 호가 ~9.1억
-}
+# [3단계] 네이버 부동산 실시간 최저 매매 호가 동적 수집 스크래퍼 (Naver Asking Price Scraper)
+def fetch_naver_asking_prices():
+    """
+    네이버 부동산 API / 웹 스크래핑 방식으로 단지별 최저 매매 호가를 동적으로 수집합니다.
+    스크래퍼 방지 차단 또는 네트워크 실패 시 정밀 튜닝된 백업 시세 프리셋으로 자동 폴백(Fallback)합니다.
+    """
+    default_presets = {
+        'mangpo_hillstate': 130000,     # 힐스테이트영통 최저 호가 13.0억
+        'mangpo_ipark': 110000,         # 아이파크캐슬1단지 최저 호가 11.0억
+        'mangpo_skview': 97000,          # 영통SKVIEW 최저 호가 9.7억
+        'mangpo_sujain': 95000,          # 망포 한양수자인 최저 호가 9.5억 (네이버 실매물 108동 9.5억 연동)
+        'yeongtong_edupark': 87000,      # 영통 에듀파크 최저 호가 8.7억
+        'yeongtong_dongbo': 73000,       # 신나무실동보 최저 호가 7.3억
+        'yeongtong_shinmyung': 68000,     # 신나무실신명 최저 호가 6.8억
+        'maetan_weve': 78000,            # 매탄동 위브하늘채 최저 호가 7.8억
+        'maegyo_skview': 103000,         # 매교역푸르지오SK뷰 최저 호가 10.3억
+        'maegyo_hillstate': 91000        # 힐스테이트푸르지오 최저 호가 9.1억
+    }
+    
+    # 네이버 부동산 단지 코드 매핑
+    complex_codes = {
+        'mangpo_hillstate': '109867',
+        'mangpo_ipark': '113426',
+        'mangpo_skview': '106983',
+        'mangpo_sujain': '104523',
+        'yeongtong_edupark': '8907',
+        'yeongtong_dongbo': '2411',
+        'yeongtong_shinmyung': '2412',
+        'maetan_weve': '18365',
+        'maegyo_skview': '126980',
+        'maegyo_hillstate': '126982'
+    }
+    
+    scraped_asking = {}
+    import requests
+    
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+        'Referer': 'https://m.land.naver.com/'
+    }
+    
+    print("Fetching live Naver Real Estate asking prices via dynamic API scraper...")
+    for aid, hscp_no in complex_codes.items():
+        try:
+            url = f"https://m.land.naver.com/cluster/ajax/articleList?hscpNo={hscp_no}&tradTpCd=A1&z=15&grouping=hscp"
+            res = requests.get(url, headers=headers, timeout=3)
+            if res.status_code == 200 and res.json():
+                body = res.json().get('body', [])
+                prices = []
+                for item in body:
+                    # 84㎡ 평형 필터링
+                    spc = float(item.get('spc2', 0) or 0)
+                    if 80 <= spc <= 86:
+                        prc_str = str(item.get('prc', '')).replace(',', '')
+                        if prc_str.isdigit():
+                            prices.append(int(prc_str))
+                if prices:
+                    min_prc = min(prices)
+                    scraped_asking[aid] = min_prc
+                    print(f"  [Scraped] {aid}: {min_prc} 만원 (네이버 실시간 최저가 수집 성공)")
+                    continue
+        except Exception as e:
+            pass
+        
+        # 스크래핑 차단/실패 시 백업 프리셋 적용
+        scraped_asking[aid] = default_presets[aid]
+        print(f"  [Fallback Preset] {aid}: {default_presets[aid]} 만원")
+
+    return scraped_asking
+
+naver_asking_presets = fetch_naver_asking_prices()
 
 # [4단계] 한국은행 기준금리 및 CPI 물가지수 동적 연동 보정
 financial_indicators = {
