@@ -419,7 +419,7 @@ experts = [
 ]
 
 # 시장 분석 요약 (실시간 뉴스 긍정 여론 비율 결합)
-up_count = sum(1 for d in chart_data.values() if d[-1] > d[-4]) if len(months)>=4 else 0
+up_count = sum(1 for d in chart_data.values() if d[-1] is not None and d[-4] is not None and d[-1] > d[-4]) if len(months)>=4 else 0
 mkt_summary = {
     'bull': up_count > len(chart_data)/2,
     'summary': '📈 수원 영통 시장 완만한 회복세 (저층 제외)' if up_count > len(chart_data)/2 else '📉 시장 조정 및 관망세 지속 (저층 제외)',
