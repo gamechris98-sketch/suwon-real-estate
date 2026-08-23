@@ -443,40 +443,38 @@ if not os.path.exists(js_path):
 # [3단계] 네이버 부동산 실시간 최저 매매 호가 수집 및 갭 분석 연산
 # (크롤러 타임아웃 방지 및 정적 캐시 프리셋 제공 - 네이버 부동산 매매 최저 호가 연동)
 naver_asking_presets = {
-    'mangpo_hillstate': 132000,     # 실거래 13.0억선 vs 매물 최저 호가 13.2억
-    'mangpo_ipark': 112000,         # 실거래 10.9억선 vs 매물 최저 호가 11.2억
-    'mangpo_skview': 98500,          # 실거래 9.68억선 vs 매물 최저 호가 9.85억
-    'mangpo_sujain': 85000,          # 실거래 8.3억선 vs 매물 최저 호가 8.5억
-    'yeongtong_edupark': 89000,      # 실거래 8.73억선 vs 매물 최저 호가 8.9억
-    'yeongtong_dongbo': 75000,       # 실거래 7.3억선 vs 매물 최저 호가 7.5억
-    'yeongtong_shinmyung': 69500,     # 실거래 6.78억선 vs 매물 최저 호가 6.95억
-    'maetan_weve': 79000,            # 매탄동 위브하늘채 매물 최저 호가 7.9억
-    'maegyo_skview': 105000,         # 실거래 10.3억선 vs 매물 최저 호가 10.5억
-    'maegyo_hillstate': 93000        # 실거래 9.1억선 vs 매물 최저 호가 9.3억
+    'mangpo_hillstate': 130000,     # 힐스테이트영통 최저 호가 ~13.0억
+    'mangpo_ipark': 110000,         # 아이파크캐슬1단지 최저 호가 ~11.0억
+    'mangpo_skview': 97000,          # 영통SKVIEW 최저 호가 ~9.7억
+    'mangpo_sujain': 81500,          # 망포 한양수자인 최저 호가 ~8.15억 (기존 8.5억 오차 수정)
+    'yeongtong_edupark': 87000,      # 영통 에듀파크 최저 호가 ~8.7억
+    'yeongtong_dongbo': 73000,       # 신나무실동보 최저 호가 ~7.3억
+    'yeongtong_shinmyung': 68000,     # 신나무실신명 최저 호가 ~6.8억
+    'maetan_weve': 78000,            # 매탄동 위브하늘채 최저 호가 ~7.8억
+    'maegyo_skview': 103000,         # 매교역푸르지오SK뷰 최저 호가 ~10.3억
+    'maegyo_hillstate': 91000        # 힐스테이트푸르지오 최저 호가 ~9.1억
 }
 
 # [4단계] 한국은행 기준금리 및 CPI 물가지수 동적 연동 보정
-# (실질 화폐가치 하락률 및 DSR 최신 이자율 시뮬레이션 적용)
 financial_indicators = {
     'base_interest_rate': 3.50, # 한국은행 기준금리 (%)
     'average_mortgage_rate': 4.15, # 시중은행 주택담보대출 평균 금리 (%)
     'cpi_index_2021': 102.50, # 2021년 기준점 대비 누적 소비자물가
-    'cpi_index_2026': 116.80, # 2026년 누적 소비자물가 (약 14% 상승 보정값)
+    'cpi_index_2026': 116.80, # 2026년 누적 소비자물가
 }
 
 # [Phase 1 & 2] 네이버 호가 갭, 전세가율, 실질 갭, 매수 협상 타겟가(Target Bid Price) 인젝션
-# 단지별 전세가 프리셋 (84㎡ 기준 실거래 전세 평균)
 jeonse_presets = {
-    'mangpo_hillstate': 78000,      # 힐스테이트영통 전세가 ~7.8억 (전세가율 ~60.0%)
-    'mangpo_ipark': 68000,          # 아이파크캐슬1단지 전세가 ~6.8억 (전세가율 ~62.3%)
-    'mangpo_skview': 61000,         # 영통SKVIEW 전세가 ~6.1억 (전세가율 ~63.0%)
-    'mangpo_sujain': 54000,         # 한양수자인 전세가 ~5.4억 (전세가율 ~65.0%)
-    'yeongtong_edupark': 58000,     # 영통에듀파크 전세가 ~5.8억 (전세가율 ~66.4%)
-    'yeongtong_dongbo': 49000,      # 신나무실동보 전세가 ~4.9억 (전세가율 ~67.1%)
-    'yeongtong_shinmyung': 46000,    # 신나무실신명 전세가 ~4.6억 (전세가율 ~67.8%)
-    'maetan_weve': 53000,           # 매탄동 위브하늘채 전세가 ~5.3억 (전세가율 ~68.8%)
-    'maegyo_skview': 64000,         # 푸르지오SKVIEW 전세가 ~6.4억 (전세가율 ~62.1%)
-    'maegyo_hillstate': 58000       # 힐스테이트푸르지오 전세가 ~5.8억 (전세가율 ~63.7%)
+    'mangpo_hillstate': 78000,      # 전세가 ~7.8억 (전세가율 ~54.2%)
+    'mangpo_ipark': 68000,          # 전세가 ~6.8억 (전세가율 ~52.3%)
+    'mangpo_skview': 61000,         # 전세가 ~6.1억 (전세가율 ~59.8%)
+    'mangpo_sujain': 54000,         # 전세가 ~5.4억 (전세가율 ~65.1%)
+    'yeongtong_edupark': 58000,     # 전세가 ~5.8억 (전세가율 ~61.4%)
+    'yeongtong_dongbo': 49000,      # 전세가 ~4.9억 (전세가율 ~63.2%)
+    'yeongtong_shinmyung': 46000,    # 전세가 ~4.6억 (전세가율 ~60.5%)
+    'maetan_weve': 53000,           # 전세가 ~5.3억 (전세가율 ~65.4%)
+    'maegyo_skview': 64000,         # 전세가 ~6.4억 (전세가율 ~58.2%)
+    'maegyo_hillstate': 58000       # 전세가 ~5.8억 (전세가율 ~61.1%)
 }
 
 for aid in analysis_data:
