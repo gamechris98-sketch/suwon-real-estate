@@ -446,7 +446,7 @@ naver_asking_presets = {
     'mangpo_hillstate': 130000,     # 힐스테이트영통 최저 호가 ~13.0억
     'mangpo_ipark': 110000,         # 아이파크캐슬1단지 최저 호가 ~11.0억
     'mangpo_skview': 97000,          # 영통SKVIEW 최저 호가 ~9.7억
-    'mangpo_sujain': 81500,          # 망포 한양수자인 최저 호가 ~8.15억 (기존 8.5억 오차 수정)
+    'mangpo_sujain': 95000,          # 망포 한양수자인 실제 최저 호가 9.5억 (네이버 실매물 108동 9.5억 기준)
     'yeongtong_edupark': 87000,      # 영통 에듀파크 최저 호가 ~8.7억
     'yeongtong_dongbo': 73000,       # 신나무실동보 최저 호가 ~7.3억
     'yeongtong_shinmyung': 68000,     # 신나무실신명 최저 호가 ~6.8억
