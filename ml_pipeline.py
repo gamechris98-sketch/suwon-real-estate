@@ -21,6 +21,7 @@ APT_FILTERS = {
     'yeongtong_edupark':   ('영통동', '에듀파크', 1279),
     'yeongtong_dongbo':    ('영통동', '신나무실동보', 836),
     'yeongtong_shinmyung': ('영통동', '신나무실신명', 384),
+    'maetan_weve':         ('매탄동', '위브하늘채', 3391),
     'maegyo_skview':       ('매교동', '푸르지오SKVIEW', 3603),
     'maegyo_hillstate':    ('매교동', '힐스테이트푸르지오', 2586),
 }
