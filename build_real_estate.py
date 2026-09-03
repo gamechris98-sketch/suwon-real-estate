@@ -32,6 +32,8 @@ APT_FILTERS = {
     'yeongtong_edupark':   ('영통동', '에듀파크', 1279, '1.02대', '연결 X'),
     'yeongtong_dongbo':    ('영통동', '신나무실동보', 836, '1.04대', '연결 X'),
     'yeongtong_shinmyung': ('영통동', '신나무실신명', 384, '1.02대', '연결 X'),
+    'yeongtong_geukdong':  ('영통동', '신나무실극동', 836, '1.04대', '연결 X'),
+    'yeongtong_punglim':   ('영통동', '신나무실풍림', 836, '1.04대', '연결 X'),
     'maetan_weve':         ('매탄동', '위브하늘채', 3391, '1.17대', '연결 O'),
     'maegyo_skview':       ('매교동', '푸르지오SKVIEW', 3603, '1.25대', '연결 O'),
     'maegyo_hillstate':    ('매교동', '힐스테이트푸르지오', 2586, '1.25대', '연결 O'),
@@ -454,6 +456,8 @@ def fetch_naver_asking_prices():
         'yeongtong_edupark': 87000,      # 영통 에듀파크 최저 호가 8.7억
         'yeongtong_dongbo': 73000,       # 신나무실동보 최저 호가 7.3억
         'yeongtong_shinmyung': 68000,     # 신나무실신명 최저 호가 6.8억
+        'yeongtong_geukdong': 86000,      # 신나무실극동 최저 호가 8.6억
+        'yeongtong_punglim': 88000,       # 신나무실풍림 최저 호가 8.8억
         'maetan_weve': 78000,            # 매탄동 위브하늘채 최저 호가 7.8억
         'maegyo_skview': 103000,         # 매교역푸르지오SK뷰 최저 호가 10.3억
         'maegyo_hillstate': 91000        # 힐스테이트푸르지오 최저 호가 9.1억
@@ -468,6 +472,8 @@ def fetch_naver_asking_prices():
         'yeongtong_edupark': '8907',
         'yeongtong_dongbo': '2411',
         'yeongtong_shinmyung': '2412',
+        'yeongtong_geukdong': '2415',
+        'yeongtong_punglim': '2416',
         'maetan_weve': '18365',
         'maegyo_skview': '126980',
         'maegyo_hillstate': '126982'
@@ -553,6 +559,8 @@ jeonse_presets = {
     'yeongtong_edupark': 58000,     # 전세가 ~5.8억 (전세가율 ~61.4%)
     'yeongtong_dongbo': 49000,      # 전세가 ~4.9억 (전세가율 ~63.2%)
     'yeongtong_shinmyung': 46000,    # 전세가 ~4.6억 (전세가율 ~60.5%)
+    'yeongtong_geukdong': 54000,     # 전세가 ~5.4억 (전세가율 ~62.8%)
+    'yeongtong_punglim': 55000,      # 전세가 ~5.5억 (전세가율 ~61.3%)
     'maetan_weve': 53000,           # 전세가 ~5.3억 (전세가율 ~65.4%)
     'maegyo_skview': 64000,         # 전세가 ~6.4억 (전세가율 ~58.2%)
     'maegyo_hillstate': 58000       # 전세가 ~5.8억 (전세가율 ~61.1%)
