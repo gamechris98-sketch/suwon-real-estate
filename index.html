@@ -3058,7 +3058,10 @@ function renderWeeklyReportTab() {
     html += '<div class="glass rounded-3xl p-6 space-y-4 border border-emerald-100/60 bg-gradient-to-br from-white via-emerald-50/20 to-white shadow-sm">';
     html += '  <div class="flex justify-between items-center border-b border-emerald-100 pb-3">';
     html += '    <h3 class="font-black text-slate-800 text-sm flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-emerald-600"></i> 이번 주 주목할 평형별 & 같은 동 갭 메우기(Gap) 포커스</h3>';
-    html += '    <button onclick="switchTab(\'areagap\')" class="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1">전체 보기 <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>';
+    html += '    <div class="flex items-center gap-2">';
+    html += '      <a href="edupark_report.html" target="_blank" class="text-xs font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200 hover:bg-indigo-100 flex items-center gap-1"><i data-lucide="file-check" class="w-3.5 h-3.5"></i> 에듀파크 336동 20층 정밀 레포트</a>';
+    html += '      <button onclick="switchTab(\'areagap\')" class="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1">전체 보기 <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>';
+    html += '    </div>';
     html += '  </div>';
     html += '  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">';
     html += '    <div class="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm space-y-2">';
