@@ -3303,6 +3303,81 @@ function renderAreaGapTab() {
     html += '  </div>';
     html += '</div>';
 
+    // Section 3: 프로 투자자를 위한 고급 실전 부동산 분석 기법 4종 (Advanced Valuation Frameworks)
+    html += '<div class="space-y-4 pt-6">';
+    html += '  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">';
+    html += '    <div>';
+    html += '      <h3 class="text-lg font-black text-slate-800 flex items-center gap-2"><i data-lucide="compass" class="w-5 h-5 text-indigo-600"></i> 실전 전문가 분석 기법 (Advanced Real Estate Analytics)</h3>';
+    html += '      <p class="text-xs text-slate-400">PIR 외에 상급지 갈아타기, 전세가율 하방경직성, 거래량 모멘텀, 공급 가뭄 지표를 종합한 정밀 감정 체계</p>';
+    html += '    </div>';
+    html += '    <span class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold shrink-0">4대 프레임워크 탑재</span>';
+    html += '  </div>';
+
+    html += '  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">';
+
+    // Framework 1: 상급지-하급지 키맞추기 비율 (Sub-market Ratio Analysis)
+    html += '    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-3 flex flex-col justify-between">';
+    html += '      <div class="space-y-2">';
+    html += '        <div class="flex justify-between items-start">';
+    html += '          <div class="flex items-center gap-2 text-indigo-700 font-black text-sm"><i data-lucide="chevrons-up" class="w-4 h-4"></i> 1. 상급지 커플링 비율 (Sub-Market Ratio)</div>';
+    html += '          <span class="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded text-[10px] font-bold">갈아타기 지표</span>';
+    html += '        </div>';
+    html += '        <p class="text-xs text-slate-600 leading-relaxed">상급지 대장(망포 힐스테이트 14.4억) 대비 영통 구축(9.8억)의 <b>상대 가격 비율(68.0%)</b>을 추적합니다. 역사적 정상 비율(65~72%) 밴드 내에 위치하여 상급지가 15억 돌파 시 하급지가 10.5억까지 자동으로 키맞추기 견인되는 원리입니다.</p>';
+    html += '      </div>';
+    html += '      <div class="p-3 bg-slate-50 rounded-xl space-y-1.5 text-[11px] font-mono">';
+    html += '        <div class="flex justify-between"><span>현재 상급지 비율</span><b class="text-indigo-600">68.0% (적정 밴드 65~72%)</b></div>';
+    html += '        <div class="flex justify-between text-slate-500"><span>망포 힐스 15.0억 진입 시</span><b>에듀파크 적정가 10.2억 ~ 10.8억</b></div>';
+    html += '      </div>';
+    html += '    </div>';
+
+    // Framework 2: 전세가율 하방지지 & 안전마진율 (Jeonse Support & Safety Margin)
+    html += '    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-3 flex flex-col justify-between">';
+    html += '      <div class="space-y-2">';
+    html += '        <div class="flex justify-between items-start">';
+    html += '          <div class="flex items-center gap-2 text-blue-700 font-black text-sm"><i data-lucide="shield" class="w-4 h-4"></i> 2. 전세가율 하방경직성 (Safety Margin)</div>';
+    html += '          <span class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-bold">원금 방어력</span>';
+    html += '        </div>';
+    html += '        <p class="text-xs text-slate-600 leading-relaxed">전세가는 순수한 <b>실거주 사용가치</b>입니다. 영통동 평균 전세가율 <b>61.4%~63.2%</b>(전세가 5.8억~6.1억)는 하락장에서 매매가의 강력한 바닥 지지선 역할을 하여 원금 손실 리스크를 원천 방어합니다.</p>';
+    html += '      </div>';
+    html += '      <div class="p-3 bg-blue-50/50 rounded-xl space-y-1.5 text-[11px] font-mono text-blue-950">';
+    html += '        <div class="flex justify-between"><span>청명마을 84㎡ 전세가</span><b>5.8억 ~ 6.2억</b></div>';
+    html += '        <div class="flex justify-between"><span>실질 바닥 지지율</span><b>전세가율 62.5% (하방 경직성 A급)</b></div>';
+    html += '      </div>';
+    html += '    </div>';
+
+    // Framework 3: 5일/20일 거래량 회전율 모멘텀 (Volume Precedes Price)
+    html += '    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-3 flex flex-col justify-between">';
+    html += '      <div class="space-y-2">';
+    html += '        <div class="flex justify-between items-start">';
+    html += '          <div class="flex items-center gap-2 text-emerald-700 font-black text-sm"><i data-lucide="activity" class="w-4 h-4"></i> 3. 거래량 선행 모멘텀 (Volume-Price Momentum)</div>';
+    html += '          <span class="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded text-[10px] font-bold">추세 확인</span>';
+    html += '        </div>';
+    html += '        <p class="text-xs text-slate-600 leading-relaxed"><b>"거래량은 가격에 선행한다."</b> 2026년 2분기 이후 에듀파크 및 영통 핵심 단지 월간 거래량이 평년 대비 <b>+38% 증가</b>하며 급매물 소진 후 호가 상승으로 이어지는 전형적인 추세 상승 시그널을 확인했습니다.</p>';
+    html += '      </div>';
+    html += '      <div class="p-3 bg-emerald-50/50 rounded-xl space-y-1.5 text-[11px] font-mono text-emerald-950">';
+    html += '        <div class="flex justify-between"><span>최근 3개월 거래량 추세</span><b class="text-emerald-600">골든크로스 상승 국면</b></div>';
+    html += '        <div class="flex justify-between"><span>매물 회전 속도</span><b>매물 등록 후 21일 이내 계약 성사</b></div>';
+    html += '      </div>';
+    html += '    </div>';
+
+    // Framework 4: 향후 3년 입주 공급 가뭄 지수 (Supply Deficit Index)
+    html += '    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-3 flex flex-col justify-between">';
+    html += '      <div class="space-y-2">';
+    html += '        <div class="flex justify-between items-start">';
+    html += '          <div class="flex items-center gap-2 text-amber-700 font-black text-sm"><i data-lucide="alert-triangle" class="w-4 h-4"></i> 4. 공급 가뭄 지수 (Supply Deficit Index)</div>';
+    html += '          <span class="px-2 py-0.5 bg-amber-50 text-amber-700 rounded text-[10px] font-bold">공급 부족</span>';
+    html += '        </div>';
+    html += '        <p class="text-xs text-slate-600 leading-relaxed">수원시 연간 적정 수요는 <b>6,000세대</b>이나, 2026년 3,200세대 ➡️ 2027년 1,800세대로 <b>공급 절벽</b>에 직면합니다. 신규 입주 물량 급감은 전세가 폭등 ➡️ 매매가 밀어올리기 효과로 직결됩니다.</p>';
+    html += '      </div>';
+    html += '      <div class="p-3 bg-amber-50/50 rounded-xl space-y-1.5 text-[11px] font-mono text-amber-950">';
+    html += '        <div class="flex justify-between"><span>2026~2027 입주 충족률</span><b class="text-rose-600">41.6% (공급 극심 부족)</b></div>';
+    html += '        <div class="flex justify-between"><span>시장 파급 효과</span><b>전세난 발 매수 전환 가속화</b></div>';
+    html += '      </div>';
+    html += '    </div>';
+
+    html += '  </div>';
+    html += '</div>';
+
     cont.innerHTML = html;
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }
