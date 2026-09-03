@@ -591,6 +591,145 @@ supply_data = {
     "summary": "2025년 이후 수원시 입주 물량이 급감하며 공급 부족 단계에 진입할 것으로 예상됩니다."
 }
 
+# [Phase 4] 동일 단지 내 평형별 갭 분석 (59㎡ vs 84㎡) 및 같은 동 비교군 저평가 모델
+area_gap_data = [
+    {
+        "id": "mangpo_hillstate",
+        "name": "힐스테이트영통",
+        "dong": "망포동",
+        "built": "2017년 준공",
+        "total_units": "2,140세대",
+        "small_name": "25평 (전용 59㎡)",
+        "small_prev": 6.8,
+        "small_prev_ratio": 74.5,
+        "small_recent": 7.3,
+        "small_recent_ratio": 71.0,
+        "base_name": "34평 (전용 84㎡)",
+        "base_prev": 12.4,
+        "base_recent": 14.4,
+        "undervalued": True,
+        "gap_diff": "-3.5%p 저평가",
+        "upside_won": "0.4억",
+        "fair_price": "7.7억",
+        "upside_pct": "+5.5%",
+        "note": "34평(14.4억) 선행 신고가 상승으로 25평 갭 메우기 상승 여력 발생"
+    },
+    {
+        "id": "mangpo_ipark",
+        "name": "영통아이파크캐슬1단지",
+        "dong": "망포동",
+        "built": "2019년 준공",
+        "total_units": "1,783세대",
+        "small_name": "25평 (전용 59㎡)",
+        "small_prev": 6.5,
+        "small_prev_ratio": 78.0,
+        "small_recent": 6.8,
+        "small_recent_ratio": 76.5,
+        "base_name": "34평 (전용 84㎡)",
+        "base_prev": 11.3,
+        "base_recent": 12.2,
+        "undervalued": True,
+        "gap_diff": "-1.5%p 저평가",
+        "upside_won": "0.3억",
+        "fair_price": "7.1억",
+        "upside_pct": "+4.4%",
+        "note": "대단지 소형 평형 실거주/투자 유입으로 적정가 7억 초반 수렴 기대"
+    },
+    {
+        "id": "maetan_weve",
+        "name": "매탄위브하늘채",
+        "dong": "매탄동",
+        "built": "2008년 준공",
+        "total_units": "3,391세대",
+        "small_name": "25평 (전용 59㎡)",
+        "small_prev": 5.4,
+        "small_prev_ratio": 92.0,
+        "small_recent": 5.5,
+        "small_recent_ratio": 89.5,
+        "base_name": "33평 (전용 84㎡)",
+        "base_prev": 7.8,
+        "base_recent": 8.3,
+        "undervalued": True,
+        "gap_diff": "-2.5%p 저평가",
+        "upside_won": "0.3억",
+        "fair_price": "5.8억",
+        "upside_pct": "+5.5%",
+        "note": "영흥공원 및 인계/매탄 인프라 대단지 25평 갭 메우기 상승 여력 확보"
+    },
+    {
+        "id": "maegyo_skview",
+        "name": "매교역푸르지오SKVIEW",
+        "dong": "매교동",
+        "built": "2022년 준공",
+        "total_units": "3,603세대",
+        "small_name": "25평 (전용 59㎡)",
+        "small_prev": 6.9,
+        "small_prev_ratio": 88.5,
+        "small_recent": 7.2,
+        "small_recent_ratio": 88.0,
+        "base_name": "34평 (전용 84㎡)",
+        "base_prev": 10.6,
+        "base_recent": 11.0,
+        "undervalued": False,
+        "gap_diff": "균형 상태",
+        "upside_won": "0.1억",
+        "fair_price": "7.3억",
+        "upside_pct": "+1.4%",
+        "note": "신축 대단지 특성상 소형과 국평이 동반 상승하며 균형 비율 유지"
+    }
+]
+
+# 같은 동 내 연간 비교군 저평가 모델 (Peer Group Analysis)
+peer_gap_data = [
+    {
+        "target_apt": "영통에듀파크 (청명마을 3단지)",
+        "dong": "수원 영통구 영통동",
+        "target_type": "30평 (전용 73㎡)",
+        "target_prev": "7.1억",
+        "target_curr": "7.6억",
+        "peers": [
+            {"name": "신나무실극동", "type": "31평 (전용 75㎡)", "prev": "7.0억", "curr": "8.6억"},
+            {"name": "신나무실풍림", "type": "31평 (전용 75㎡)", "prev": "7.1억", "curr": "7.9억"}
+        ],
+        "peer_median": "8.3억",
+        "gap_amount": "0.7억 낮음",
+        "gap_pct": "-8%",
+        "status": "undervalued",
+        "verdict": "영통동 유사 대단지 비교군 중앙값(8.3억) 대비 -8% 저평가 상태로 갭 메우기 유효"
+    },
+    {
+        "target_apt": "영통에듀파크 (청명마을 3단지 84㎡)",
+        "dong": "수원 영통구 영통동",
+        "target_type": "34평 (전용 85㎡)",
+        "target_prev": "8.7억",
+        "target_curr": "9.45억",
+        "peers": [
+            {"name": "신나무실풍림 (84㎡)", "type": "34평", "prev": "8.1억", "curr": "8.97억"},
+            {"name": "황골쌍용 (84㎡)", "type": "34평", "prev": "7.5억", "curr": "8.2억"}
+        ],
+        "peer_median": "8.6억",
+        "gap_amount": "0.85억 높음 (신고가 주도)",
+        "gap_pct": "+9.8%",
+        "status": "leader",
+        "verdict": "영통 1기 신도시 학군 대장 단지로 권역 내 최고가 밴드를 새로 개척 중"
+    },
+    {
+        "target_apt": "매탄권선역리버파크",
+        "dong": "수원 권선구 권선동",
+        "target_type": "25평 (전용 59㎡)",
+        "target_prev": "5.1억",
+        "target_curr": "5.8억",
+        "peers": [
+            {"name": "매탄권선역리버파크 21평", "type": "21평", "prev": "3.8억", "curr": "5.0억"}
+        ],
+        "peer_median": "6.7억 (평형 역산 적정가)",
+        "gap_amount": "0.9억 낮음",
+        "gap_pct": "-16%",
+        "status": "undervalued",
+        "verdict": "21평(5.0억) 급등 대비 25평(5.8억)이 저평가 구간으로 적정가 6.7억까지 상승 여력"
+    }
+]
+
 import json
 injection = f"""// ======== AUTO_UPDATE_ZONE_START ========
 const INJECTED_DATA = {json.dumps(chart_data)};
@@ -601,6 +740,8 @@ const INJECTED_TIMESTAMP = '{now.strftime('%Y-%m-%d %H:%M')}';
 const INJECTED_NEWS = {json.dumps(news_list, ensure_ascii=False)};
 const INJECTED_SUPPLY = {json.dumps(supply_data, ensure_ascii=False)};
 const INJECTED_FINANCE = {json.dumps(financial_indicators)};
+const INJECTED_AREA_GAP = {json.dumps(area_gap_data, ensure_ascii=False)};
+const INJECTED_PEER_GAP = {json.dumps(peer_gap_data, ensure_ascii=False)};
 // ======== AUTO_UPDATE_ZONE_END ========"""
 
 raw_injection = f"""// ======== AUTO_UPDATE_RAW_ZONE_START ========
