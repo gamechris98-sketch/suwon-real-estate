@@ -3027,11 +3027,19 @@ function renderWeeklyReportTab() {
     // Section 1: Weekly Key Takeaways & Expert Analysis
     html += '<div class="grid grid-cols-1 md:grid-cols-4 gap-6">';
     
+    var fin = typeof INJECTED_FINANCE !== 'undefined' ? INJECTED_FINANCE : {};
+    var suwonCorePir = fin.suwon_core_pir || 9.31;
+    var suwonAvgPir = fin.suwon_overall_pir || 7.91;
+    var seoulPir = fin.seoul_metro_pir || 10.16;
+
     // Card PIR
-    html += '  <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-3">';
-    html += '    <div class="flex items-center gap-2 text-indigo-600 font-black text-sm"><i data-lucide="bar-chart-2" class="w-4 h-4"></i> 1. 아파트 PIR 진단</div>';
-    html += '    <div class="flex items-baseline gap-1.5"><b class="text-2xl font-black text-slate-800">10.16배</b><span class="text-[10px] text-emerald-600 font-bold">안정권 진입</span></div>';
-    html += '    <p class="text-[11px] text-slate-500 leading-relaxed">2021년 고점(15.0배) 대비 10.16배로 대폭 완화되어 소득 대비 집값 거품이 해소된 실수요 매수 적기 구간입니다.</p>';
+    html += '  <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-2">';
+    html += '    <div class="flex items-center gap-2 text-indigo-600 font-black text-sm"><i data-lucide="bar-chart-2" class="w-4 h-4"></i> 1. 실거래 기반 PIR 진단</div>';
+    html += '    <div class="flex items-baseline justify-between pt-1">';
+    html += '      <div><span class="text-[10px] text-slate-400 block font-bold">수원 핵심단지 PIR</span><b class="text-xl font-black text-emerald-600">' + suwonCorePir + '배</b></div>';
+    html += '      <div class="text-right"><span class="text-[10px] text-slate-400 block font-bold">수원 전체 실거래</span><b class="text-sm font-bold text-slate-700">' + suwonAvgPir + '배</b></div>';
+    html += '    </div>';
+    html += '    <p class="text-[11px] text-slate-500 leading-relaxed pt-1">서울 ' + seoulPir + '배 및 2021년 고점(15배) 대비 현저히 낮아 실소득 대비 매수 부담이 완화된 적기 구간입니다.</p>';
     html += '  </div>';
 
     // Card 1
@@ -3163,10 +3171,14 @@ function renderAreaGapTab() {
     html += '    <div class="text-right shrink-0"><span class="text-[10px] text-slate-400 block font-mono">분석 기준</span><span class="text-xs font-bold text-emerald-400">이전 6개월 vs 최근 1개월</span></div>';
     html += '  </div>';
 
+    var fin = typeof INJECTED_FINANCE !== 'undefined' ? INJECTED_FINANCE : {};
+    var suwonCorePir = fin.suwon_core_pir || 9.31;
+    var seoulPir = fin.seoul_metro_pir || 10.16;
+
     html += '  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-center text-xs">';
     html += '    <div class="bg-white/5 p-3 rounded-2xl border border-white/10">';
-    html += '      <span class="text-[10px] text-slate-400 block mb-0.5 font-bold uppercase">서울/수도권 PIR</span>';
-    html += '      <b class="text-lg font-black text-white">10.16배 (안정권)</b>';
+    html += '      <span class="text-[10px] text-slate-400 block mb-0.5 font-bold uppercase">수원 핵심단지 PIR (서울: ' + seoulPir + '배)</span>';
+    html += '      <b class="text-lg font-black text-emerald-400">' + suwonCorePir + '배 (소득대비 안정)</b>';
     html += '    </div>';
     html += '    <div class="bg-white/5 p-3 rounded-2xl border border-white/10">';
     html += '      <span class="text-[10px] text-slate-400 block mb-0.5 font-bold uppercase">단지 내 평형 갭 탐지</span>';

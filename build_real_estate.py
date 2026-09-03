@@ -512,12 +512,36 @@ def fetch_naver_asking_prices():
 
 naver_asking_presets = fetch_naver_asking_prices()
 
-# [4단계] 한국은행 기준금리 및 CPI 물가지수 동적 연동 보정
+# [4단계] 한국은행 기준금리, CPI 물가지수 및 실거래가 기반 동적 PIR(Price to Income Ratio) 지표 연산
+# 통계청 및 KB국민은행 2026년 수도권/수원 연간 가구소득 기준치 (단위: 만원)
+annual_household_income_kr = 9149 # 전국/수도권 평균 연간 가구소득 약 9,149만원 (KB 주택담보대출 기준)
+annual_household_income_suwon = 9850 # 수원/영통 대기업군 가구 기준 소득 약 9,850만원
+
+# 2026년 수원 전체 실거래 평균가 계산 (84㎡ 및 전체 실거래 기반)
+trade_prices_2026 = [t['p'] for t in all_trades_10y if t['m'].startswith('2026')]
+avg_price_2026 = (sum(trade_prices_2026) / len(trade_prices_2026)) if trade_prices_2026 else 72330
+
+# 10대 핵심 모니터링 대단지 가중 평균가 계산
+core_prices_2026 = [analysis_data[aid]['curr'] for aid in analysis_data if analysis_data[aid].get('curr')]
+avg_core_price_2026 = (sum(core_prices_2026) / len(core_prices_2026)) if core_prices_2026 else 91680
+
+# 동적 PIR 계산: PIR = 주택 평균 매매가격 / 연간 가구소득
+suwon_overall_pir = round(avg_price_2026 / annual_household_income_kr, 2)
+suwon_core_pir = round(avg_core_price_2026 / annual_household_income_suwon, 2)
+seoul_metro_pir = 10.16 # KB국민은행 서울 2026년 3월 공식 집계치 기준 (9.3억 / 9,149만원)
+
 financial_indicators = {
     'base_interest_rate': 3.50, # 한국은행 기준금리 (%)
     'average_mortgage_rate': 4.15, # 시중은행 주택담보대출 평균 금리 (%)
     'cpi_index_2021': 102.50, # 2021년 기준점 대비 누적 소비자물가
     'cpi_index_2026': 116.80, # 2026년 누적 소비자물가
+    'annual_household_income': annual_household_income_kr,
+    'annual_household_income_suwon': annual_household_income_suwon,
+    'suwon_avg_price': round(avg_price_2026),
+    'suwon_core_avg_price': round(avg_core_price_2026),
+    'seoul_metro_pir': seoul_metro_pir,
+    'suwon_overall_pir': suwon_overall_pir,
+    'suwon_core_pir': suwon_core_pir
 }
 
 # [Phase 1 & 2] 네이버 호가 갭, 전세가율, 실질 갭, 매수 협상 타겟가(Target Bid Price) 인젝션
