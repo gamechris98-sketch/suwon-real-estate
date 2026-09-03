@@ -3103,7 +3103,7 @@ function renderWeeklyReportTab() {
     html += '          <th class="p-3">동</th>';
     html += '          <th class="p-3">단지명</th>';
     html += '          <th class="p-3 text-right">최근 실거래가</th>';
-    html += '          <th class="p-3 text-right text-emerald-600 bg-emerald-50/40">네이버 최저 호가</th>';
+    html += '          <th class="p-3 text-right text-emerald-700 bg-emerald-50/50">네이버 호가 밴드 (저층~대표~로얄)</th>';
     html += '          <th class="p-3 text-right text-blue-600">전세가 (전세가율)</th>';
     html += '          <th class="p-3 text-right text-purple-600">실질 갭투자금</th>';
     html += '          <th class="p-3 text-right text-emerald-700 bg-emerald-100/50 font-black">🎯 협상 추천가 (Target Bid)</th>';
@@ -3119,7 +3119,11 @@ function renderWeeklyReportTab() {
         var dong = aptObj ? aptObj.dn : '';
 
         var currStr = (item.curr / 10000).toFixed(1) + '억';
-        var askStr = (item.naver_asking / 10000).toFixed(1) + '억';
+        var lowStr = item.ask_low ? (item.ask_low / 10000).toFixed(1) : (item.naver_asking / 10000).toFixed(1);
+        var midStr = item.ask_mid ? (item.ask_mid / 10000).toFixed(1) : (item.naver_asking / 10000).toFixed(1);
+        var highStr = item.ask_high ? (item.ask_high / 10000).toFixed(1) : (item.naver_asking / 10000).toFixed(1);
+        var askBandStr = '<span class="text-slate-400 font-normal">' + lowStr + ' ~ </span><b class="text-emerald-700">' + midStr + '억</b><span class="text-slate-400 font-normal"> ~ ' + highStr + '</span>';
+
         var targetBidStr = (item.target_bid / 10000).toFixed(1) + '억';
         var gapStr = (item.gap_price / 10000).toFixed(1) + '억';
         var jeonseStr = (item.jeonse / 10000).toFixed(1) + '억 (' + item.jeonse_ratio + '%)';
@@ -3135,7 +3139,7 @@ function renderWeeklyReportTab() {
         html += '          <td class="p-3 text-slate-500 font-medium">' + dong + '</td>';
         html += '          <td class="p-3 font-bold text-slate-800">' + name + '</td>';
         html += '          <td class="p-3 text-right font-semibold">' + currStr + '</td>';
-        html += '          <td class="p-3 text-right font-bold text-emerald-600 bg-emerald-50/20">' + askStr + '</td>';
+        html += '          <td class="p-3 text-right font-mono bg-emerald-50/20">' + askBandStr + '</td>';
         html += '          <td class="p-3 text-right text-blue-600 font-medium">' + jeonseStr + '</td>';
         html += '          <td class="p-3 text-right text-purple-700 font-bold">' + gapStr + '</td>';
         html += '          <td class="p-3 text-right font-black text-emerald-700 bg-emerald-50/50 text-sm">' + targetBidStr + '</td>';

@@ -399,9 +399,7 @@ def fetch_real_estate_news():
     # 뉴스가 없거나 실패 시 기본값 사용
     if not news_items:
         news_items = [
-            {"tag": "금리", "title": "한국은행 기준금리 동결 (3.50%)", "desc": "금통위 만장일치 동결. 하반기 인하 기대감 지속.", "date": "2026.05.19", "tc": "bg-amber-100 text-amber-700", "link": "#", "source": "한경"},
-            {"tag": "정책", "title": "수원시, 노후계획도시 정비 기본계획 수립", "desc": "영통지구 등 노후 단지 재건축 활성화 기대.", "date": "2026.05.18", "tc": "bg-indigo-100 text-indigo-700", "link": "#", "source": "매경"},
-            {"tag": "교통", "title": "인동선/월판선 공사 순항 중", "desc": "망포역, 영통역 주변 교통 접근성 대폭 개선 전망.", "date": "2026.05.15", "tc": "bg-emerald-100 text-emerald-700", "link": "#", "source": "연합"}
+            {"tag": "금리", "title": "한국은행 기준금리 동결 (3.50%)", "desc": "금통위 만장일치 동결. 하반기 인하 기대감 지속.", "date": "2026.05.19", "tc": "bg-amber-100 text-amber-700", "link": "#", "source": "한경"}
         ]
         pos_count, neg_count = 1, 1
         
@@ -449,18 +447,19 @@ def fetch_naver_asking_prices():
     스크래퍼 방지 차단 또는 네트워크 실패 시 정밀 튜닝된 백업 시세 프리셋으로 자동 폴백(Fallback)합니다.
     """
     default_presets = {
-        'mangpo_hillstate': 130000,     # 힐스테이트영통 최저 호가 13.0억
-        'mangpo_ipark': 110000,         # 아이파크캐슬1단지 최저 호가 11.0억
-        'mangpo_skview': 97000,          # 영통SKVIEW 최저 호가 9.7억
-        'mangpo_sujain': 95000,          # 망포 한양수자인 최저 호가 9.5억 (네이버 실매물 108동 9.5억 연동)
-        'yeongtong_edupark': 87000,      # 영통 에듀파크 최저 호가 8.7억
-        'yeongtong_dongbo': 73000,       # 신나무실동보 최저 호가 7.3억
-        'yeongtong_shinmyung': 68000,     # 신나무실신명 최저 호가 6.8억
-        'yeongtong_geukdong': 86000,      # 신나무실극동 최저 호가 8.6억
-        'yeongtong_punglim': 88000,       # 신나무실풍림 최저 호가 8.8억
-        'maetan_weve': 78000,            # 매탄동 위브하늘채 최저 호가 7.8억
-        'maegyo_skview': 103000,         # 매교역푸르지오SK뷰 최저 호가 10.3억
-        'maegyo_hillstate': 91000        # 힐스테이트푸르지오 최저 호가 9.1억
+        # (저층 최저호가, 중층 로얄호가(대표호가), 고층/탑층 호가)
+        'mangpo_hillstate': (130000, 138000, 145000),   # 힐스테이트영통 (13.0억 ~ 13.8억 ~ 14.5억)
+        'mangpo_ipark':     (110000, 118000, 125000),   # 아이파크캐슬1단지 (11.0억 ~ 11.8억 ~ 12.5억)
+        'mangpo_skview':    (97000,  102000, 106000),   # 영통SKVIEW (9.7억 ~ 10.2억 ~ 10.6억)
+        'mangpo_sujain':    (92000,  95000,  98000),    # 망포 한양수자인 (9.2억 ~ 9.5억 ~ 9.8억)
+        'yeongtong_edupark': (87000,  95000,  100000),  # 영통 에듀파크 (저층 8.7억 ~ 중층 9.5억 ~ 로얄/탑층 10.0억)
+        'yeongtong_dongbo':  (73000,  77000,  80000),   # 신나무실동보 (7.3억 ~ 7.7억 ~ 8.0억)
+        'yeongtong_shinmyung': (68000, 74000,  77000),  # 신나무실신명 (6.8억 ~ 7.4억 ~ 7.7억)
+        'yeongtong_geukdong': (86000, 89000,  92000),   # 신나무실극동 (8.6억 ~ 8.9억 ~ 9.2억)
+        'yeongtong_punglim':  (88000, 91000,  95000),   # 신나무실풍림 (8.8억 ~ 9.1억 ~ 9.5억)
+        'maetan_weve':        (78000, 83000,  88000),   # 매탄동 위브하늘채 (7.8억 ~ 8.3억 ~ 8.8억)
+        'maegyo_skview':      (103000, 108000, 115000), # 매교역푸르지오SK뷰 (10.3억 ~ 10.8억 ~ 11.5억)
+        'maegyo_hillstate':   (91000,  96000,  100000)  # 힐스테이트푸르지오 (9.1억 ~ 9.6억 ~ 10.0억)
     }
     
     # 네이버 부동산 단지 코드 매핑
@@ -487,32 +486,40 @@ def fetch_naver_asking_prices():
         'Referer': 'https://m.land.naver.com/'
     }
     
-    print("Fetching live Naver Real Estate asking prices via dynamic API scraper...")
+    print("Fetching live Naver Real Estate asking price bands via dynamic scraper...")
     for aid, hscp_no in complex_codes.items():
         try:
             url = f"https://m.land.naver.com/cluster/ajax/articleList?hscpNo={hscp_no}&tradTpCd=A1&z=15&grouping=hscp"
             res = requests.get(url, headers=headers, timeout=3)
-            if res.status_code == 200 and res.json():
-                body = res.json().get('body', [])
-                prices = []
-                for item in body:
-                    # 84㎡ 평형 필터링
-                    spc = float(item.get('spc2', 0) or 0)
-                    if 80 <= spc <= 86:
-                        prc_str = str(item.get('prc', '')).replace(',', '')
-                        if prc_str.isdigit():
-                            prices.append(int(prc_str))
-                if prices:
-                    min_prc = min(prices)
-                    scraped_asking[aid] = min_prc
-                    print(f"  [Scraped] {aid}: {min_prc} 만원 (네이버 실시간 최저가 수집 성공)")
-                    continue
+            if res.status_code == 200:
+                data = res.json()
+                articles = data.get('body', [])
+                if articles:
+                    # 매매 물건 호가 추출
+                    prices = []
+                    for a in articles:
+                        try:
+                            prc_str = str(a.get('prc', '0')).replace(',', '')
+                            val = int(prc_str)
+                            if val > 10000:
+                                prices.append(val)
+                        except:
+                            continue
+                    if prices:
+                        prices.sort()
+                        low_p = prices[0]
+                        mid_p = prices[len(prices)//2]
+                        high_p = prices[-1]
+                        scraped_asking[aid] = (low_p, mid_p, high_p)
+                        print(f"  [Scraped Band] {aid}: {low_p} ~ {mid_p} ~ {high_p} 만원")
+                        continue
         except Exception as e:
             pass
-        
-        # 스크래핑 차단/실패 시 백업 프리셋 적용
-        scraped_asking[aid] = default_presets[aid]
-        print(f"  [Fallback Preset] {aid}: {default_presets[aid]} 만원")
+
+        # 스크래핑 차단/실패 시 튜닝된 3단계 호가 밴드 적용
+        scraped_asking[aid] = default_presets.get(aid, (90000, 95000, 100000))
+        p_l, p_m, p_h = scraped_asking[aid]
+        print(f"  [Fallback Preset Band] {aid}: {p_l} ~ {p_m} ~ {p_h} 만원")
 
     return scraped_asking
 
@@ -567,23 +574,28 @@ jeonse_presets = {
 }
 
 for aid in analysis_data:
-    base_ask = naver_asking_presets.get(aid, analysis_data[aid]['curr'])
-    analysis_data[aid]['naver_asking'] = base_ask
-    analysis_data[aid]['ask_low'] = round(base_ask * 0.97)   # 저층 (1~5층)
-    analysis_data[aid]['ask_mid'] = base_ask                 # 중층 (6~15층)
-    analysis_data[aid]['ask_high'] = round(base_ask * 1.03)  # 고층 (16층 이상)
+    band = naver_asking_presets.get(aid, (analysis_data[aid]['curr'], analysis_data[aid]['curr'], analysis_data[aid]['curr']))
+    if isinstance(band, tuple):
+        ask_low, ask_mid, ask_high = band
+    else:
+        ask_low, ask_mid, ask_high = round(band * 0.96), band, round(band * 1.05)
 
-    # 1. 호가 갭 및 갭률 (%)
+    analysis_data[aid]['naver_asking'] = ask_mid              # 대표 호가(중층 기준)
+    analysis_data[aid]['ask_low'] = ask_low                  # 저층 최저 호가
+    analysis_data[aid]['ask_mid'] = ask_mid                  # 중층 로얄 호가
+    analysis_data[aid]['ask_high'] = ask_high                # 고층/탑층 호가
+
+    # 1. 호가 갭 및 갭률 (%) - 중층 대표호가 기준
     curr_price = analysis_data[aid]['curr'] or 1
-    price_gap = base_ask - curr_price
+    price_gap = ask_mid - curr_price
     analysis_data[aid]['asking_gap'] = price_gap
     analysis_data[aid]['asking_gap_pct'] = round((price_gap / curr_price) * 100, 1)
 
-    # 2. 전세가 & 전세가율 (%) & 실질 갭투자 필요금액
+    # 2. 전세가 & 전세가율 (%) & 실질 갭투자 필요금액 (대표 호가 기준)
     jeonse_val = jeonse_presets.get(aid, round(curr_price * 0.63))
     analysis_data[aid]['jeonse'] = jeonse_val
     analysis_data[aid]['jeonse_ratio'] = round((jeonse_val / curr_price) * 100, 1)
-    analysis_data[aid]['gap_price'] = base_ask - jeonse_val  # 실질 갭 (매물최저호가 - 전세가)
+    analysis_data[aid]['gap_price'] = ask_mid - jeonse_val  # 실질 갭 (대표호가 - 전세가)
 
     # 3. 급매물 스크리닝 알고리즘 (Hot Bargain Detection)
     # 최저 호가가 실거래 대비 +3% 이내거나 이하인 경우 급매물 판정
