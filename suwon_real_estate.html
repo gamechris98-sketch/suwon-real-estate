@@ -45,6 +45,7 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
 <div class="overflow-x-auto whitespace-nowrap no-scrollbar scroll-smooth flex items-center px-4">
 <button onclick="switchTab('dash')" id="t1" class="tb tab-a flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>대시보드</button>
 <button onclick="switchTab('weekly')" id="t13" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all text-indigo-700 font-bold bg-indigo-50/60 rounded-xl my-1 border border-indigo-100/80"><i data-lucide="file-text" class="w-4 h-4 text-indigo-600"></i>주간 브리핑 레포트</button>
+<button onclick="switchTab('areagap')" id="t14" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all text-emerald-700 font-bold bg-emerald-50/60 rounded-xl my-1 border border-emerald-100/80"><i data-lucide="split" class="w-4 h-4 text-emerald-600"></i>평형·동별 갭 분석</button>
 <button onclick="switchTab('news')" id="t11" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="newspaper" class="w-4 h-4"></i>관련 뉴스룸</button>
 <button onclick="switchTab('history')" id="t12" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="history" class="w-4 h-4"></i>업데이트 히스토리</button>
 <button onclick="switchTab('peak')" id="t4" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="trending-up" class="w-4 h-4"></i>전고점 비교</button>
@@ -489,6 +490,10 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
 
 <div id="p13" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
     <div id="weeklyReportContent" class="space-y-6"></div>
+</div>
+
+<div id="p14" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
+    <div id="areaGapContent" class="space-y-6"></div>
 </div>
 
 <div id="p11" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
@@ -1473,6 +1478,7 @@ function switchTab(t){
         'supply': {btn: 't9', page: 'p9', func: renderSupplyAnalysis, title: '공급 분석'},
         'ai': {btn: 't10', page: 'p10', func: initAiTab, title: 'AI 멀티 에이전트', requiresRaw: true},
         'weekly': {btn: 't13', page: 'p13', func: renderWeeklyReportTab, title: '주간 브리핑 레포트'},
+        'areagap': {btn: 't14', page: 'p14', func: renderAreaGapTab, title: '평형·동별 갭 분석'},
         'news': {btn: 't11', page: 'p11', func: renderNewsTab, title: '관련 뉴스룸'},
         'history': {btn: 't12', page: 'p12', func: renderHistoryTab, title: '업데이트 히스토리'}
     };
@@ -3019,26 +3025,55 @@ function renderWeeklyReportTab() {
     html += '</div>';
 
     // Section 1: Weekly Key Takeaways & Expert Analysis
-    html += '<div class="grid grid-cols-1 md:grid-cols-3 gap-6">';
+    html += '<div class="grid grid-cols-1 md:grid-cols-4 gap-6">';
     
+    // Card PIR
+    html += '  <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-3">';
+    html += '    <div class="flex items-center gap-2 text-indigo-600 font-black text-sm"><i data-lucide="bar-chart-2" class="w-4 h-4"></i> 1. 아파트 PIR 진단</div>';
+    html += '    <div class="flex items-baseline gap-1.5"><b class="text-2xl font-black text-slate-800">10.16배</b><span class="text-[10px] text-emerald-600 font-bold">안정권 진입</span></div>';
+    html += '    <p class="text-[11px] text-slate-500 leading-relaxed">2021년 고점(15.0배) 대비 10.16배로 대폭 완화되어 소득 대비 집값 거품이 해소된 실수요 매수 적기 구간입니다.</p>';
+    html += '  </div>';
+
     // Card 1
     html += '  <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-3">';
-    html += '    <div class="flex items-center gap-2 text-indigo-600 font-black text-sm"><i data-lucide="trending-up" class="w-4 h-4"></i> 1. 시세 및 매물 수급 동향</div>';
-    html += '    <p class="text-xs text-slate-600 leading-relaxed">수원 영통·망포·매교·매탄 84㎡ 시세는 매매 보합세 속 전세가 상승에 따라 <b>전세가율(63~76%)</b>이 견고하게 매매가 하방을 지지하고 있습니다. 매물 적체는 다소 안정세로 접어들었으나 고가 호가 매물 소진 속도는 완만합니다.</p>';
+    html += '    <div class="flex items-center gap-2 text-indigo-600 font-black text-sm"><i data-lucide="trending-up" class="w-4 h-4"></i> 2. 시세 및 매물 수급</div>';
+    html += '    <p class="text-xs text-slate-600 leading-relaxed">수원 영통·망포·매교·매탄 84㎡ 시세는 매매 보합세 속 <b>전세가율(63~76%)</b>이 견고하게 하방을 지지 중입니다.</p>';
     html += '  </div>';
     
     // Card 2
     html += '  <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-3">';
-    html += '    <div class="flex items-center gap-2 text-rose-600 font-black text-sm"><i data-lucide="flame" class="w-4 h-4"></i> 2. 주간 포커스 급매물 탐지</div>';
-    html += '    <p class="text-xs text-slate-600 leading-relaxed">네이버 호가 스크리닝 결과, 실거래가 대비 최저 호가가 낮거나 호가 갭률이 급감한 <b>초급매 출현 단지가 ' + urgentList.length + '곳</b> 감지되었습니다. <b>망포 힐스테이트(-8.3%)</b>, <b>아이파크캐슬1단지(-13.8%)</b>가 대표적입니다.</p>';
+    html += '    <div class="flex items-center gap-2 text-rose-600 font-black text-sm"><i data-lucide="flame" class="w-4 h-4"></i> 3. 주간 포커스 급매물</div>';
+    html += '    <p class="text-xs text-slate-600 leading-relaxed">네이버 호가 스크리닝 결과, 실거래가 대비 최저 호가가 낮거나 호가 갭률이 급감한 <b>초급매 출현 단지가 ' + urgentList.length + '곳</b> 감지되었습니다.</p>';
     html += '  </div>';
     
     // Card 3
     html += '  <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-3">';
-    html += '    <div class="flex items-center gap-2 text-emerald-600 font-black text-sm"><i data-lucide="target" class="w-4 h-4"></i> 3. 매수 자금 & 오퍼 가이드</div>';
-    html += '    <p class="text-xs text-slate-600 leading-relaxed">실거주자는 네이버 저층 호가 이하로 <b>🎯 매수 협상 타겟가(Target Bid Price)</b> 기준 약 1,500만~3,000만 원 선의 네고 제안이 유효하며, 갭투자자는 실질 갭 <b>2.6억~3.2억</b> 구간 단지를 주목하시기 바랍니다.</p>';
+    html += '    <div class="flex items-center gap-2 text-emerald-600 font-black text-sm"><i data-lucide="target" class="w-4 h-4"></i> 4. 매수 오퍼 가이드</div>';
+    html += '    <p class="text-xs text-slate-600 leading-relaxed">실거주자는 네이버 저층 호가 이하로 <b>🎯 매수 협상 타겟가</b> 기준 약 1,500만~3,000만 원 선의 네고 제안이 유효합니다.</p>';
     html += '  </div>';
     
+    html += '</div>';
+
+    // [New Section] 이번 주 주목할 평형별 & 같은 동 저평가 갭 메우기 하이라이트
+    html += '<div class="glass rounded-3xl p-6 space-y-4 border border-emerald-100/60 bg-gradient-to-br from-white via-emerald-50/20 to-white shadow-sm">';
+    html += '  <div class="flex justify-between items-center border-b border-emerald-100 pb-3">';
+    html += '    <h3 class="font-black text-slate-800 text-sm flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-emerald-600"></i> 이번 주 주목할 평형별 & 같은 동 갭 메우기(Gap) 포커스</h3>';
+    html += '    <button onclick="switchTab(\'areagap\')" class="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1">전체 보기 <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>';
+    html += '  </div>';
+    html += '  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">';
+    html += '    <div class="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm space-y-2">';
+    html += '      <div class="flex justify-between items-center"><span class="font-black text-slate-800">힐스테이트영통 (25평)</span><span class="px-2 py-0.5 bg-rose-50 text-rose-600 rounded-full font-bold text-[10px]">34평 대비 저평가</span></div>';
+    html += '      <p class="text-slate-500 text-[11px] leading-relaxed">34평(14.4억) 선행 급등으로 25평 평단가 비율이 71%로 축소. 적정가 <b>7.7억 (+0.4억, +5.5%)</b> 상승 여력 발생.</p>';
+    html += '    </div>';
+    html += '    <div class="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm space-y-2">';
+    html += '      <div class="flex justify-between items-center"><span class="font-black text-slate-800">영통에듀파크 (30평)</span><span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full font-bold text-[10px]">동 비교군 -8% 갭</span></div>';
+    html += '      <p class="text-slate-500 text-[11px] leading-relaxed">신나무실극동(8.6억)/풍림(7.9억) 중앙값 8.3억 대비 에듀파크(7.6억)가 <b>-0.7억 저평가</b>되어 갭 메우기 유망.</p>';
+    html += '    </div>';
+    html += '    <div class="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm space-y-2">';
+    html += '      <div class="flex justify-between items-center"><span class="font-black text-slate-800">영통에듀파크 (34평 20층)</span><span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full font-bold text-[10px]">신고가 밴드 리더</span></div>';
+    html += '      <p class="text-slate-500 text-[11px] leading-relaxed">청명마을 랜드마크 학군 수요로 <b>9.8억 최고가</b> 안착 시 영통 구축 라인업의 전반적 상단 견인 기대.</p>';
+    html += '    </div>';
+    html += '  </div>';
     html += '</div>';
 
     // Section 2: Detailed Target Bid & Jeonse Gap Table for all 10 Apt complexes
@@ -3101,6 +3136,159 @@ function renderWeeklyReportTab() {
     html += '</div>';
 
     container.innerHTML = html;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function renderAreaGapTab() {
+    var cont = document.getElementById('areaGapContent');
+    if (!cont) return;
+
+    var areaGaps = typeof INJECTED_AREA_GAP !== 'undefined' ? INJECTED_AREA_GAP : [];
+    var peerGaps = typeof INJECTED_PEER_GAP !== 'undefined' ? INJECTED_PEER_GAP : [];
+
+    var html = '';
+
+    // Header Banner
+    html += '<div class="glass rounded-3xl p-8 bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-900 text-white space-y-4 shadow-2xl relative overflow-hidden">';
+    html += '  <div class="absolute -right-8 -bottom-8 opacity-10"><i data-lucide="split" class="w-64 h-64"></i></div>';
+    html += '  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-700/60 pb-5">';
+    html += '    <div>';
+    html += '      <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded-full text-[10px] font-black tracking-widest uppercase">AREA & PEER GAP MODEL</span>';
+    html += '      <h2 class="text-2xl font-black mt-2 tracking-tight">수원시 평형별 & 같은 동 연간 저평가 갭 메우기 분석</h2>';
+    html += '      <p class="text-xs text-slate-300 opacity-80 mt-1">동일 단지 내 평형 간 평단가 상대비율 추적 및 인근 유사 단지 비교군 중앙값 대비 상승 여력 산출</p>';
+    html += '    </div>';
+    html += '    <div class="text-right shrink-0"><span class="text-[10px] text-slate-400 block font-mono">분석 기준</span><span class="text-xs font-bold text-emerald-400">이전 6개월 vs 최근 1개월</span></div>';
+    html += '  </div>';
+
+    html += '  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-center text-xs">';
+    html += '    <div class="bg-white/5 p-3 rounded-2xl border border-white/10">';
+    html += '      <span class="text-[10px] text-slate-400 block mb-0.5 font-bold uppercase">서울/수도권 PIR</span>';
+    html += '      <b class="text-lg font-black text-white">10.16배 (안정권)</b>';
+    html += '    </div>';
+    html += '    <div class="bg-white/5 p-3 rounded-2xl border border-white/10">';
+    html += '      <span class="text-[10px] text-slate-400 block mb-0.5 font-bold uppercase">단지 내 평형 갭 탐지</span>';
+    html += '      <b class="text-lg font-black text-emerald-400">' + areaGaps.length + '개 핵심 대단지</b>';
+    html += '    </div>';
+    html += '    <div class="bg-white/5 p-3 rounded-2xl border border-white/10">';
+    html += '      <span class="text-[10px] text-slate-400 block mb-0.5 font-bold uppercase">동별 비교군 분석</span>';
+    html += '      <b class="text-lg font-black text-indigo-400">' + peerGaps.length + '개 매칭 그룹</b>';
+    html += '    </div>';
+    html += '  </div>';
+    html += '</div>';
+
+    // Section 1: 동일 단지 내 평형별 갭 분석 (인스타 피드 카드 스타일)
+    html += '<div class="space-y-4">';
+    html += '  <h3 class="text-lg font-black text-slate-800 flex items-center gap-2"><i data-lucide="layers" class="w-5 h-5 text-emerald-600"></i> 동일 단지 내 평형 간 갭 메우기 (Within-Complex Area Gap)</h3>';
+    html += '  <p class="text-xs text-slate-400">국평(34평) 또는 소형(25평)이 먼저 상승할 때 발생하는 평단가 상대비율 왜곡과 수렴 적정가를 도출합니다.</p>';
+    html += '  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">';
+
+    areaGaps.forEach(function(item) {
+        var badgeColor = item.undervalued ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-slate-100 text-slate-600';
+        var badgeText = item.undervalued ? '저평가' : '균형';
+
+        html += '<div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-4 hover:shadow-md transition-all">';
+        html += '  <div class="flex justify-between items-start border-b border-slate-100 pb-3">';
+        html += '    <div>';
+        html += '      <h4 class="font-black text-slate-800 text-base flex items-center gap-2">' + item.name + ' <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-600">' + item.dong + '</span></h4>';
+        html += '      <p class="text-[11px] text-slate-400 mt-0.5">' + item.built + ' · ' + item.total_units + '</p>';
+        html += '    </div>';
+        html += '    <span class="px-3 py-1 rounded-full text-xs font-black ' + badgeColor + '">' + badgeText + '</span>';
+        html += '  </div>';
+
+        // Table Comparison
+        html += '  <div class="overflow-x-auto">';
+        html += '    <table class="w-full text-xs text-center">';
+        html += '      <thead>';
+        html += '        <tr class="text-slate-400 text-[10px] font-bold border-b border-slate-100">';
+        html += '          <th class="pb-2 text-left">평형</th>';
+        html += '          <th colspan="2" class="pb-2 bg-slate-50/80 rounded-t-lg">이전 6개월</th>';
+        html += '          <th colspan="2" class="pb-2 bg-emerald-50/50 rounded-t-lg text-emerald-700">최근 1개월</th>';
+        html += '        </tr>';
+        html += '        <tr class="text-slate-400 text-[9px] border-b border-slate-100">';
+        html += '          <th></th>';
+        html += '          <th class="py-1">평균가</th><th>평단가 비율</th>';
+        html += '          <th class="py-1 text-emerald-700">평균가</th><th class="text-emerald-700">평단가 비율</th>';
+        html += '        </tr>';
+        html += '      </thead>';
+        html += '      <tbody class="divide-y divide-slate-100">';
+        html += '        <tr>';
+        html += '          <td class="py-2.5 text-left font-bold text-slate-700">' + item.small_name + ' <span class="text-rose-500 font-bold text-[10px]">저평가</span></td>';
+        html += '          <td class="py-2.5 font-medium">' + item.small_prev + '억</td><td class="text-slate-500">' + item.small_prev_ratio + '%</td>';
+        html += '          <td class="py-2.5 font-bold text-rose-600 bg-emerald-50/20">' + item.small_recent + '억</td><td class="font-bold text-rose-600 bg-emerald-50/20">' + item.small_recent_ratio + '%</td>';
+        html += '        </tr>';
+        html += '        <tr class="bg-slate-50/40">';
+        html += '          <td class="py-2.5 text-left font-bold text-slate-700">' + item.base_name + '</td>';
+        html += '          <td class="py-2.5 font-medium">' + item.base_prev + '억</td><td class="text-slate-400">기준(100%)</td>';
+        html += '          <td class="py-2.5 font-bold text-slate-800">' + item.base_recent + '억</td><td class="text-slate-400">기준(100%)</td>';
+        html += '        </tr>';
+        html += '      </tbody>';
+        html += '    </table>';
+        html += '  </div>';
+
+        // Upside Box
+        html += '  <div class="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-100 space-y-1.5 text-xs text-emerald-950">';
+        html += '    <div class="flex justify-between items-center">';
+        html += '      <span class="font-bold text-slate-700">' + item.small_name + ' 상승 여력</span>';
+        html += '      <div class="flex items-center gap-1.5">';
+        html += '        <b class="text-base font-black text-rose-600">' + item.upside_won + '</b>';
+        html += '        <span class="text-[11px] text-slate-500 font-medium">(적정가 ' + item.fair_price + ')</span>';
+        html += '        <span class="px-2 py-0.5 bg-rose-500 text-white rounded-md font-black text-[10px]">' + item.upside_pct + '</span>';
+        html += '      </div>';
+        html += '    </div>';
+        html += '    <p class="text-[11px] text-slate-600 leading-relaxed font-medium">' + item.note + '</p>';
+        html += '  </div>';
+
+        html += '</div>';
+    });
+
+    html += '  </div>';
+    html += '</div>';
+
+    // Section 2: 같은 동 내 연간 비교군 저평가 모델 (Peer Group Analysis)
+    html += '<div class="space-y-4 pt-6">';
+    html += '  <h3 class="text-lg font-black text-slate-800 flex items-center gap-2"><i data-lucide="git-compare" class="w-5 h-5 text-indigo-600"></i> 같은 동 내 연간 비교군 저평가 모델 (Peer Group Comparison)</h3>';
+    html += '  <p class="text-xs text-slate-400">인근 유사 입지 단지들의 최고가 중앙값을 기준으로 상대적 저평가 갭 및 상승 리더 여부를 진단합니다.</p>';
+    html += '  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">';
+
+    peerGaps.forEach(function(item) {
+        var statusBadge = item.status === 'undervalued' 
+            ? '<span class="px-2.5 py-0.5 bg-rose-50 text-rose-600 border border-rose-200 rounded-full text-[10px] font-black">비교군 대비 저평가</span>'
+            : '<span class="px-2.5 py-0.5 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-full text-[10px] font-black">신고가 리더</span>';
+
+        html += '<div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-4 hover:shadow-md transition-all flex flex-col justify-between">';
+        html += '  <div>';
+        html += '    <div class="flex justify-between items-start border-b border-slate-100 pb-3">';
+        html += '      <div>';
+        html += '        <h4 class="font-black text-slate-800 text-sm">' + item.target_apt + '</h4>';
+        html += '        <span class="text-[10px] text-slate-400 font-bold block mt-0.5">' + item.target_type + ' · ' + item.dong + '</span>';
+        html += '      </div>';
+        html += '      ' + statusBadge;
+        html += '    </div>';
+
+        html += '    <div class="py-3 space-y-2 text-xs">';
+        html += '      <div class="flex justify-between text-slate-600"><span class="font-bold">25년 최고가 ➡️ 26년 최고가</span><span class="font-black text-slate-800">' + item.target_prev + ' ➡️ ' + item.target_curr + '</span></div>';
+        html += '      <div class="bg-slate-50 p-3 rounded-xl space-y-1.5">';
+        html += '        <span class="text-[10px] text-slate-400 font-bold block uppercase">인근 비교군 단지</span>';
+        item.peers.forEach(function(p) {
+            html += '        <div class="flex justify-between text-[11px] text-slate-600"><span>' + p.name + ' (' + p.type + ')</span><b>' + p.curr + '</b></div>';
+        });
+        html += '        <div class="flex justify-between text-[11px] pt-1 border-t border-slate-200 font-bold text-indigo-700"><span>비교군 중앙값</span><b>' + item.peer_median + '</b></div>';
+        html += '      </div>';
+        html += '    </div>';
+        html += '  </div>';
+
+        html += '  <div class="p-3 bg-indigo-50/60 rounded-xl text-xs space-y-1">';
+        html += '    <div class="flex justify-between items-center"><span class="text-slate-600 font-bold">비교군 격차</span><b class="text-sm font-black ' + (item.status === 'undervalued' ? 'text-rose-600' : 'text-indigo-600') + '">' + item.gap_amount + ' (' + item.gap_pct + ')</b></div>';
+        html += '    <p class="text-[10.5px] text-slate-500 leading-relaxed">' + item.verdict + '</p>';
+        html += '  </div>';
+
+        html += '</div>';
+    });
+
+    html += '  </div>';
+    html += '</div>';
+
+    cont.innerHTML = html;
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
