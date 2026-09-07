@@ -67,23 +67,29 @@ def run_checks():
         
     # Check R2 scores
     rf_r2 = ml_data.get('rf_r2', 0)
+    lgb_r2 = ml_data.get('lgb_r2', 0)
     torch_r2 = ml_data.get('torch_r2', 0)
     print(f"   > RandomForest validation R2 score: {rf_r2}")
+    print(f"   > LightGBM validation R2 score: {lgb_r2}")
     print(f"   > PyTorch MLP validation R2 score: {torch_r2}")
     
-    if rf_r2 < 0.50:
-        print(f"[FAIL] RandomForest R2 score ({rf_r2}) is below acceptable threshold 0.50!")
+    if rf_r2 < 0.50 or lgb_r2 < 0.50:
+        print(f"[FAIL] ML R2 score (RF: {rf_r2}, LGB: {lgb_r2}) is below acceptable threshold 0.50!")
         return False
     print("[PASS] ML/DL Model performance scores are within acceptable boundaries.")
 
-    # Check 4: Check if all 9 apartments exist in predictions
-    print("[Check 4] Checking prediction keys for target apartments")
+    # Check 4: Check if all 12 apartments exist in predictions and AI reports
+    print("[Check 4] Checking prediction keys and AI reports for all 12 target apartments")
     expected_apts = [
         'mangpo_hillstate', 'mangpo_ipark', 'mangpo_skview', 'mangpo_sujain',
         'yeongtong_edupark', 'yeongtong_dongbo', 'yeongtong_shinmyung',
+        'yeongtong_geukdong', 'yeongtong_punglim', 'maetan_weve',
         'maegyo_skview', 'maegyo_hillstate'
     ]
     preds = ml_data.get('predictions', {})
+    ai_reports = ml_data.get('ai_reports', {})
+    liquidity_metrics = ml_data.get('liquidity_metrics', {})
+
     for apt in expected_apts:
         if apt not in preds:
             print(f"[FAIL] Prediction key for '{apt}' is missing in ML predictions!")
@@ -96,8 +102,14 @@ def run_checks():
             if 'fair_price' not in vals or 'forecast_price' not in vals:
                 print(f"[FAIL] Price fields missing in '{apt}' floor '{floor}' prediction!")
                 return False
+        if apt not in ai_reports or 'body' not in ai_reports[apt]:
+            print(f"[FAIL] AI appraisal report missing for '{apt}'!")
+            return False
+        if apt not in liquidity_metrics or 'liquidity_score' not in liquidity_metrics[apt]:
+            print(f"[FAIL] Liquidity metric missing for '{apt}'!")
+            return False
                 
-    print("[PASS] All 9 target apartments have complete low/mid/high price predictions.")
+    print("[PASS] All 12 target apartments have complete low/mid/high price predictions, liquidity indices, and AI reports.")
 
     # Check 5: HTML integrity checks
     html_path = "index.html"
