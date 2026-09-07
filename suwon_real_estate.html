@@ -689,24 +689,24 @@ function renderAll(data, months){
             var displayPrice = cp;
             var formattedPrice = (displayPrice % 1000 === 0) ? (displayPrice/10000).toFixed(1) : (displayPrice/10000).toFixed(2);
             
-// 네이버 부동산 호가 및 갭 배지 정보: 최고 호가와 평균 호가를 계산하여 표시
-var naverAskingHtml = '';
-if (typeof INJECTED_RAW !== 'undefined') {
-    var rawTradesForApt = INJECTED_RAW.filter(function(r) {
-        return r.apt.includes(a.kw) && r.dong === a.dn;
-    });
-    if (rawTradesForApt.length > 0) {
-        var prices = rawTradesForApt.map(function(r) { return r.price; });
-        var maxPrice = Math.max.apply(null, prices);
-        var avgPrice = Math.round(prices.reduce(function(s, v) { return s + v; }, 0) / prices.length);
-        var maxFormatted = (maxPrice % 1000 === 0) ? (maxPrice/10000).toFixed(1) : (maxPrice/10000).toFixed(2);
-        var avgFormatted = (avgPrice % 1000 === 0) ? (avgPrice/10000).toFixed(1) : (avgPrice/10000).toFixed(2);
-        naverAskingHtml = '<div class="flex gap-2 text-[10px] mt-2">' +
-            '<span class="px-2 py-0.5 rounded bg-red-50 text-red-600 font-bold">최고 호가 ' + maxFormatted + '억</span>' +
-            '<span class="px-2 py-0.5 rounded bg-amber-50 text-amber-600 font-bold">평균 호가 ' + avgFormatted + '억</span>' +
-            '</div>';
-    }
-}
+            // 네이버 부동산 3단계 호가 밴드 (저층~대표중층~로얄탑층)
+            var naverAskingHtml = '';
+            if (ad.ask_mid || ad.naver_asking) {
+                var aLow = (ad.ask_low ? ad.ask_low / 10000 : (ad.naver_asking*0.96)/10000).toFixed(1);
+                var aMid = (ad.ask_mid ? ad.ask_mid / 10000 : ad.naver_asking/10000).toFixed(1);
+                var aHigh = (ad.ask_high ? ad.ask_high / 10000 : (ad.naver_asking*1.05)/10000).toFixed(1);
+                naverAskingHtml = '<div class="mt-2.5 p-2 bg-emerald-50/50 border border-emerald-100 rounded-xl space-y-1">' +
+                    '  <div class="flex justify-between items-center text-[9.5px] text-slate-500 font-bold">' +
+                    '    <span class="flex items-center gap-1 text-emerald-700 font-black"><i data-lucide="tag" class="w-3 h-3"></i> 네이버 호가 밴드</span>' +
+                    '    <span class="text-slate-400">저~대표~고층</span>' +
+                    '  </div>' +
+                    '  <div class="flex justify-between items-baseline text-xs font-mono">' +
+                    '    <span class="text-slate-400 text-[10px]">' + aLow + '억 ~ </span>' +
+                    '    <b class="text-emerald-700 text-sm font-black">' + aMid + '억</b>' +
+                    '    <span class="text-slate-400 text-[10px]"> ~ ' + aHigh + '억</span>' +
+                    '  </div>' +
+                    '</div>';
+            }
 
             // 최근 3건 실거래 리스트 HTML 연동
             var tradeListHtml = '';
