@@ -1,6 +1,6 @@
 import urllib.request
 import xml.etree.ElementTree as ET
-import datetime, ssl, os, json
+import datetime, ssl, os, json, re
 import concurrent.futures
 from collections import defaultdict
 
@@ -479,7 +479,6 @@ def fetch_naver_asking_prices():
     }
     
     scraped_asking = {}
-    import requests
     
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
@@ -490,30 +489,31 @@ def fetch_naver_asking_prices():
     for aid, hscp_no in complex_codes.items():
         try:
             url = f"https://m.land.naver.com/cluster/ajax/articleList?hscpNo={hscp_no}&tradTpCd=A1&z=15&grouping=hscp"
-            res = requests.get(url, headers=headers, timeout=3)
-            if res.status_code == 200:
-                data = res.json()
-                articles = data.get('body', [])
-                if articles:
-                    # 매매 물건 호가 추출
-                    prices = []
-                    for a in articles:
-                        try:
-                            prc_str = str(a.get('prc', '0')).replace(',', '')
-                            val = int(prc_str)
-                            if val > 10000:
-                                prices.append(val)
-                        except:
+            req_naver = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req_naver, timeout=3, context=ctx) as res:
+                if res.status == 200:
+                    data = json.loads(res.read().decode('utf-8'))
+                    articles = data.get('body', [])
+                    if articles:
+                        # 매매 물건 호가 추출
+                        prices = []
+                        for a in articles:
+                            try:
+                                prc_str = str(a.get('prc', '0')).replace(',', '')
+                                val = int(prc_str)
+                                if val > 10000:
+                                    prices.append(val)
+                            except:
+                                continue
+                        if prices:
+                            prices.sort()
+                            low_p = prices[0]
+                            mid_p = prices[len(prices)//2]
+                            high_p = prices[-1]
+                            scraped_asking[aid] = (low_p, mid_p, high_p)
+                            print(f"  [Scraped Band] {aid}: {low_p} ~ {mid_p} ~ {high_p} 만원")
                             continue
-                    if prices:
-                        prices.sort()
-                        low_p = prices[0]
-                        mid_p = prices[len(prices)//2]
-                        high_p = prices[-1]
-                        scraped_asking[aid] = (low_p, mid_p, high_p)
-                        print(f"  [Scraped Band] {aid}: {low_p} ~ {mid_p} ~ {high_p} 만원")
-                        continue
-        except Exception as e:
+        except Exception:
             pass
 
         # 스크래핑 차단/실패 시 튜닝된 3단계 호가 밴드 적용
@@ -794,8 +794,20 @@ const INJECTED_RAW = {json.dumps(raw_items, ensure_ascii=False)};
 
 raw_js_path = js_path.replace("real_estate_data.js", "real_estate_raw.js")
 
+# 기존 INJECTED_ML_DATA 보존
+existing_ml_data = ""
+if os.path.exists(js_path):
+    try:
+        with open(js_path, 'r', encoding='utf-8') as f:
+            old_js = f.read()
+            match_ml = re.search(r'(// ======== AUTO_UPDATE_ML_ZONE_START ========.*// ======== AUTO_UPDATE_ML_ZONE_END ========)', old_js, re.DOTALL)
+            if match_ml:
+                existing_ml_data = "\n" + match_ml.group(1)
+    except Exception:
+        pass
+
 with open(js_path, 'w', encoding='utf-8') as f:
-    f.write(injection)
+    f.write(injection + existing_ml_data)
 
 with open(raw_js_path, 'w', encoding='utf-8') as f:
     f.write(raw_injection)
