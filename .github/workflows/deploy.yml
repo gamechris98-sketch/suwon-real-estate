@@ -7,8 +7,20 @@ on:
   schedule:
     - cron: '0 2 * * *'  # Run daily at 02:00 UTC
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -38,8 +50,6 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
         id: deployment
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Notify deployment URL
         run: echo "Site deployed at https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
