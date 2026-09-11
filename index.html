@@ -42,7 +42,27 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
 <div class="hidden sm:flex text-[10px] bg-indigo-500/20 px-3 py-1.5 rounded-full border border-white/10 items-center gap-2 backdrop-blur-sm"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span><span id="updateTime">데이터 연결 중...</span></div>
 </div></div></header>
 <div class="nav-container w-full border-b border-slate-100 bg-white">
-<div class="overflow-x-auto whitespace-nowrap no-scrollbar scroll-smooth flex items-center px-4">
+<div class="md:hidden px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
+    <span class="text-xs font-bold text-slate-500 shrink-0 flex items-center gap-1"><i data-lucide="layers" class="w-3.5 h-3.5 text-indigo-600"></i> 바로가기:</span>
+    <select id="mobileTabSelect" onchange="switchTab(this.value)" class="flex-grow text-xs font-bold bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+        <option value="dash">📊 대시보드</option>
+        <option value="weekly">📑 주간 브리핑 레포트</option>
+        <option value="areagap">⚖️ 평형·동별 갭 분석</option>
+        <option value="news">📰 관련 뉴스룸</option>
+        <option value="history">⏱️ 업데이트 히스토리</option>
+        <option value="peak">📈 전고점 비교</option>
+        <option value="ai">🤖 AI 멀티 에이전트</option>
+        <option value="vol">📉 거래량 분석</option>
+        <option value="calc">🧮 매수 계산기</option>
+        <option value="rank">🏆 종합 점수</option>
+        <option value="timing">⏱️ 매수 타이밍</option>
+        <option value="supply">🏗️ 공급 분석</option>
+        <option value="raw">📋 실거래 데이터</option>
+    </select>
+</div>
+<div class="relative flex items-center">
+<button onclick="scrollNavTabs(-180)" class="hidden sm:flex items-center justify-center w-7 h-7 rounded-full bg-white/90 border border-slate-200 shadow-sm text-slate-500 hover:text-indigo-600 absolute left-1 z-20 hover:bg-slate-50 transition-colors" title="이전 탭"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+<div id="navTabsScroll" class="overflow-x-auto whitespace-nowrap no-scrollbar scroll-smooth flex items-center px-4 w-full">
 <button onclick="switchTab('dash')" id="t1" class="tb tab-a flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>대시보드</button>
 <button onclick="switchTab('weekly')" id="t13" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all text-indigo-700 font-bold bg-indigo-50/60 rounded-xl my-1 border border-indigo-100/80"><i data-lucide="file-text" class="w-4 h-4 text-indigo-600"></i>주간 브리핑 레포트</button>
 <button onclick="switchTab('areagap')" id="t14" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all text-emerald-700 font-bold bg-emerald-50/60 rounded-xl my-1 border border-emerald-100/80"><i data-lucide="split" class="w-4 h-4 text-emerald-600"></i>평형·동별 갭 분석</button>
@@ -56,7 +76,10 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
 <button onclick="switchTab('timing')" id="t7" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="timer" class="w-4 h-4"></i>매수 타이밍</button>
 <button onclick="switchTab('supply')" id="t9" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="bar-chart-3" class="w-4 h-4"></i>공급 분석</button>
 <button onclick="switchTab('raw')" id="t2" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="table" class="w-4 h-4"></i>실거래 데이터</button>
-</div></div></div>
+</div>
+<button onclick="scrollNavTabs(180)" class="hidden sm:flex items-center justify-center w-7 h-7 rounded-full bg-white/90 border border-slate-200 shadow-sm text-slate-500 hover:text-indigo-600 absolute right-1 z-20 hover:bg-slate-50 transition-colors" title="다음 탭"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+</div>
+</div>
 <main id="p1" class="tab-page flex-grow container mx-auto px-4 py-6 max-w-7xl space-y-6">
 <div class="flex flex-col gap-2">
     <p class="text-[10px] text-slate-400 ml-1">💡 단지 카드를 클릭하면 층수별 상세 실거래 내역을 확인할 수 있습니다.</p>
@@ -511,10 +534,14 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
 <div id="mSummary" class="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg"></div>
 <table class="w-full text-sm"><thead class="bg-slate-50 text-slate-500"><tr><th class="px-2 py-2 text-left">거래일</th><th class="px-2 py-2 text-right">금액</th><th class="px-2 py-2 text-right">면적</th><th class="px-2 py-2 text-right">층</th></tr></thead><tbody id="mB" class="divide-y"></tbody></table>
 <div id="mI" class="bg-indigo-50 p-4 rounded-xl text-sm"></div>
-<div id="priceAnalysisModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-[60] flex items-center justify-center p-4">
-<div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
+</div>
+</div>
+</div>
+
+<div id="priceAnalysisModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-[70] flex items-center justify-center p-4">
+<div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
 <div class="p-5 border-b flex justify-between items-center bg-slate-50"><h3 id="paTitle" class="text-lg font-bold text-slate-800">가격 적정성 및 호가 분석</h3><button onclick="closePriceAnalysisModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button></div>
-<div class="p-6 space-y-4 text-sm">
+<div class="p-6 space-y-4 text-sm overflow-y-auto">
     <div class="flex justify-between items-center pb-3 border-b border-slate-100">
         <span class="text-slate-500">최근 실거래가</span>
         <span id="paCurr" class="font-black text-slate-900 text-base"></span>
@@ -583,7 +610,8 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
     </div>
     <div id="paAdvice" class="text-xs text-slate-600 bg-slate-50 p-3.5 rounded-xl leading-relaxed border border-slate-100"></div>
 </div>
-</div></div>
+</div>
+</div>
 <footer class="bg-slate-900 text-slate-400 py-16 mt-20 border-t border-slate-800 w-full overflow-hidden">
     <div class="container">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -989,8 +1017,13 @@ function renderPeakAnalysis(){
     var h=''; var labels=[], ratiosPast=[], ratiosRecent=[], colors=[];
     A.forEach(function(a){
         var d=data[a.id];if(!d)return;
-        var rPast = d.past_peak ? Math.round((d.curr / d.past_peak) * 100) : (d.ratio || 0);
-        var rRecent = d.recent_1y_peak ? Math.round((d.curr / d.recent_1y_peak) * 100) : 100;
+        var pastPeakVal = d.past_peak || d.hist_peak || d.recent_peak || d.curr || 0;
+        var pastPeakDate = d.past_peak_date || d.hist_peak_date || d.recent_peak_date || '-';
+        var rPast = pastPeakVal > 0 ? Math.round((d.curr / pastPeakVal) * 100) : (d.ratio || 0);
+
+        var recentPeakVal = d.recent_1y_peak || d.recent_peak || d.hist_peak || d.curr || 0;
+        var recentPeakDate = d.recent_1y_peak_date || d.recent_peak_date || d.hist_peak_date || '-';
+        var rRecent = recentPeakVal > 0 ? Math.round((d.curr / recentPeakVal) * 100) : 100;
         
         // 가격 적정성 계산
         var allCurr = Object.values(data).map(function(v){ return v.curr; }).filter(Boolean);
@@ -1012,10 +1045,10 @@ function renderPeakAnalysis(){
         h+='<td class="px-3 py-4 text-xs font-medium text-slate-500">'+a.dn+'</td>';
         h+='<td class="px-3 py-4 font-black text-xs text-slate-800 group-hover:text-indigo-600 transition-colors">'+a.nm+'</td>';
         h+='<td class="px-3 py-4 text-right text-xs font-bold">'+((d.curr||0)/10000).toFixed(1)+'억</td>';
-        h+='<td class="px-3 py-4 text-right text-xs font-black text-indigo-600 bg-indigo-50/50">'+((d.past_peak||0)/10000).toFixed(1)+'억</td>';
-        h+='<td class="px-3 py-4 text-[10px] text-slate-400 text-center">'+(d.past_peak_date||'-')+'</td>';
-        h+='<td class="px-3 py-4 text-right text-xs font-black text-violet-600 bg-violet-50/50">'+((d.recent_1y_peak||0)/10000).toFixed(1)+'억</td>';
-        h+='<td class="px-3 py-4 text-[10px] text-slate-400 text-center">'+(d.recent_1y_peak_date||'-')+'</td>';
+        h+='<td class="px-3 py-4 text-right text-xs font-black text-indigo-600 bg-indigo-50/50">'+(pastPeakVal > 0 ? (pastPeakVal/10000).toFixed(1)+'억' : '-')+'</td>';
+        h+='<td class="px-3 py-4 text-[10px] text-slate-400 text-center">'+pastPeakDate+'</td>';
+        h+='<td class="px-3 py-4 text-right text-xs font-black text-violet-600 bg-violet-50/50">'+(recentPeakVal > 0 ? (recentPeakVal/10000).toFixed(1)+'억' : '-')+'</td>';
+        h+='<td class="px-3 py-4 text-[10px] text-slate-400 text-center">'+recentPeakDate+'</td>';
         h+='<td class="px-3 py-4 text-right"><span class="px-2.5 py-1 rounded-full text-[10px] font-black border '+ (rPast>=95?'bg-red-50 text-red-600 border-red-100':rPast>=80?'bg-amber-50 text-amber-600 border-amber-100':'bg-slate-50 text-slate-500 border-slate-200')+'">'+rPast+'%</span></td>';
         h+='<td class="px-3 py-4 text-right"><span class="px-2.5 py-1 rounded-full text-[10px] font-black border '+ (rRecent>=95?'bg-red-50 text-red-600 border-red-100':rRecent>=80?'bg-amber-50 text-amber-600 border-amber-100':'bg-slate-50 text-slate-500 border-slate-200')+'">'+rRecent+'%</span></td>';
         h+='<td class="px-3 py-4 text-right text-xs font-bold text-emerald-600 bg-emerald-50/20">'+(askLow/10000).toFixed(1)+'억 / '+(askMid/10000).toFixed(1)+'억 / '+(askHigh/10000).toFixed(1)+'억</td>';
@@ -1511,6 +1544,18 @@ function switchTab(t){
     
     btn.classList.add('tab-a');
     btn.classList.remove('tab-i');
+
+    // 모바일 드롭다운 셀렉트 동기화
+    var mobileSelect = document.getElementById('mobileTabSelect');
+    if (mobileSelect && mobileSelect.value !== t) {
+        mobileSelect.value = t;
+    }
+
+    // 활성화된 탭 버튼을 가로 스크롤 영역 중앙으로 자동 스크롤
+    try {
+        btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    } catch(e) {}
+
     if(target.func) target.func();
     window.scrollTo({top:0, behavior:'smooth'});
     
@@ -1519,6 +1564,13 @@ function switchTab(t){
     else location.hash = t;
     
     if(typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function scrollNavTabs(offset) {
+    var container = document.getElementById('navTabsScroll');
+    if (container) {
+        container.scrollBy({ left: offset, behavior: 'smooth' });
+    }
 }
 
 // Handle browser back/forward
