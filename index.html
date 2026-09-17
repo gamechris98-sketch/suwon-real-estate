@@ -31,6 +31,29 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
     pointer-events: none; z-index: 10; 
 }
 @media (min-width: 1024px) { .nav-container::after { display: none; } }
+
+/* 모바일 전용 가독성 및 UI 최적화 */
+@media (max-width: 640px) {
+    .container { padding-left: 0.75rem; padding-right: 0.75rem; }
+    .glass { padding: 1rem !important; border-radius: 1.25rem !important; }
+    .tab-page { padding-top: 1rem !important; padding-bottom: 1.5rem !important; }
+    h1 { font-size: 1.125rem !important; }
+    h2 { font-size: 1rem !important; }
+    h3 { font-size: 0.95rem !important; }
+    
+    /* 모바일 테이블 터치 스크롤 힌트 및 폰트 크기 보정 */
+    .overflow-x-auto {
+        -webkit-overflow-scrolling: touch;
+        border-radius: 0.75rem;
+    }
+    table { font-size: 0.75rem !important; min-width: 600px; }
+    table th, table td { padding: 0.5rem 0.5rem !important; }
+    
+    /* 모바일 단지 카드 터치 패딩 최적화 */
+    .group.cursor-pointer {
+        padding: 1.125rem !important;
+    }
+}
 </style>
 <script src="real_estate_data.js"></script>
 </head><body class="text-slate-800 antialiased min-h-screen flex flex-col">
