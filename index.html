@@ -69,6 +69,7 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
     <span class="text-xs font-bold text-slate-500 shrink-0 flex items-center gap-1"><i data-lucide="layers" class="w-3.5 h-3.5 text-indigo-600"></i> 바로가기:</span>
     <select id="mobileTabSelect" onchange="switchTab(this.value)" class="flex-grow text-xs font-bold bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400">
         <option value="dash">📊 대시보드</option>
+        <option value="jump">🚀 상급지 갈아타기(점프)</option>
         <option value="weekly">📑 주간 브리핑 레포트</option>
         <option value="areagap">⚖️ 평형·동별 갭 분석</option>
         <option value="news">📰 관련 뉴스룸</option>
@@ -87,6 +88,7 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
 <button onclick="scrollNavTabs(-180)" class="hidden sm:flex items-center justify-center w-7 h-7 rounded-full bg-white/90 border border-slate-200 shadow-sm text-slate-500 hover:text-indigo-600 absolute left-1 z-20 hover:bg-slate-50 transition-colors" title="이전 탭"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
 <div id="navTabsScroll" class="overflow-x-auto whitespace-nowrap no-scrollbar scroll-smooth flex items-center px-4 w-full">
 <button onclick="switchTab('dash')" id="t1" class="tb tab-a flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>대시보드</button>
+<button onclick="switchTab('jump')" id="t15" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all text-violet-700 font-bold bg-violet-50/70 rounded-xl my-1 border border-violet-200/80 shadow-xs"><i data-lucide="arrow-up-right-square" class="w-4 h-4 text-violet-600"></i>상급지 갈아타기(점프)</button>
 <button onclick="switchTab('weekly')" id="t13" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all text-indigo-700 font-bold bg-indigo-50/60 rounded-xl my-1 border border-indigo-100/80"><i data-lucide="file-text" class="w-4 h-4 text-indigo-600"></i>주간 브리핑 레포트</button>
 <button onclick="switchTab('areagap')" id="t14" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all text-emerald-700 font-bold bg-emerald-50/60 rounded-xl my-1 border border-emerald-100/80"><i data-lucide="split" class="w-4 h-4 text-emerald-600"></i>평형·동별 갭 분석</button>
 <button onclick="switchTab('news')" id="t11" class="tb tab-i flex items-center gap-2 py-4 px-4 text-sm transition-all"><i data-lucide="newspaper" class="w-4 h-4"></i>관련 뉴스룸</button>
@@ -532,6 +534,8 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
             </div>
         </div>
     </div>
+<div id="p15" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
+    <div id="jumpContent" class="space-y-6"></div>
 </div>
 
 <div id="p13" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
@@ -1527,6 +1531,7 @@ function initKakaoMapGIS() {
 function switchTab(t){
     const tabs = {
         'dash': {btn: 't1', page: 'p1', func: initKakaoMapGIS, title: '대시보드'},
+        'jump': {btn: 't15', page: 'p15', func: renderJumpTab, title: '상급지 갈아타기(점프)'},
         'raw':  {btn: 't2', page: 'p2', title: '실거래 데이터', requiresRaw: true},
         'vol':  {btn: 't3', page: 'p3', func: renderVolAnalysis, title: '거래량 분석', requiresRaw: true},
         'peak': {btn: 't4', page: 'p4', func: renderPeakAnalysis, title: '전고점 비교'},
@@ -1601,6 +1606,441 @@ window.onpopstate = function() {
     var h = location.hash.replace('#','') || 'dash';
     switchTab(h);
 };
+
+// ==========================================
+// [신규 기능] 상급지 갈아타기(점프) 시뮬레이터 & 갭 추적 엔진
+// ==========================================
+var jumpChartInstance = null;
+
+function renderJumpTab() {
+    var cont = document.getElementById('jumpContent');
+    if (!cont) return;
+
+    var aptList = A || [];
+    var myDefault = 'yeongtong_edupark';
+    var targetDefault = 'mangpo_hillstate';
+
+    var html = '';
+
+    // Header Banner
+    html += '<div class="glass rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-violet-900 via-indigo-950 to-slate-900 text-white space-y-4 shadow-2xl relative overflow-hidden">';
+    html += '  <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none"><i data-lucide="arrow-up-right-square" class="w-72 h-72"></i></div>';
+    html += '  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-5">';
+    html += '    <div>';
+    html += '      <div class="flex items-center gap-2">';
+    html += '        <span class="px-3 py-1 bg-violet-500/30 text-violet-200 border border-violet-400/40 rounded-full text-[10px] font-black tracking-widest uppercase">UPGRADE & JUMP STRATEGY</span>';
+    html += '        <span class="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded-full text-[10px] font-bold">10개년 실거래 갭 추적</span>';
+    html += '      </div>';
+    html += '      <h2 class="text-xl sm:text-2xl font-black mt-2 tracking-tight">수원 아파트 상급지 갈아타기(점프) 시뮬레이터</h2>';
+    html += '      <p class="text-xs text-slate-300 opacity-80 mt-1">내 보유 아파트와 목표 단지 간의 실시간 갭을 역대 평균과 대조하여 최적의 매도 및 점프 타이밍과 필요 순현금을 진단합니다.</p>';
+    html += '    </div>';
+    html += '    <div class="text-right shrink-0 bg-white/10 backdrop-blur px-4 py-2 rounded-2xl border border-white/10">';
+    html += '      <span class="text-[10px] text-violet-200 block font-bold">핵심 갈아타기 전략</span>';
+    html += '      <span class="text-xs font-black text-amber-300">갭 축소 시 점프 ➔ 갭 확대 시 내집 매도</span>';
+    html += '    </div>';
+    html += '  </div>';
+    html += '</div>';
+
+    // Main Control Panel: Selection + Simulator
+    html += '<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">';
+    
+    // Left: Selection & Financial Inputs (5 cols)
+    html += '  <div class="lg:col-span-5 glass rounded-3xl p-6 space-y-5 border border-slate-100 shadow-sm">';
+    html += '    <div class="flex items-center justify-between border-b border-slate-100 pb-3">';
+    html += '      <h3 class="font-black text-slate-800 text-sm flex items-center gap-2"><i data-lucide="sliders" class="w-4 h-4 text-violet-600"></i> 단지 선택 및 자금 조건 설정</h3>';
+    html += '      <span class="text-[10px] font-bold text-slate-400">84㎡ 국민평수 기준</span>';
+    html += '    </div>';
+
+    // My Apt Select
+    html += '    <div class="space-y-1.5">';
+    html += '      <label class="text-xs font-black text-slate-700 flex items-center gap-1.5">';
+    html += '        <span class="w-2 h-2 rounded-full bg-blue-500"></span> 1. 내 보유 단지 (매도 대상)';
+    html += '      </label>';
+    html += '      <select id="jumpMyApt" onchange="calcJumpSimulator()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-400">';
+    aptList.forEach(function(a) {
+        var sel = a.id === myDefault ? 'selected' : '';
+        html += '<option value="' + a.id + '" ' + sel + '>' + a.nm + ' (' + a.dn + ')</option>';
+    });
+    html += '      </select>';
+    html += '    </div>';
+
+    // Target Apt Select
+    html += '    <div class="space-y-1.5">';
+    html += '      <label class="text-xs font-black text-slate-700 flex items-center gap-1.5">';
+    html += '        <span class="w-2 h-2 rounded-full bg-violet-600"></span> 2. 갈아탈 목표 단지 (매수 대상)';
+    html += '      </label>';
+    html += '      <select id="jumpTargetApt" onchange="calcJumpSimulator()" class="w-full bg-violet-50/50 border border-violet-200 rounded-xl p-3 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-400">';
+    aptList.forEach(function(a) {
+        var sel = a.id === targetDefault ? 'selected' : '';
+        html += '<option value="' + a.id + '" ' + sel + '>' + a.nm + ' (' + a.dn + ')</option>';
+    });
+    html += '      </select>';
+    html += '    </div>';
+
+    // Financial Inputs Accordion / Form
+    html += '    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-3.5">';
+    html += '      <div class="text-[11px] font-black text-slate-600 uppercase tracking-wide flex items-center justify-between">';
+    html += '        <span>💰 보유 자금 및 대출 조건</span>';
+    html += '        <span class="text-[10px] font-normal text-slate-400">직접 수정 가능</span>';
+    html += '      </div>';
+    
+    html += '      <div class="grid grid-cols-2 gap-3 text-xs">';
+    html += '        <div>';
+    html += '          <label class="text-[10px] text-slate-500 font-bold block mb-1">기존 주담대 잔액</label>';
+    html += '          <div class="relative">';
+    html += '            <input type="number" id="jumpExistingLoan" value="20000" step="1000" oninput="calcJumpSimulator()" class="w-full bg-white border border-slate-200 rounded-lg py-2 px-2.5 text-xs font-bold text-slate-800 pr-8 focus:outline-none focus:ring-2 focus:ring-violet-400">';
+    html += '            <span class="absolute right-2 top-2 text-[10px] font-bold text-slate-400">만원</span>';
+    html += '          </div>';
+    html += '        </div>';
+
+    html += '        <div>';
+    html += '          <label class="text-[10px] text-slate-500 font-bold block mb-1">순 보유 현금(예적금)</label>';
+    html += '          <div class="relative">';
+    html += '            <input type="number" id="jumpCashHolding" value="10000" step="1000" oninput="calcJumpSimulator()" class="w-full bg-white border border-slate-200 rounded-lg py-2 px-2.5 text-xs font-bold text-slate-800 pr-8 focus:outline-none focus:ring-2 focus:ring-violet-400">';
+    html += '            <span class="absolute right-2 top-2 text-[10px] font-bold text-slate-400">만원</span>';
+    html += '          </div>';
+    html += '        </div>';
+
+    html += '        <div>';
+    html += '          <label class="text-[10px] text-slate-500 font-bold block mb-1">목표 신규 대출 (LTV 70% 한도)</label>';
+    html += '          <div class="relative">';
+    html += '            <input type="number" id="jumpNewLoan" value="40000" step="1000" oninput="calcJumpSimulator()" class="w-full bg-white border border-slate-200 rounded-lg py-2 px-2.5 text-xs font-bold text-slate-800 pr-8 focus:outline-none focus:ring-2 focus:ring-violet-400">';
+    html += '            <span class="absolute right-2 top-2 text-[10px] font-bold text-slate-400">만원</span>';
+    html += '          </div>';
+    html += '        </div>';
+
+    html += '        <div>';
+    html += '          <label class="text-[10px] text-slate-500 font-bold block mb-1">양도소득세 비과세 여부</label>';
+    html += '          <select id="jumpTaxExempt" onchange="calcJumpSimulator()" class="w-full bg-white border border-slate-200 rounded-lg py-2 px-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-400">';
+    html += '            <option value="yes" selected>1주택 비과세 (12억 이하)</option>';
+    html += '            <option value="no">일반 과세 (양도차익 30% 가정)</option>';
+    html += '          </select>';
+    html += '        </div>';
+    html += '      </div>';
+    html += '    </div>';
+
+    html += '    <button onclick="calcJumpSimulator()" class="w-full py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white rounded-2xl font-black text-xs transition-all shadow-md flex items-center justify-center gap-1.5">';
+    html += '      <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> 시뮬레이션 결과 새로고침';
+    html += '    </button>';
+    html += '  </div>';
+
+    // Right: Jump Diagnostics, Gap Metrics & Net Cash (7 cols)
+    html += '  <div class="lg:col-span-7 space-y-5" id="jumpResultsContainer">';
+    html += '  </div>';
+
+    html += '</div>';
+
+    // Historical Gap Chart Section
+    html += '<div class="glass rounded-3xl p-6 sm:p-8 space-y-4 border border-slate-100 shadow-sm">';
+    html += '  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">';
+    html += '    <div>';
+    html += '      <h3 class="font-black text-slate-800 text-base flex items-center gap-2"><i data-lucide="line-chart" class="w-5 h-5 text-violet-600"></i> 두 단지 간 역사적 시세 갭(Spread) 추이 그래프</h3>';
+    html += '      <p class="text-xs text-slate-400">월별 가격 격차가 좁혀질 때가 상급지 갈아타기의 최적 골든타임입니다.</p>';
+    html += '    </div>';
+    html += '    <div class="flex items-center gap-3 text-xs font-bold">';
+    html += '      <span class="flex items-center gap-1 text-violet-700"><span class="w-2.5 h-2.5 rounded-full bg-violet-600"></span> 갭(차이)</span>';
+    html += '      <span class="flex items-center gap-1 text-slate-400"><span class="w-2.5 h-0.5 bg-slate-400"></span> 평균 갭 기준선</span>';
+    html += '    </div>';
+    html += '  </div>';
+    html += '  <div class="relative h-[280px] w-full">';
+    html += '    <canvas id="jumpGapChart"></canvas>';
+    html += '  </div>';
+    html += '</div>';
+
+    cont.innerHTML = html;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    // Run initial calculation
+    calcJumpSimulator();
+}
+
+function calcJumpSimulator() {
+    var myAptId = document.getElementById('jumpMyApt') ? document.getElementById('jumpMyApt').value : 'yeongtong_edupark';
+    var targetAptId = document.getElementById('jumpTargetApt') ? document.getElementById('jumpTargetApt').value : 'mangpo_hillstate';
+    var resCont = document.getElementById('jumpResultsContainer');
+    if (!resCont) return;
+
+    var data = INJECTED_ANALYSIS_DATA || {};
+    var myData = data[myAptId] || {};
+    var targetData = data[targetAptId] || {};
+
+    var myAptObj = (A || []).find(x => x.id === myAptId) || { nm: myAptId, dn: '' };
+    var targetAptObj = (A || []).find(x => x.id === targetAptId) || { nm: targetAptId, dn: '' };
+
+    var myPrice = myData.curr || 80000;
+    var targetPrice = targetData.curr || 100000;
+    var myAsk = myData.naver_asking || myPrice;
+    var targetAsk = targetData.naver_asking || targetPrice;
+
+    // Financial Inputs
+    var existingLoan = Number(document.getElementById('jumpExistingLoan') ? document.getElementById('jumpExistingLoan').value : 20000) || 0;
+    var cashHolding = Number(document.getElementById('jumpCashHolding') ? document.getElementById('jumpCashHolding').value : 10000) || 0;
+    var newLoan = Number(document.getElementById('jumpNewLoan') ? document.getElementById('jumpNewLoan').value : 40000) || 0;
+    var taxExempt = document.getElementById('jumpTaxExempt') ? document.getElementById('jumpTaxExempt').value : 'yes';
+
+    // 1. Transaction Costs
+    // 내 집 매도 시 중개보수: 0.4% (9억 이상은 0.5%)
+    var sellFeeRate = myPrice >= 90000 ? 0.005 : 0.004;
+    var sellBrokerFee = Math.round(myPrice * sellFeeRate);
+    
+    // 매수 시 취득세: 6억 이하 1%, 6~9억 1.33~2.67%, 9억 초과 3% + 지방교육세
+    var buyTaxRate = 0.033;
+    if (targetPrice <= 60000) buyTaxRate = 0.011;
+    else if (targetPrice <= 90000) buyTaxRate = 0.024;
+    else buyTaxRate = 0.033;
+    var buyAcquisitionTax = Math.round(targetPrice * buyTaxRate);
+
+    // 매수 시 중개보수
+    var buyFeeRate = targetPrice >= 90000 ? 0.005 : 0.004;
+    var buyBrokerFee = Math.round(targetPrice * buyFeeRate);
+
+    // 가용 자금 계산 (Net Available Equity)
+    // 내 집 매도 금액 - 기존 대출 상환 - 매도 복비
+    var netSellEquity = myPrice - existingLoan - sellBrokerFee;
+    
+    // 총 필요 매수 자금: 목표 집값 + 취득세 + 매수 복비
+    var totalBuyNeeded = targetPrice + buyAcquisitionTax + buyBrokerFee;
+
+    // 총 가용 조달 자금: 매도 순현금 + 보유 현금 + 신규 주담대
+    var totalFunding = netSellEquity + cashHolding + newLoan;
+
+    // 최종 추가 필요 현금 (또는 여유 자금)
+    var finalBalance = totalFunding - totalBuyNeeded;
+    var needMoreCash = finalBalance < 0 ? Math.abs(finalBalance) : 0;
+    var surplusCash = finalBalance >= 0 ? finalBalance : 0;
+
+    // 2. 10개년 실거래 갭 시계열 분석
+    var gapHistory = [];
+    var months = INJECTED_MONTHS || [];
+    var mySeries = (INJECTED_DATA && INJECTED_DATA[myAptId]) ? INJECTED_DATA[myAptId] : [];
+    var targetSeries = (INJECTED_DATA && INJECTED_DATA[targetAptId]) ? INJECTED_DATA[targetAptId] : [];
+
+    var validGaps = [];
+    for (var i = 0; i < months.length; i++) {
+        var mVal = mySeries[i];
+        var tVal = targetSeries[i];
+        if (mVal !== null && tVal !== null && typeof mVal !== 'undefined' && typeof tVal !== 'undefined') {
+            var diff = tVal - mVal;
+            gapHistory.push({ month: months[i], gap: diff, myP: mVal, targetP: tVal });
+            validGaps.push(diff);
+        }
+    }
+
+    var currentGap = targetPrice - myPrice;
+    var avgGap = validGaps.length > 0 ? Math.round(validGaps.reduce((a, b) => a + b, 0) / validGaps.length) : currentGap;
+    var maxGap = validGaps.length > 0 ? Math.max.apply(null, validGaps) : currentGap;
+    var minGap = validGaps.length > 0 ? Math.min.apply(null, validGaps) : currentGap;
+
+    // 갭 메트릭 및 판정
+    var gapDiff = currentGap - avgGap; // 현재 갭이 평균보다 얼마나 크거나 작은가?
+    var gapDiffPct = avgGap !== 0 ? Math.round((gapDiff / Math.abs(avgGap)) * 100) : 0;
+
+    var jumpVerdict = '';
+    var jumpBadgeClass = '';
+    var jumpIcon = '';
+    var jumpDesc = '';
+
+    if (myAptId === targetAptId) {
+        jumpVerdict = '동일 단지 선택';
+        jumpBadgeClass = 'bg-slate-100 text-slate-600 border-slate-200';
+        jumpIcon = 'info';
+        jumpDesc = '내 보유 아파트와 갈아탈 목표 아파트를 서로 다르게 선택해 주세요.';
+    } else if (currentGap < 0) {
+        jumpVerdict = '하급지(다운사이징) 이동';
+        jumpBadgeClass = 'bg-blue-50 text-blue-700 border-blue-200';
+        jumpIcon = 'arrow-down-right';
+        jumpDesc = '목표 단지 가격이 현재 단지보다 낮아 순현금 ' + ((Math.abs(currentGap))/10000).toFixed(1) + '억 원이 회수되는 현금 확보형 다운사이징 포지션입니다.';
+    } else if (gapDiff <= -2000) {
+        jumpVerdict = '🚀 역대급 상급지 점프 찬스 (강력 추천)';
+        jumpBadgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-300 animate-pulse';
+        jumpIcon = 'sparkles';
+        jumpDesc = '현재 두 단지 간 가격 격차(' + (currentGap/10000).toFixed(1) + '억)가 10개년 평균 갭(' + (avgGap/10000).toFixed(1) + '억) 대비 <b>' + (Math.abs(gapDiff)/10000).toFixed(1) + '억 원이나 축소</b>되었습니다! 내 집이 상대적으로 고평가되었거나 상급지가 덜 오른 상태이므로 <b>적은 추가금으로 상급지로 갈아타기 최적의 골든타임</b>입니다.';
+    } else if (gapDiff < 1500) {
+        jumpVerdict = '⚖️ 보통 / 균형 상태 (조건부 갈아타기)';
+        jumpBadgeClass = 'bg-indigo-50 text-indigo-700 border-indigo-200';
+        jumpIcon = 'check-circle';
+        jumpDesc = '현재 갭(' + (currentGap/10000).toFixed(1) + '억)이 역사적 평균(' + (avgGap/10000).toFixed(1) + '억) 수준에 근접해 있습니다. 목표 단지의 급매물이 나오거나 내 집을 시세보다 1~2천만 원 높게 매도할 수 있다면 추진할 만한 평이한 구간입니다.';
+    } else {
+        jumpVerdict = '⚠️ 점프 보류 / 내 집 키맞추기 대기 권장';
+        jumpBadgeClass = 'bg-rose-50 text-rose-700 border-rose-200';
+        jumpIcon = 'alert-triangle';
+        jumpDesc = '상급지가 먼저 급등하여 현재 갭(' + (currentGap/10000).toFixed(1) + '억)이 역사적 평균(' + (avgGap/10000).toFixed(1) + '억)보다 <b>' + (gapDiff/10000).toFixed(1) + '억 원 더 벌어져</b> 있습니다. 지금 점프하면 상투를 잡을 위험이 크므로, <b>내 집이 후행 상승하며 키를 맞출 때까지 매도를 기다렸다가 갭이 줄어들 때 갈아타는 것</b>이 현명합니다.';
+    }
+
+    // Render Right Panel
+    var rHtml = '';
+
+    // 1. Verdict Banner
+    rHtml += '<div class="glass rounded-3xl p-6 border border-slate-100 shadow-sm space-y-4">';
+    rHtml += '  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">';
+    rHtml += '    <div>';
+    rHtml += '      <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Jump Timing Analysis</span>';
+    rHtml += '      <h3 class="text-base font-black text-slate-800 flex items-center gap-2 mt-0.5">';
+    rHtml += '        <span>' + myAptObj.nm + '</span>';
+    rHtml += '        <i data-lucide="arrow-right" class="w-4 h-4 text-violet-500"></i>';
+    rHtml += '        <span class="text-violet-700 font-extrabold">' + targetAptObj.nm + '</span>';
+    rHtml += '      </h3>';
+    rHtml += '    </div>';
+    rHtml += '    <span class="px-3.5 py-1.5 rounded-full text-xs font-black border ' + jumpBadgeClass + ' flex items-center gap-1.5 self-start sm:self-auto">';
+    rHtml += '      <i data-lucide="' + jumpIcon + '" class="w-4 h-4"></i>' + jumpVerdict;
+    rHtml += '    </span>';
+    rHtml += '  </div>';
+
+    // Gap Metric 3-Boxes
+    rHtml += '  <div class="grid grid-cols-3 gap-3 text-center">';
+    rHtml += '    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">';
+    rHtml += '      <span class="text-[10px] text-slate-400 font-bold block mb-1">현재 시세 갭</span>';
+    rHtml += '      <b class="text-base sm:text-lg font-black text-slate-800">' + (currentGap >= 0 ? '+' : '') + (currentGap / 10000).toFixed(2) + '억</b>';
+    rHtml += '      <span class="text-[9px] text-slate-400 block mt-0.5">실거래가 차이</span>';
+    rHtml += '    </div>';
+
+    rHtml += '    <div class="p-3 bg-violet-50/60 rounded-2xl border border-violet-100">';
+    rHtml += '      <span class="text-[10px] text-violet-500 font-bold block mb-1">10개년 평균 갭</span>';
+    rHtml += '      <b class="text-base sm:text-lg font-black text-violet-700">' + (avgGap / 10000).toFixed(2) + '억</b>';
+    rHtml += '      <span class="text-[9px] text-violet-400 block mt-0.5">역사적 정상 격차</span>';
+    rHtml += '    </div>';
+
+    var diffColor = gapDiff <= -1500 ? 'text-emerald-600' : (gapDiff > 1500 ? 'text-rose-600' : 'text-slate-700');
+    rHtml += '    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">';
+    rHtml += '      <span class="text-[10px] text-slate-400 font-bold block mb-1">평균 대비 괴리</span>';
+    rHtml += '      <b class="text-base sm:text-lg font-black ' + diffColor + '">' + (gapDiff > 0 ? '+' : '') + (gapDiff / 10000).toFixed(2) + '억</b>';
+    rHtml += '      <span class="text-[9px] text-slate-400 block mt-0.5">' + (gapDiff <= 0 ? '축소 (유리)' : '확대 (불리)') + '</span>';
+    rHtml += '    </div>';
+    rHtml += '  </div>';
+
+    // Detailed Strategy Guidance
+    rHtml += '  <p class="text-xs text-slate-600 leading-relaxed font-medium bg-white p-4 rounded-2xl border border-slate-100">' + jumpDesc + '</p>';
+    rHtml += '</div>';
+
+    // 2. Financial Balance Calculator Card
+    rHtml += '<div class="glass rounded-3xl p-6 border border-slate-100 shadow-sm space-y-4">';
+    rHtml += '  <div class="flex items-center justify-between border-b border-slate-100 pb-3">';
+    rHtml += '    <h3 class="font-black text-slate-800 text-sm flex items-center gap-2"><i data-lucide="calculator" class="w-4 h-4 text-emerald-600"></i> 갈아타기 필요 순현금 정밀 계산 (Net Cash Balance)</h3>';
+    rHtml += '    <span class="text-[10px] font-bold text-slate-400">취득세·중개료 100% 반영</span>';
+    rHtml += '  </div>';
+
+    rHtml += '  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">';
+    // Step A: Sell & Available
+    rHtml += '    <div class="p-4 rounded-2xl bg-blue-50/40 border border-blue-100/70 space-y-2">';
+    rHtml += '      <span class="text-[10px] font-black text-blue-700 uppercase tracking-wide block">A. 내 집 매도 후 손에 쥐는 돈</span>';
+    rHtml += '      <div class="flex justify-between text-slate-600"><span>예상 매도가</span><b class="text-slate-800">' + (myPrice/10000).toFixed(2) + '억</b></div>';
+    rHtml += '      <div class="flex justify-between text-slate-500 text-[11px]"><span>- 기존 대출 상환</span><span class="text-rose-600">-' + (existingLoan/10000).toFixed(1) + '억</span></div>';
+    rHtml += '      <div class="flex justify-between text-slate-500 text-[11px]"><span>- 매도 중개보수</span><span class="text-rose-600">-' + (sellBrokerFee/10000).toFixed(2) + '억 (' + sellBrokerFee + '만)</span></div>';
+    rHtml += '      <div class="pt-2 border-t border-blue-200/60 flex justify-between font-black text-blue-900 text-sm"><span>매도 순 가용 자금</span><span>' + (netSellEquity/10000).toFixed(2) + '억</span></div>';
+    rHtml += '    </div>';
+
+    // Step B: Buy & Total Needed
+    rHtml += '    <div class="p-4 rounded-2xl bg-purple-50/40 border border-purple-100/70 space-y-2">';
+    rHtml += '      <span class="text-[10px] font-black text-purple-700 uppercase tracking-wide block">B. 목표 아파트 매수에 드는 총비용</span>';
+    rHtml += '      <div class="flex justify-between text-slate-600"><span>목표 매수가</span><b class="text-slate-800">' + (targetPrice/10000).toFixed(2) + '억</b></div>';
+    rHtml += '      <div class="flex justify-between text-slate-500 text-[11px]"><span>+ 취득세 등 제세공과</span><span class="text-slate-700">+' + (buyAcquisitionTax/10000).toFixed(2) + '억 (' + buyAcquisitionTax + '만)</span></div>';
+    rHtml += '      <div class="flex justify-between text-slate-500 text-[11px]"><span>+ 매수 중개보수</span><span class="text-slate-700">+' + (buyBrokerFee/10000).toFixed(2) + '억 (' + buyBrokerFee + '만)</span></div>';
+    rHtml += '      <div class="pt-2 border-t border-purple-200/60 flex justify-between font-black text-purple-900 text-sm"><span>총 매수 필요액</span><span>' + (totalBuyNeeded/10000).toFixed(2) + '억</span></div>';
+    rHtml += '    </div>';
+    rHtml += '  </div>';
+
+    // Final Outcome Banner
+    var finalResultBg = needMoreCash > 0 ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-emerald-50 border-emerald-200 text-emerald-900';
+    rHtml += '  <div class="p-5 rounded-2xl border ' + finalResultBg + ' flex flex-col sm:flex-row sm:items-center justify-between gap-3">';
+    rHtml += '    <div>';
+    rHtml += '      <span class="text-[10px] font-black uppercase tracking-wider opacity-70 block">조달 계획 (매도자금 ' + (netSellEquity/10000).toFixed(1) + '억 + 보유현금 ' + (cashHolding/10000).toFixed(1) + '억 + 신규대출 ' + (newLoan/10000).toFixed(1) + '억 = 총 ' + (totalFunding/10000).toFixed(1) + '억)</span>';
+    if (needMoreCash > 0) {
+        rHtml += '      <div class="text-sm font-bold mt-0.5">⚠️ 추가 준비 필요 현금: <span class="text-xl sm:text-2xl font-black text-rose-600 ml-1">' + (needMoreCash/10000).toFixed(2) + '억 원</span></div>';
+        rHtml += '      <p class="text-[11px] opacity-80 mt-1 font-medium">현재 계획된 신규 대출(' + (newLoan/10000).toFixed(1) + '억) 외에 약 <b>' + needMoreCash + '만 원</b>의 추가 현금이나 신용대출 또는 네고가 필요합니다.</p>';
+    } else {
+        rHtml += '      <div class="text-sm font-bold mt-0.5">✅ 갈아타기 즉시 가능! (잉여 현금: <span class="text-xl sm:text-2xl font-black text-emerald-700 ml-1">' + (surplusCash/10000).toFixed(2) + '억 원</span>)</div>';
+        rHtml += '      <p class="text-[11px] opacity-80 mt-1 font-medium">현재 자금 및 신규 대출만으로 목표 단지 취득세와 복비를 모두 완납하고도 약 <b>' + surplusCash + '만 원</b>의 비상금이 남습니다.</p>';
+    }
+    rHtml += '    </div>';
+    rHtml += '  </div>';
+
+    rHtml += '</div>';
+
+    resCont.innerHTML = rHtml;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    // 3. Render / Update Chart
+    renderJumpChart(gapHistory, avgGap, myAptObj.nm, targetAptObj.nm);
+}
+
+function renderJumpChart(gapHistory, avgGap, myName, targetName) {
+    var canvas = document.getElementById('jumpGapChart');
+    if (!canvas) return;
+
+    if (jumpChartInstance) {
+        jumpChartInstance.destroy();
+        jumpChartInstance = null;
+    }
+
+    var labels = gapHistory.map(function(d) {
+        return d.month.substring(2, 4) + '.' + d.month.substring(4, 6);
+    });
+    var gapValues = gapHistory.map(function(d) { return Math.round(d.gap); });
+    var avgValues = gapHistory.map(function() { return avgGap; });
+
+    var ctx = canvas.getContext('2d');
+    jumpChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '시세 갭 (' + targetName + ' - ' + myName + ')',
+                    data: gapValues,
+                    borderColor: '#7c3aed',
+                    backgroundColor: 'rgba(124, 58, 237, 0.08)',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.25,
+                    pointRadius: function(context) {
+                        return context.dataIndex === gapValues.length - 1 ? 5 : 0;
+                    },
+                    pointBackgroundColor: '#7c3aed'
+                },
+                {
+                    label: '역사적 평균 갭 (' + Math.round(avgGap) + '만 원)',
+                    data: avgValues,
+                    borderColor: '#94a3b8',
+                    borderWidth: 1.5,
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(c) {
+                            return c.dataset.label + ': ' + (c.parsed.y / 10000).toFixed(2) + '억 원 (' + c.parsed.y.toLocaleString() + '만원)';
+                        }
+                    }
+                },
+                legend: {
+                    position: 'bottom',
+                    labels: { boxWidth: 12, font: { size: 11, family: 'Pretendard' } }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 9 }, maxTicksLimit: 12 }
+                },
+                y: {
+                    grid: { color: 'rgba(226, 232, 240, 0.6)' },
+                    ticks: {
+                        font: { size: 10 },
+                        callback: function(v) { return (v / 10000).toFixed(1) + '억'; }
+                    }
+                }
+            }
+        }
+    });
+}
 
 function renderTimingAnalysis() {
     var cont = document.getElementById('timingContent');
@@ -1773,6 +2213,79 @@ function renderTimingAnalysis() {
     h += '      </ul>';
     h += '    </div>';
     h += '  </div>';
+    
+    // 🎯 [신규 기능] 단지별 매도 및 엑시트(Exit) 타이밍 진단표 (고점 매도 신호 스크리닝)
+    h += '  <div class="max-w-4xl mx-auto glass p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm space-y-5 text-left">';
+    h += '    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">';
+    h += '      <div>';
+    h += '        <span class="text-[9px] font-black text-rose-500 uppercase tracking-widest block">Exit & Selling Timing Matrix</span>';
+    h += '        <h3 class="text-base font-black text-slate-800 flex items-center gap-2">';
+    h += '          <i data-lucide="log-out" class="w-5 h-5 text-rose-600"></i> 단지별 고점 매도 및 엑시트(Exit) 적기 진단 매트릭스';
+    h += '        </h3>';
+    h += '        <p class="text-xs text-slate-400 mt-0.5">전고점 회복률, 호가 괴리율, 유동성 점수를 종합하여 지금 팔고 상급지로 점프해야 할 단지를 감지합니다.</p>';
+    h += '      </div>';
+    h += '      <span class="px-3 py-1 bg-rose-50 text-rose-600 border border-rose-200 rounded-full text-xs font-black self-start sm:self-auto">매도 신호 실시간 스크리닝</span>';
+    h += '    </div>';
+
+    h += '    <div class="overflow-x-auto">';
+    h += '      <table class="w-full text-xs text-left">';
+    h += '        <thead>';
+    h += '          <tr class="bg-slate-50 text-slate-500 font-black uppercase text-[10px] border-b border-slate-100">';
+    h += '            <th class="p-3">단지명</th>';
+    h += '            <th class="p-3 text-right">최근 실거래</th>';
+    h += '            <th class="p-3 text-right">전고점 회복률</th>';
+    h += '            <th class="p-3 text-right">호가 괴리율</th>';
+    h += '            <th class="p-3 text-center">매도 권장 신호</th>';
+    h += '            <th class="p-3">엑시트 및 갈아타기 전략 코멘트</th>';
+    h += '          </tr>';
+    h += '        </thead>';
+    h += '        <tbody class="divide-y divide-slate-100">';
+
+    var aptList = A || [];
+    aptList.forEach(function(apt) {
+        var d = data[apt.id] || {};
+        var curr = d.curr ? (d.curr / 10000).toFixed(1) + '억' : '-';
+        var ratio = d.ratio || 0;
+        var askGapPct = d.asking_gap_pct || 0;
+        
+        // 매도 신호 판정 로직
+        var sellSignal = '';
+        var sellBadge = '';
+        var sellComment = '';
+
+        if (ratio >= 105) {
+            sellSignal = '🚨 적극 매도 (신고가 차익 실현)';
+            sellBadge = 'bg-rose-50 text-rose-700 border-rose-300 font-black';
+            sellComment = '역대 최고가를 뚫고 전고점 대비 ' + ratio + '% 도달. 호가 과열 구간이므로 상급지 점프를 위한 최고가 털기 매도 최적기입니다.';
+        } else if (ratio >= 98) {
+            sellSignal = '📤 매도 고려 (전고점 탈출 찬스)';
+            sellBadge = 'bg-amber-50 text-amber-700 border-amber-200 font-bold';
+            sellComment = '전고점의 98% 이상을 회복하여 2021년 물림 물량이 모두 해소되었습니다. 추가 상승 시 추격보다는 익절 후 상급지 갈아타기를 추천합니다.';
+        } else if (ratio >= 90) {
+            sellSignal = '⚖️ 관망 / 가격 네고 대기';
+            sellBadge = 'bg-slate-100 text-slate-700 border-slate-200 font-medium';
+            sellComment = '시세가 90%대로 수렴 중입니다. 급매가 아니라면 상급지 가격 동향을 보며 매도 호가를 강하게 유지해 볼 만합니다.';
+        } else {
+            sellSignal = '⏳ 매도 보류 (저평가 구간)';
+            sellBadge = 'bg-blue-50 text-blue-700 border-blue-200 font-medium';
+            sellComment = '아직 회복률이 ' + ratio + '%로 낙폭이 남아있습니다. 지금 팔면 저가 매도 손실이 발생하므로 키맞추기 반등 시점까지 보유를 권장합니다.';
+        }
+
+        h += '          <tr class="hover:bg-slate-50/80 transition-colors">';
+        h += '            <td class="p-3 font-bold text-slate-800">' + apt.nm + ' <span class="text-[10px] text-slate-400 font-normal">(' + apt.dn + ')</span></td>';
+        h += '            <td class="p-3 text-right font-bold text-slate-900">' + curr + '</td>';
+        h += '            <td class="p-3 text-right font-black ' + (ratio >= 98 ? 'text-rose-600' : 'text-slate-700') + '">' + ratio + '%</td>';
+        h += '            <td class="p-3 text-right font-mono text-slate-500">' + (askGapPct >= 0 ? '+' : '') + askGapPct + '%</td>';
+        h += '            <td class="p-3 text-center"><span class="px-2.5 py-1 rounded-full text-[10px] border ' + sellBadge + '">' + sellSignal + '</span></td>';
+        h += '            <td class="p-3 text-[11px] text-slate-600 leading-relaxed max-w-xs">' + sellComment + '</td>';
+        h += '          </tr>';
+    });
+
+    h += '        </tbody>';
+    h += '      </table>';
+    h += '    </div>';
+    h += '  </div>';
+
     h += '</div>';
     cont.innerHTML = h;
     if(typeof lucide !== 'undefined') lucide.createIcons();
