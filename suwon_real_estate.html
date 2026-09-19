@@ -534,6 +534,8 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,sans-se
             </div>
         </div>
     </div>
+</div>
+
 <div id="p15" class="tab-page container mx-auto px-4 py-6 max-w-7xl hidden space-y-6">
     <div id="jumpContent" class="space-y-6"></div>
 </div>
@@ -1584,14 +1586,31 @@ function switchTab(t){
         btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     } catch(e) {}
 
-    if(target.func) target.func();
+    if(target.func) {
+        try {
+            target.func();
+        } catch(err) {
+            console.error("Tab render failed for [" + t + "]:", err);
+            var pageEl = document.getElementById(target.page);
+            if (pageEl && !pageEl.innerHTML.trim()) {
+                pageEl.innerHTML = '<div class="glass rounded-2xl p-8 text-center space-y-3 max-w-lg mx-auto">' +
+                    '<div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto text-xl font-bold">⚠️</div>' +
+                    '<h3 class="text-base font-bold text-slate-800">' + (target.title || t) + ' 화면 렌더링 준비 중</h3>' +
+                    '<p class="text-xs text-slate-500">데이터를 집계하거나 계산하는 중 일시적인 지연이 발생했습니다. 새로고침 후 다시 시도해 주세요.</p>' +
+                    '<button onclick="switchTab(\'' + t + '\')" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700">다시 시도</button>' +
+                    '</div>';
+            }
+        }
+    }
     window.scrollTo({top:0, behavior:'smooth'});
     
     // Update hash without jumping
     if(history.pushState) history.pushState(null, null, '#'+t);
     else location.hash = t;
     
-    if(typeof lucide !== 'undefined') lucide.createIcons();
+    try {
+        if(typeof lucide !== 'undefined') lucide.createIcons();
+    } catch(e) {}
 }
 
 function scrollNavTabs(offset) {
